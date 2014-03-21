@@ -88,11 +88,16 @@ $listing_attributes = PL_Shortcode_CPT::get_listing_attributes();
 								<?php if (!empty($atts['help'])):?>
 									<?php
 									if ($subcode=='custom' || $subcode=='if') {
-										if ($pl_shortcode == 'search_form') {
-											$atts['help'] = $atts['help'] . '<br />Click <a href="#" class="show_search_form_attributes">here</a> to see a list of available listing attributes.';
-										}
-										else {
-											$atts['help'] = $atts['help'] . '<br />Click <a href="#" class="show_listing_attributes">here</a> to see a list of available listing attributes.';
+										switch($pl_shortcode) {
+											case 'search_listings':
+											case 'static_listings':
+											case 'featured_listings':
+											case 'favorite_listings':
+												$atts['help'] = $atts['help'] . '<br />Click <a href="#" class="show_listing_attributes">here</a> to see a list of available listing attributes.';
+												break;
+											case 'search_form':
+												$atts['help'] = $atts['help'] . '<br />Click <a href="#" class="show_search_form_attributes">here</a> to see a list of available listing attributes.';
+												break;
 										}
 									}
 									?>
