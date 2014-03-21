@@ -746,7 +746,9 @@ class PL_Shortcode_CPT {
 		$form_types = $form_types['args']['attr_type']['options'];
 
 		foreach($config as $g_key => &$g_attrs) {
+
 			$group = '';
+			$search_form_group = '';
 			switch($g_key) {
 				case 'include_disabled':
 					continue;
@@ -754,12 +756,15 @@ class PL_Shortcode_CPT {
 				case 'location':
 				case 'rets':
 					$group = $g_key;
+					$search_form_group = $g_key;
 					break;
 				case 'metadata':
 					$group = 'cur_data';
+					$search_form_group = $g_key;
 					break;
 				case 'custom':
 					$group = 'uncur_data';
+					$search_form_group = 'metadata';
 					break;
 			}
 			if (!empty($g_attrs['type']) && $g_attrs['type']=='bundle') {
@@ -784,7 +789,7 @@ class PL_Shortcode_CPT {
 								}
 							}
 						}
-						$attrs[] = array_merge($f_attrs, array('attribute' => $f_attrs['key'], 'group' => $group, 'attr_type' => $attr_type, 'type' => $attr_type, 'cat'=>ucwords($attr_cat)));
+						$attrs[] = array_merge($f_attrs, array('attribute' => $f_attrs['key'], 'group' => $group, 'search_form_group' => $search_form_group, 'attr_type' => $attr_type, 'type' => $attr_type, 'cat'=>ucwords($attr_cat)));
 					}
 				}
 				continue;
@@ -794,7 +799,7 @@ class PL_Shortcode_CPT {
 					if (!empty($f_attrs['label']) && strpos($f_key, 'min_')!==0 && strpos($f_key, 'max_')!==0) {
 						$attr_type = isset($f_attrs['attr_type']) ? $f_attrs['attr_type'] : $f_attrs['type'];
 						$attr_cat = empty($f_attrs['cat']) ? $f_attrs['group'] : $f_attrs['cat'];
-						$attrs[] = array_merge($f_attrs, array('attribute' => $f_key, 'group' => $group, 'attr_type' => $attr_type, 'cat'=>ucwords($attr_cat)));
+						$attrs[] = array_merge($f_attrs, array('attribute' => $f_key, 'group' => $group, 'search_form_group' => $search_form_group, 'attr_type' => $attr_type, 'cat'=>ucwords($attr_cat)));
 					}
 				}
 			}
@@ -802,7 +807,7 @@ class PL_Shortcode_CPT {
 				if (!empty($g_attrs['label'])) {
 					$attr_type = isset($g_attrs['attr_type']) ? $g_attrs['attr_type'] : $g_attrs['type'];
 					$attr_cat = $g_attrs['group'];
-					$attrs[] = array_merge($g_attrs, array('attribute' => $g_key, 'group' => $group, 'attr_type' => $attr_type, 'cat'=>ucwords($attr_cat)));
+					$attrs[] = array_merge($g_attrs, array('attribute' => $g_key, 'group' => $group, 'search_form_group' => $search_form_group, 'attr_type' => $attr_type, 'cat'=>ucwords($attr_cat)));
 				}
 			}
 		}

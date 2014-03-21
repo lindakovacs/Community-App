@@ -16,7 +16,6 @@ $listing_attributes = PL_Shortcode_CPT::get_listing_attributes();
 	<h3>Create Shortcode Template</h3>
 
 	<div class="inside">
-
 		<!-- Template Type -->
 		<section class="row-fluid">
 
@@ -87,9 +86,14 @@ $listing_attributes = PL_Shortcode_CPT::get_listing_attributes();
 							<?php foreach($sct_args['subcodes'] as $subcode=>$atts): ?>
 								<?php $subcodes .= '<h4 class="subcode"><a href="#">[' . $subcode . ']</a></h4>';?>
 								<?php if (!empty($atts['help'])):?>
-									<?php 
+									<?php
 									if ($subcode=='custom' || $subcode=='if') {
-										$atts['help'] = $atts['help'] . '<br />Click <a href="#" class="show_listing_attributes">here</a> to see a list of available listing attributes.';
+										if ($pl_shortcode == 'search_form') {
+											$atts['help'] = $atts['help'] . '<br />Click <a href="#" class="show_search_form_attributes">here</a> to see a list of available listing attributes.';
+										}
+										else {
+											$atts['help'] = $atts['help'] . '<br />Click <a href="#" class="show_listing_attributes">here</a> to see a list of available listing attributes.';
+										}
 									}
 									?>
 									<?php $subcodes .= '<div class="description subcode-help">'. $atts['help'] .'</div>';?>
@@ -114,6 +118,26 @@ $listing_attributes = PL_Shortcode_CPT::get_listing_attributes();
 							<td>
 							<?php if ($attr['group']):?>
 								<?php echo $attr['group']?>
+							<?php endif;?>
+							</td>
+						</tr>
+					<?php endforeach;?>
+				</table>
+			</div>
+			<div id="search_form_attributes" style="display:none;">
+				<table>
+					<tr>
+						<th>Listing Field</th>
+						<th>Attribute</th>
+						<th>Group</th>
+					</tr>
+					<?php foreach($listing_attributes as $attr) :?>
+						<tr>
+							<td><strong><?php echo $attr['label']?></strong></td>
+							<td><?php echo $attr['attribute']?></td>
+							<td>
+							<?php if ($attr['search_form_group']):?>
+								<?php echo $attr['search_form_group']?>
 							<?php endif;?>
 							</td>
 						</tr>

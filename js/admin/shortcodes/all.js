@@ -463,6 +463,12 @@ jQuery(document).ready(function($){
 		$('#listing_attributes').dialog({modal: true, title: 'Lookup Listing Attribute', width: 'auto', height: 300});
 	});
 
+	// popup with list of attributes for search_form shortcode
+	$('.show_search_form_attributes').click(function(e){
+		e.preventDefault();
+		$('#search_form_attributes').dialog({modal: true, title: 'Lookup Listing Attribute', width: 'auto', height: 300});
+	});
+
 	// trigger an event to set up the preview pane on page load
 	$('#pl_sc_tpl_shortcode').trigger('change');
 
