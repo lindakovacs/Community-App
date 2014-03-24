@@ -61,7 +61,7 @@ class PL_Search_Listing_CPT extends PL_SC_Base {
 		'full_address'	=> array('help' => 'Full address'),
 		'email'			=> array('help' => 'Email address for this listing'),
 		'phone'			=> array('help' => 'Contact phone'),
-		'desc'			=> array('help' => 'Property description'),
+		'desc'			=> array('help' => 'Property description.  You can use the <code>maxlen</code> attribute to override default description length, for example: <code>[desc maxlen=\'140\']</code>'),
 		'image'			=> array('help' => 'Property thumbnail image. You can use <code>width</code> and <code>height</code> to set the dimensions of the thumbnail in pixels, for example: <code>[image width=\'180\' height=\'120\']</code>'),
 		'image_url'		=> array('help' => 'Image URL for the listing if one exists. You can use the optional <code>index</code> attribute (defaults to 0, the first image) to specify the index of the listing image and <code>placeholder</code> to specify the URL of an image to use if the listing does not have an image, for example: <code>[image_url index=\'1\' placeholder=\'http://www.domain.com/path/to/image\']</code>'),
 		'mls_id'		=> array('help' => 'MLS #'),
