@@ -41,7 +41,7 @@ class PL_Component_Entity {
 			'full_address'	=> array('help' => 'Full address'),
 			'email'			=> array('help' => 'Email address for this listing'),
 			'phone'			=> array('help' => 'Contact phone'),
-			'desc'			=> array('help' => 'Property description'),
+			'desc'			=> array('help' => 'Property description.  You can use the <code>maxlen</code> attribute to override default description length, for example: <code>[desc maxlen=\'140\']</code>'),
 			'image'			=> array('help' => 'First property image'),
 			'image_url'		=> array('help' => 'Image URL for the listing if one exists. You can use the optional <code>index</code> attribute (defaults to 0, the first image) to specify the index of the listing image and <code>placeholder</code> to specify the URL of an image to use if the listing does not have an image, for example: <code>[image_url index=\'1\' placeholder=\'http://www.domain.com/path/to/image\']</code>'),
 			'mls_id'		=> array('help' => 'MLS #'),
@@ -539,8 +539,14 @@ To add some text to your listings:<br />
 		// TODO: make this more elegant...
 		switch ($tag) {
 			case 'desc':
-				$max_len = !empty($atts['maxlen']) ? (int)$atts['maxlen'] : 500;
-				$val = substr($val, 0, $max_len);
+				// default is to use full description for Listing Detail Template
+				if ( !empty($atts['maxlen']) ) {
+					// use max length attribute if present
+					$val = substr($val, 0, (int)$atts['maxlen']);
+				} else if ( !is_single() ) {
+					// restrict display for search_results and static_listings to 15 words
+					$val = wp_trim_words($val, 15, '...');
+				}
 				break;
 			case 'image':
 				$width = !empty($atts['width']) ? (int)$atts['width'] : 180;
