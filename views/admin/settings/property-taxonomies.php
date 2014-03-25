@@ -42,6 +42,8 @@ $post_type = 'property';
 add_screen_option('per_page', array('label' => 'Per page', 'default' => 20, 'option' => 'edit_' . $tax->name . '_per_page'));
 $action = $wp_list_table->current_action();
 $message = isset($_REQUEST['message']) ? (int)$_REQUEST['message'] : 0;
+$error = false;
+$message_str = '';
 
 switch ($action) {
 
@@ -54,14 +56,39 @@ case 'add-tag':
 		$message = 7;
 	}
 	else {
+		$_POST['slug'] = sanitize_title($_POST['tag-name']);
 		$ret = wp_insert_term($_POST['tag-name'], $taxonomy, $_POST);
 		$location = "$pagenow?page=$page&taxonomy=$taxonomy";
-		if ($ret && !is_wp_error($ret)) {
-			$location = add_query_arg('message', 1, $location);
+		if ($ret) {
+			if (is_wp_error($ret)) {
+				$message_str = $ret->get_error_message();
+			}
+			else {
+				$term = get_term($ret['term_id'], $taxonomy);
+				if ($term->slug == $_POST['slug']) {
+					$location = add_query_arg('message', 1, $location);
+					wp_redirect( $location );
+					exit;
+				}
+				// WP has a bug where there can be only one term name for a term slug, so if the slug is already used with a different name
+				// we cannot create our term.
+				wp_delete_term($ret['term_id'], $taxonomy);
+				$error = true;
+				$taxonomies = get_taxonomies(array('show_ui' => true), 'objects');
+				$message_str = "Unable to create the location page because the slug \"{$_POST['slug']}\" is in use with a name other than \"{$_POST['tag-name']}\"!<br>";
+				foreach ($taxonomies as $tax_type => $tax) {
+					// try to find where the slug has been used so we can help the user fix it
+					$term = get_term_by('slug', $_POST['slug'], $tax_type);
+					if ($term && !is_wp_error($term)) {
+						$tax_name = ($tax_type == 'post_tag' || $tax_type == 'category' ? 'Post ' : '').$tax->labels->singular_name;
+						$message_str .= "The {$tax_name} item \"$term->name\" is using the slug \"{$_POST['slug']}\". Please rename it to \"{$_POST['tag-name']}\" or change its slug. ";
+						$message_str .= "Click <a href=\"".admin_url('edit-tags.php?action=edit&tag_ID='.$term->term_id.'&taxonomy='.$tax_type)."\" target=\"_blank\">here</a> to edit it.<br/>";
+					}
+				}
+			}
 		} else {
-			$location = add_query_arg('message', 4, $location);
+			$message = 4;
 		}
-		wp_redirect( $location );
 	}
 	break;
 
@@ -131,14 +158,21 @@ if (!current_user_can($tax->cap->edit_terms)) {
 }
 
 $locations = (array)PL_Listing_Helper::locations_for_options();
+$curr_locations = array();
 if (empty($locations[$taxlist[$taxonomy]])) {
 	$locations = array();
 }
 else {
 	$locations = $locations[$taxlist[$taxonomy]];
 	sort($locations);
+	$terms = get_terms($taxonomy, array('offset'=>0, 'hide_empty'=>0));
+	foreach($terms as $term) {
+		$curr_locations[] = $term->name;
+	}
 }
+$_POST += array('tag-name'=>'', 'description'=>'');
 
+$messages = array();
 $messages[1] = __('Item added.');
 $messages[2] = __('Item deleted.');
 $messages[3] = __('Item updated.');
@@ -146,6 +180,9 @@ $messages[4] = __('Item not added.');
 $messages[5] = __('Item not updated.');
 $messages[6] = __('Items deleted.');
 $messages[7] = __('No item selected.');
+$error = $error || in_array($message, array(4, 5, 7)); 
+$message_str = $message_str ? $message_str : ($message ? $messages[$message] : '');
+
 ?>
 <div class="wrap nosubsub">
 	<?php echo PL_Helper_Header::pl_settings_subpages(); ?>
@@ -175,8 +212,8 @@ $messages[7] = __('No item selected.');
 		<?php printf('<span class="subtitle">' . __('Search results for &#8220;%s&#8221;') . '</span>', esc_html(stripslashes($_REQUEST['s']))); ?>
 	<?php endif ?>
 	</h3>
-	<?php if ($message) : ?>
-	<div id="message" class="updated"><p><?php echo $messages[$message]; ?></p></div>
+	<?php if ($message_str) : ?>
+	<div id="message" class="<?php echo ($error ? 'error' : 'updated') ?>"><p><?php echo $message_str; ?></p></div>
 	<?php $_SERVER['REQUEST_URI'] = remove_query_arg(array('message'), $_SERVER['REQUEST_URI']);
 	endif; ?>
 	<div id="ajax-response"></div>
@@ -229,14 +266,14 @@ $messages[7] = __('No item selected.');
 									<option value="">Select</option>
 									<?php foreach($locations as $location):?>
 										<?php if (trim($location)!=''):?>
-											<option><?php echo $location ?></option>
+											<option <?php echo ($location == $_POST['tag-name'] ? 'selected="selected"' : '') ?> <?php echo (in_array($location, $curr_locations) ? 'disabled="disabled"' : '') ?>><?php echo $location ?></option>
 										<?php endif ?>
 									<?php endforeach;?>
 								</select>
 							</div>
 							<div class="form-field">
 								<label for="tag-description"><?php _ex('Description', 'Taxonomy Description'); ?></label>
-								<textarea name="description" id="tag-description" rows="5" cols="40"></textarea>
+								<textarea name="description" id="tag-description" rows="5" cols="40"><?php echo $_POST['description'] ?></textarea>
 								<p><?php _e('The description is not prominent by default; however, some themes may show it.'); ?></p>
 							</div>
 		
