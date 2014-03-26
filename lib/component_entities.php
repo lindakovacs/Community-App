@@ -908,7 +908,16 @@ To add some text to your listings:<br />
 								echo 'listings.default_filters.push( { "name": "' . $key . '['.$key2.'_match]", "value" : "in" } );';
 							}
 							elseif (!empty($av_filters[$key1.'.'.$key2]['type']) && ($av_filters[$key.'.'.$key2]['type']=='text'|| $av_filters[$key.'.'.$key2]['type']=='textarea')) {
-								echo 'listings.default_filters.push( { "name": "' . $key . '['.$key2.'_match]", "value" : "like" } );';
+								// perform an exact match for agent and office id
+								switch($key2) {
+									case 'aid':
+									case 'oid':
+										$match_by = 'exact';
+										break;
+									default:
+										$match_by = 'like';
+								}
+								echo 'listings.default_filters.push( { "name": "' . $key . '['.$key2.'_match]", "value" : "'. $match_by . '" } );';
 							}
 						}
 					}
