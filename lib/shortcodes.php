@@ -386,7 +386,15 @@ class PL_Shortcodes
 		}
 		else {
 			if (!empty($av_filters[$av_filter]['type']) && ($av_filters[$av_filter]['type']=='text' || $av_filters[$av_filter]['type']=='textarea')) {
-				$jsfilter .= apply_filters('pl_filter_wrap_filter', "{ 'name': '" . $filterlogic . "', 'value' : 'like'} ");
+				switch ($av_filters[$av_filter]['attribute']) {
+					case 'aid':
+					case 'oid':
+						$match_by = 'exact';
+						break;
+					default:
+						$match_by = 'like';
+				}
+				$jsfilter .= apply_filters('pl_filter_wrap_filter', "{ 'name': '$filterlogic', 'value' : '$match_by'} ");
 			}
 			$jsfilter .= apply_filters('pl_filter_wrap_filter', "{ 'name': '" . $filterstr . "', 'value' : '" . $value . "'} ");
 		}
