@@ -67,7 +67,7 @@ class PL_Sitemaps {
 				}
 			}
 			// location taxonomy
-			$response = PL_Listing::locations();
+			$response = PL_Listing_Helper::locations_for_options(false, true);
 			foreach (self::$supported_taxonomies as $tax=>$loc_type) {
 				if (!empty($response[$loc_type]) && (!isset($seo_options["taxonomies-$tax-not_in_sitemap"]) || !$seo_options["taxonomies-$tax-not_in_sitemap"])) {
 					$count = count($response[$loc_type]);
@@ -178,7 +178,7 @@ class PL_Sitemaps {
 			$rem = self::$max_entries;
 			$date = date('c', time() - 24 * 60 * 60);
 
-			$response = PL_Listing::locations();
+			$response = PL_Listing_Helper::locations_for_options(false, true);
 
 			if (!empty($response[$loc_type]) && count($response[$loc_type]) > $offset) {
 				$rem = min(array($rem, count($response[$loc_type])-$offset));
