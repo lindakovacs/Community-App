@@ -236,6 +236,14 @@ $PL_API_LISTINGS = array(
                 	'type' => 'date', 
                 	'group' => 'basic', 
                 ),
+                'lst_dte' => array(
+                	'attr_type' => 'date',
+                	'label' => 'List Date',
+                	'label_max' => 'Latest List Date',
+                	'label_min' => 'Earliest List Date',
+                	'type' => 'date', 
+                	'group' => 'basic', 
+                ),
                 'lt_sz' => array(
                 	'attr_type' => 'int',
                 	'label' => 'Lot Size',
@@ -313,6 +321,7 @@ $PL_API_LISTINGS = array(
                 'sqft' => false,
                 'baths' => false,
                 'avail_on' => false,
+                'lst_dte' => false,
                 'beds' => false,
                 'url' => false,
                 'desc' => false,
