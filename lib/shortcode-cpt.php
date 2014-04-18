@@ -382,7 +382,7 @@ class PL_Shortcode_CPT {
 							if(!empty($args[$option])) {
 								$val = $args[$option];
 							}
-							update_post_meta( $id, $key, json_encode($val) );
+							update_post_meta( $id, $key, json_encode($val, JSON_HEX_APOS) );
 							break;
 						case 'select':
 						default:
