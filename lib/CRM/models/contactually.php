@@ -277,7 +277,7 @@ class PL_CRM_Contactually extends PL_CRM_Base {
 		// Can't do this until Contactually actually documents their API properly AND gives us the ability to
 		// create a contact along with appropriate tags, notes + identify the correct bucket in a single call...
 
-		$response = $this->callAPI("contacts", "POST", array("body" => $contact));
+		$response = $this->callAPI("contacts", "POST", array("body" => array("contact" => $contact)));
 
 		return $response;
 	}
