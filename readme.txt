@@ -2,8 +2,8 @@
 Contributors: Placester, MattBarba
 Tags: real estate, realestate, home, housing, rentals, properties, neighborhood, map, mortgage, listing, listings, craigslist, rental, google map, mls, idx, rets, agent, broker, leasing, realty, realtor, placester, widget, buddypress, homes, property, property management, estate, realestate, real estate crm, real estate maps
 Requires at least: 3.0
-Tested up to: 3.7.1
-Stable tag: 1.1.27
+Tested up to: 3.9
+Stable tag: 1.2.0
 
 Easily create and manage real estate sites powered by WordPress.
 
@@ -29,7 +29,7 @@ From the creators of http://placester.com: Create your fully functional real est
 This is the only plugin you need to create a powerful WordPress powered real estate website. Watch our quick demo about how to get started:
 http://www.youtube.com/watch?v=a6sJi4iXObU&feature=plcp
 
-**Getting Started without a Non-Placester Theme**
+**Getting Started with a Non-Placester Theme**
 http://www.youtube.com/watch?v=pBneS5LjuNU&feature=player_embedded
 
 
@@ -54,7 +54,7 @@ Find the latest themes and theme updates at [Placester.com/portfolio/](https://p
 * Powerful search based on the Placester API and Google Maps
 * Easily promote featured properties across your site
 * Search engine optimized from top to bottom ^
-* Always up-to-date, Placester automatically update itself with the the latest listings data
+* Always up-to-date, Placester automatically updates itself with the the latest listings data
 
 Note ^: Feature requires a Placester-enabled theme.
 
@@ -141,6 +141,13 @@ Absolutely, [reach out](mailto:support@placester.com) to us and let us know what
 In general - real-time. But if you use 3rd party property management services, the updates will only be as recent as your provider allows.
 
 == Changelog ==
+
+= 1.2.0 =
+* The default location for search result maps is now determined from the user or office address on the Placester.com account
+* The [desc] shortcode tag now renders the full description on property detail pages, a shorter excerpt on search pages
+* Fixes:
+    * Updated the CRM interface to Contactually to reflect the new format of their API call
+    * Miscellaneous minor fixes to improve the clarity and robustness of Placester shortcodes
 
 = 1.1.27 =
 * Virtual property posts and terms have been introduced to greatly increase performance and vastly decrease what's stored in the DB
