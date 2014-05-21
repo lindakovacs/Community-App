@@ -3,19 +3,19 @@
 	$themes = array(
 		"Columbus" => array(
 			"download_link" => "http://plcstr.com/14Ka7ic",
-			"info_link" => "https://placester.com/wordpress-themes/#columbus"
+			"info_link" => "https://placester.com/wordpress-themes/columbus"
 		),
 		"Manchester" => array(
 			"download_link" => "http://plcstr.com/1237uEg",
-			"info_link" => "https://placester.com/wordpress-themes/#manchester"
+			"info_link" => "https://placester.com/wordpress-themes/manchester"
 		),
 		"Tampa" => array(
 			"download_link" => "http://plcstr.com/16Jco9m",
-			"info_link" => "https://placester.com/wordpress-themes/#tampa"
+			"info_link" => "https://placester.com/wordpress-themes/tampa"
 		),
 		"Ventura" => array(
 			"download_link" => "http://plcstr.com/17LXH4m",
-			"info_link" => "https://placester.com/wordpress-themes/#ventura"
+			"info_link" => "https://placester.com/wordpress-themes/ventura"
 		)	
 	);
 
