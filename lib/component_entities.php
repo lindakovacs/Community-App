@@ -1406,7 +1406,7 @@ To add some text to your listings:<br />
 						<?php if (!empty($group['listings'])):?>
 						list: list,
 						<?php endif ?>
-						disable_saved_search: <?php echo count(self::$shortcode_groups)>1 ? '1' : '0' ?>,
+						disable_saved_search: 1, // always // <?php echo count(self::$shortcode_groups)>1 ? '1' : '0' ?>,
 						<?php if (!empty($group['map'])):?>
 						map: map,
 						<?php endif ?>
