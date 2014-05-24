@@ -209,6 +209,14 @@ class PL_Listing_Helper {
 			}
 		}
 
+		// Transfer over control flags...
+		$flags = array('agency_only', 'non_import', 'include_disabled');
+		foreach ($flags as $key) {
+			if (!empty($_POST[$key])) {
+				$args[$key] = $_POST[$key];
+			}
+		}
+
 		// Transfer over pertinent groups of args...
 		$arg_groups = array('zoning_types', 'purchase_types', 'property_type', 'location', 'rets', 'metadata', 'custom');
 		foreach ($arg_groups as $key) {

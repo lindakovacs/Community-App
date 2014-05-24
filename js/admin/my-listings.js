@@ -147,22 +147,30 @@ jQuery(document).ready(function($) {
 	function my_listings_search_params (aoData) {
 		var formAdditions = new Array();
 		$.each($('#pls_admin_my_listings:visible').serializeArray(), function(i, field) {
-			if( field.name == 'zoning_types' || field.name == 'listing_types' || field.name == 'purchase_types' ) {
-				// API expects these to be arrays
-				aoData.push({"name" : field.name + "[]", "value" : field.value});
-			} else {
-				aoData.push({"name" : field.name, "value" : field.value});
-			}
-			// if this is an array then tell the api to look for multiple values
-			if( field.name.slice(-2) == '[]' ) {
-				if ( $.inArray(field.name, formAdditions) == -1) {
-					formAdditions.push(field.name);
-					var matchname = field.name.slice(0, -2);
-					matchname = matchname.slice(-1) == ']' ? matchname.slice(0,-1)+'_match]' : matchname+'_match';
-					aoData.push({name: matchname, value: 'in'});
+
+			// only push the criteria we need for the call
+			if(field.value && field.value != 'false') {
+				if(field.value == 'true') field.value = 1;
+
+				if( field.name == 'zoning_types' || field.name == 'listing_types' || field.name == 'purchase_types' ) {
+					// API expects these to be arrays
+					aoData.push({"name" : field.name + "[]", "value" : field.value});
+				} else {
+					aoData.push({"name" : field.name, "value" : field.value});
+				}
+
+				// if this is an array then tell the api to look for multiple values
+				if( field.name.slice(-2) == '[]' ) {
+					if ( $.inArray(field.name, formAdditions) == -1) {
+						formAdditions.push(field.name);
+						var matchname = field.name.slice(0, -2);
+						matchname = matchname.slice(-1) == ']' ? matchname.slice(0,-1)+'_match]' : matchname+'_match';
+						aoData.push({name: matchname, value: 'in'});
+					}
 				}
 			}
 		});
+
 		return aoData;
 	}
 });
