@@ -142,6 +142,8 @@ class PL_Option_Helper {
 		$r2  = PL_Options::get('pls_default_longitude');
 		if ($r1 && $r2) { return array('lat' => $r1, 'lng' => $r2); }
 
+		$default = array('lat' => 42.3596681, 'lng' => -71.0599325);
+
 		$response = PL_Helper_User::whoami();
 		if ($response) {
 
@@ -154,8 +156,14 @@ class PL_Option_Helper {
 					return array('lat' => $lat, 'lng' => $lng);
 				}
 
-				$address = $loc['address'] . " " . $loc['locality'] . ", " . $loc['region'];
-				if ($geo = self::geocode_address($address)) {
+				if($loc['locality'] && $loc['region']) {
+					$address = $loc['address'] . " " . $loc['locality'] . ", " . $loc['region'];
+
+					if (!($geo = self::geocode_address($address))) {
+						$geo = $default;
+					}
+
+					// only try to geocode once, whether successful or not
 					self::set_default_location ($geo);
 					return $geo;
 				}
@@ -170,8 +178,13 @@ class PL_Option_Helper {
 					return array('lat' => $lat, 'lng' => $lng);
 				}
 
-				$address = $loc['address'] . " " . $loc['locality'] . ", " . $loc['region'];
-				if ($geo = self::geocode_address($address)) {
+				if($loc['locality'] && $loc['region']) {
+					$address = $loc['address'] . " " . $loc['locality'] . ", " . $loc['region'];
+					if (!($geo = self::geocode_address($address))) {
+						$geo = $default;
+					}
+
+					// only try to geocode once, whether successful or not
 					self::set_default_location ($geo);
 					return $geo;
 				}
@@ -179,7 +192,7 @@ class PL_Option_Helper {
 		}
 
 		// default
-		return array('lat' => 42.3596681, 'lng' => -71.0599325);
+		return $default;
 	}
 
 	private static function geocode_address ($address) {
