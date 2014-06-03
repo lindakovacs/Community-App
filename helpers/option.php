@@ -144,6 +144,9 @@ class PL_Option_Helper {
 
 		$default = array('lat' => 42.3596681, 'lng' => -71.0599325);
 
+		// bail out here without attempting lookup -- disabled until we get google geocoding api issue cleared up
+		return $default;
+
 		$response = PL_Helper_User::whoami();
 		if ($response) {
 
