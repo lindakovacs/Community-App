@@ -138,14 +138,22 @@ class PL_Option_Helper {
 	}
 
 	public static function get_default_location () {
+		$geo_default = array('lat' => 42.3596681, 'lng' => -71.0599325);
+		$geo_error = array('lat' => 42.3596680, 'lng' => -71.0599326);
+
 		$r1 = PL_Options::get('pls_default_latitude');
 		$r2  = PL_Options::get('pls_default_longitude');
-		if ($r1 && $r2) { return array('lat' => $r1, 'lng' => $r2); }
+		$geo_option = array('lat' => $r1, 'lng' => $r2);
 
-		$default = array('lat' => 42.3596681, 'lng' => -71.0599325);
+		if($geo_option != $geo_default) {
+			if ($r1 && $r2) { return $geo_option; } }
 
-		// bail out here without attempting lookup -- disabled until we get google geocoding api issue cleared up
-		return $default;
+		// partition the geocoding calls out over a week -- temporary
+		if(!($api_key = self::api_key())) return $geo_default;
+		$modulus = ((array_sum(array_map("ord", str_split($api_key))) % 7) + 1);
+		if($modulus != date('N')) {
+			return $geo_default;
+		}
 
 		$response = PL_Helper_User::whoami();
 		if ($response) {
@@ -163,10 +171,11 @@ class PL_Option_Helper {
 					$address = $loc['address'] . " " . $loc['locality'] . ", " . $loc['region'];
 
 					if (!($geo = self::geocode_address($address))) {
-						$geo = $default;
+						$geo = $geo_error;
 					}
 
 					// only try to geocode once, whether successful or not
+					file_put_contents('/var/tmp/geocode-requests.log', date('Y-m-d H:i:s') . ' placester/option.php' . (!empty($geo) ? ('         ' . implode(', ', $geo)) : '') . "\n", LOCK_EX | FILE_APPEND);
 					self::set_default_location ($geo);
 					return $geo;
 				}
@@ -184,10 +193,11 @@ class PL_Option_Helper {
 				if($loc['locality'] && $loc['region']) {
 					$address = $loc['address'] . " " . $loc['locality'] . ", " . $loc['region'];
 					if (!($geo = self::geocode_address($address))) {
-						$geo = $default;
+						$geo = $geo_error;
 					}
 
 					// only try to geocode once, whether successful or not
+					file_put_contents('/var/tmp/geocode-requests.log', date('Y-m-d H:i:s') . ' placester/option.php' . (!empty($geo) ? ('         ' . implode(', ', $geo)) : '') . "\n", LOCK_EX | FILE_APPEND);
 					self::set_default_location ($geo);
 					return $geo;
 				}
@@ -195,7 +205,7 @@ class PL_Option_Helper {
 		}
 
 		// default
-		return $default;
+		return $geo_default;
 	}
 
 	private static function geocode_address ($address) {
@@ -205,12 +215,11 @@ class PL_Option_Helper {
 			return null;
 
 		$body = json_decode($result['body']);
-		$loc = array(
-			'lat' => $body->results[0]->geometry->location->lat,
-		  'lng' => $body->results[0]->geometry->location->lng);
-
-		if (isset($loc) && isset($loc['lat']) && isset($loc['lng']))
-			return $loc;
+		if(isset($body->results) && isset($body->results[0]) && isset($body->results[0]->geometry)) {
+			return array(
+				'lat' => $body->results[0]->geometry->location->lat,
+				'lng' => $body->results[0]->geometry->location->lng);
+		}
 
 		return null;
 	}
