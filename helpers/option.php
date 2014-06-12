@@ -148,13 +148,6 @@ class PL_Option_Helper {
 		if($geo_option != $geo_default) {
 			if ($r1 && $r2) { return $geo_option; } }
 
-		// partition the geocoding calls out over a week -- temporary
-		if(!($api_key = self::api_key())) return $geo_default;
-		$modulus = ((array_sum(array_map("ord", str_split($api_key))) % 7) + 1);
-		if($modulus != date('N')) {
-			return $geo_default;
-		}
-
 		$response = PL_Helper_User::whoami();
 		if ($response) {
 
