@@ -95,11 +95,9 @@ class PL_Cache {
  */
 
 	public static function allow_caching() {
-		// Allow caching as long as user is not an admin AND is not in the admin panel...
-		// return ( !current_user_can('manage_options') && !is_admin() );
-		
-		// For now, refuse caching for ALL authenticated users + devs with debug turned on...
-		return ( !is_user_logged_in() && !defined('PL_DISABLE_CACHE') );
+		// Caching is off by default, but enabled within our hosting environment
+		// For now, we disable caching for admins and other authenticated users
+		return ( !is_user_logged_in() && defined('PL_ENABLE_CACHE') );
 	}
 
 	public static function build_cache_key ($group, $func_args = array()) {
