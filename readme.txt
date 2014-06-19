@@ -3,7 +3,7 @@ Contributors: Placester, MattBarba
 Tags: real estate, realestate, home, housing, rentals, properties, neighborhood, map, mortgage, listing, listings, craigslist, rental, google map, mls, idx, rets, agent, broker, leasing, realty, realtor, placester, widget, buddypress, homes, property, property management, estate, realestate, real estate crm, real estate maps
 Requires at least: 3.0
 Tested up to: 3.9
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 
 Easily create and manage real estate sites powered by WordPress.
 
@@ -141,6 +141,12 @@ Absolutely, [reach out](mailto:support@placester.com) to us and let us know what
 In general - real-time. But if you use 3rd party property management services, the updates will only be as recent as your provider allows.
 
 == Changelog ==
+
+= 1.2.1 =
+* Turned caching off by default for off-hosted users (enabled in wp-config)
+* Fixed Inactive, Agency, Non-MLS flags on plugin Listings page
+* Disabled permalink URL generation for shortcodes
+* Fixed links to Placester.com theme gallery
 
 = 1.2.0 =
 * The default location for search result maps is now determined from the user or office address on the Placester.com account
