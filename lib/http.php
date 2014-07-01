@@ -98,7 +98,6 @@ Class PL_HTTP extends WP_Http {
 		$wp_http = self::_get_object();
 
 		switch ($method) {
-			case 'POST':
 			case 'PUT':
 				$response = $wp_http->post($url, array('body' => $request_string, 'timeout' => self::$timeout, 'method' => $method));
 				if ( is_array($response) && isset($response['body']) ) {
@@ -114,6 +113,7 @@ Class PL_HTTP extends WP_Http {
 				return false;
 
 			case 'GET':
+			case 'POST':
 				$cache = new PL_Cache('http');
 				if ($allow_cache && $transient = $cache->get($url . $request_string)) {
 					// error_log('From cache:  ' . $url . $request_string);
@@ -121,9 +121,13 @@ Class PL_HTTP extends WP_Http {
 				}
 
 				else {
-					$response = $wp_http->get($url . '?' . $request_string, array('timeout' => self::$timeout));
+					if($method == 'GET') {
+						$response = $wp_http->get($url . '?' . $request_string, array('timeout' => self::$timeout));
+					}
+					else {
+						$response = $wp_http->post($url, array('body' => $request_string, 'timeout' => self::$timeout));
+					}
 
-					// error_log($url . "?" . $request_string);
 					// error_log(var_export($response, true));
 
 					if ( (is_array($response) && isset($response['headers']) && isset($response['headers']['status'])) || $force_return) {
