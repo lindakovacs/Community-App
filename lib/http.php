@@ -78,15 +78,24 @@ Class PL_HTTP extends WP_Http {
 	public static function send_request ($url, $request, $method = 'GET', $allow_cache = true, $allow_empty_values = false, $force_return = false, $use_encoding = true) {
 
 		$request_string = self::build_request($request, $allow_empty_values);
-	    // error_log($url);
-	    // error_log($request_string);
-	    if (!$use_encoding) {
-	    	$request_string = urldecode($request_string);
-	    }
-	    // error_log(var_export(debug_backtrace(), true));
-	    // error_log("Endpoint Logged As: {$method} {$url}?{$request_string}");
 
-	    $wp_http = self::_get_object();
+		// error_log($url);
+		// error_log($request_string);
+
+		if (!$use_encoding) {
+			$request_string = urldecode($request_string);
+		}
+
+		// NGINX is currently configured with an 8k limit, so 8000 leaves some space for the domain and document
+		// -- the Rails Data API v2.1/listings endpoint can handle either GET or POST
+		if ($method == 'GET' && strlen($request_string) > 8000) {
+			$method = 'POST';
+		}
+
+		// error_log(var_export(debug_backtrace(), true));
+		// error_log("Endpoint logged as: {$method} {$url}?{$request_string}");
+
+		$wp_http = self::_get_object();
 
 		switch ($method) {
 			case 'POST':
@@ -105,34 +114,36 @@ Class PL_HTTP extends WP_Http {
 				return false;
 
 			case 'GET':
-			default:
 				$cache = new PL_Cache('http');
 				if ($allow_cache && $transient = $cache->get($url . $request_string)) {
-					// error_log('Cached!!!!!:  ' . $url . $request_string);
+					// error_log('From cache:  ' . $url . $request_string);
 					return $transient;
 				}
+
 				else {
-	            	$response = $wp_http->get($url . '?' . $request_string, array('timeout' => self::$timeout));
+					$response = $wp_http->get($url . '?' . $request_string, array('timeout' => self::$timeout));
 
-	            	// error_log($url . "?" . $request_string);
-	        		// error_log(var_export($response, true));
+					// error_log($url . "?" . $request_string);
+					// error_log(var_export($response, true));
 
-					if ( (is_array($response) && isset($response['headers']) && isset($response['headers']['status']) && $response['headers']['status'] == 200) || $force_return) {
-						if (!empty($response['body'])) {
+					if ( (is_array($response) && isset($response['headers']) && isset($response['headers']['status'])) || $force_return) {
+						if ($response['headers']['status'] == 200 && !empty($response['body'])) {
 							$body = json_decode($response['body'], true);
 							$cache->save($body, PL_Cache::TTL_HOURS);
 							return $body;
+
 						} else {
-							return false;
+							// error_log("Server returned: {$response['headers']['status']} {$response['body']}.");
 						}
 					}
 					else {
-						// error_log("------- ERROR VALIDATING REQUEST. --------");
-						return false;
+						// error_log("Error processing response.");
 					}
+				}
+				return false;
 
-	        	}
-				break;
+			default:
+				return false;
 		}
 	}
 
