@@ -9,6 +9,7 @@
         <div class="clear"></div>
         <div id="fileupload-holder-message">
             <?php if (isset($images)): ?>
+            <?php usort($images, function ($a, $b) { return $a['order'] < $b['order'] ? -1 : 1; }); ?>
                 <?php foreach ($images as $key => $image): ?>
                 <li class="image_container">
                     <div>
