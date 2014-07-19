@@ -32,9 +32,8 @@ class PL_Membership {
 
 	public static function get_client_area_url () {
 		global $wpdb;
-		$page_id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_name = 'client-profile'");
-		
-        return $page_id ? get_permalink($page_id) : '';
+		$page_id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_name = 'client-profile' AND post_status = 'publish'");
+		return $page_id ? get_permalink($page_id) : '';
 	}
 
 	// Callback function for when the frontend lead register form is submitted
@@ -478,8 +477,9 @@ class PL_Membership {
 			</div>
 			<?php
 			$result = ob_get_clean();
-		} 
-        else {
+		}
+
+		else {
 			ob_start();
 			?>
 				<div style="display:none">
@@ -495,149 +495,159 @@ class PL_Membership {
 	}
 
 	/**
+	 * Creates a login form
+	 *
+	 */
+	public static function generate_login_form ()
+	{
+		if ( !is_user_logged_in() ) {
+			ob_start();
+			?>
+			<div style='display:none;'>
+				<form name="pl_login_form" id="pl_login_form" action="<?php echo home_url(); ?>/wp-login.php" method="post" class="pl_login_reg_form">
+
+					<?php pls_do_atomic( 'login_form_before_title' ); ?>
+
+					<div id="pl_login_form_inner_wrapper">
+						<h2>Login</h2>
+						<!-- redirect-uri="<?php //echo $_SERVER["HTTP_REFERER"]; ?>" -->
+						<!-- <fb:registration fields="name,location,email" width="260"></fb:registration> -->
+
+						<?php pls_do_atomic( 'login_form_before_email' ); ?>
+
+						<p class="login-username">
+							<label for="user_login">Email</label>
+							<input type="text" name="user_login" id="user_login" class="input" required="required" value="" tabindex="20" data-message="A valid email is needed" placeholder="Email" />
+						</p>
+
+						<?php pls_do_atomic( 'login_form_before_password' ); ?>
+
+						<p class="login-password">
+							<label for="user_pass">Password</label>
+							<input type="password" name="user_pass" id="user_pass" class="input" required="required" value="" tabindex="21" data-message="A password is needed" placeholder="Password" />
+						</p>
+
+						<?php pls_do_atomic( 'login_form_before_remember' ); ?>
+
+						<p class="login-remember">
+							<label><input name="rememberme" type="checkbox" id="rememberme" value="forever" tabindex="22" /> Remember Me</label>
+						</p>
+
+						<?php pls_do_atomic( 'login_form_before_submit' ); ?>
+
+						<p class="login-submit">
+							<input type="submit" name="wp-submit" id="wp-submit" class="button-primary" value="Log In" tabindex="23" />
+							<input type="hidden" name="redirect_to" value="<?php echo $_SERVER['REQUEST_URI']; ?>" />
+						</p>
+
+						<?php pls_do_atomic( 'before_login_title' ); ?>
+
+					</div>
+
+				</form>
+			</div>
+			<?php
+			$result = ob_get_clean();
+		}
+
+		else {
+			ob_start();
+			?>
+				<div style="display:none">
+					<div class="pl_error error" id="pl_lead_register_form">
+						You cannot login if you are already logged in. You shouldn't even see a "Login" link.
+					</div>
+				</div>
+			<?php
+			$result = ob_get_clean();
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Adds "Login | Register" if not logged in
 	 * or "Logout | My account" if logged in
 	 *
-	 * TODO If logged in and not lead display something informing them
-	 * of what they need to do to register a lead account
 	 */
 	public static function placester_lead_control_panel ($args) {
-    	$fb_registered = false;
-    	// Capture users that just logged on w/ FB registration
-    	// if (isset($_POST['signed_request'])) {
-    	//   $fb_registered = true;
-    	//   $signed_request = self::fb_parse_signed_request($_POST['signed_request'], false);
-    	// }
+		$defaults = array(
+			'loginout' => true,
+			'profile' => true,
+			'register' => true,
+			'container_tag' => false,
+			'container_class' => false,
+			'anchor_tag' => false,
+			'anchor_class' => false,
+			'separator' => ' | ',
+			'inside_pre_tag' => false,
+			'inside_post_tag' => false,
+			'no_forms' => false // use this to return just the links. Do this for all calls to this function after the first on a page.
+		);
+		$args = wp_parse_args( $args, $defaults );
+		extract( $args, EXTR_SKIP );
 
-    	$defaults = array(
-    		'loginout' => true,
-    		'profile' => true,
-    		'register' => true,
-    		'container_tag' => false,
-    		'container_class' => false,
-    		'anchor_tag' => false,
-    		'anchor_class' => false,
-    		'separator' => ' | ',
-    		'inside_pre_tag' => false,
-    		'inside_post_tag' => false,
-    		'no_forms' => false // use this to return just the login/logout forms, no links. Do this for all calls to this function after the first on a page.
-    	);
-    	$args = wp_parse_args( $args, $defaults );
-    	extract( $args, EXTR_SKIP );
+		$logged_in = is_user_logged_in();
 
-    	// Register WP user w/ FB creds when FB registration has been triggered
-    	// if ($fb_registered) {
-    	//   self::connect_fb_with_wp($signed_request);
-    	// }
+		/** Capture users that just logged on w/ FB registration **/
+//		if (isset($_POST['signed_request'])) {
+//			$signed_request = self::fb_parse_signed_request($_POST['signed_request'], false);
+//			self::connect_fb_with_wp($signed_request);
+//			$logged_in = true;
+//		}
 
-    	$is_lead = current_user_can( 'placester_lead' );
+		/** Login/Logout **/
+		if ($loginout) {
+			if (!$logged_in) {
+				$loginout_link = '<a class="pl_login_link" href="#pl_login_form">Log in</a>';
+			}
+			else {
+				$loginout_link = '<a href="' . esc_url(wp_logout_url(site_url())) . '" id="pl_logout_link">Log out</a>';
+			}
+			if ($anchor_tag) {
+				$loginout_link = "<{$anchor_tag} class={$anchor_class}>" . $inside_pre_tag . $loginout_link . $inside_post_tag . "</{$anchor_tag}>";
+			}
+		}
+		else
+			$loginout_link = '';
 
-    	/** The login or logout link. */
+		/** Register **/
+		if ($register && !$logged_in) {
+			$register_link = '<a class="pl_register_lead_link" href="#pl_lead_register_form">Register</a>';
+			if ($anchor_tag) {
+				$register_link = "<{$anchor_tag} class={$anchor_class}>" . $inside_pre_tag . $register_link . $inside_post_tag . "</{$anchor_tag}>";
+			}
+		}
+		else
+			$register_link = '';
 
-    	// user isn't logged into WP nor FB
-    	if ( !is_user_logged_in() && !$fb_registered ) {
-    		$loginout_link = '<a class="pl_login_link" href="#pl_login_form">Log in</a>';
-    	} 
-        else {
-    		$loginout_link = '<a href="' . esc_url( wp_logout_url(site_url()) ) . '" id="pl_logout_link">Log out</a>';
-    	}
-    	
-        if ($anchor_tag) {
-    		$loginout_link = "<{$anchor_tag} class={$anchor_class}>" . $inside_pre_tag . $loginout_link . $inside_post_tag . "</{$anchor_tag}>";
-    	}
+		/** My Account **/
+		if ($profile && $logged_in && current_user_can('placester_lead') && ($profile_url = self::get_client_area_url())) {
+			$profile_link = '<a id="pl_lead_profile_link" target="_blank" href="' . $profile_url . '">My Account</a>';
+			if ($anchor_tag) {
+				$profile_link = "<{$anchor_tag} class={$anchor_class}>" . $inside_pre_tag . $profile_link . $inside_post_tag . "</{$anchor_tag}>";
+			}
+		}
+		else
+			$profile_link = '';
 
-    	/** The register link. */
-    	$register_link = '<a class="pl_register_lead_link" href="#pl_lead_register_form">Register</a>';
-    	if ($anchor_tag) {
-    		$register_link = "<{$anchor_tag} class={$anchor_class}>" . $inside_pre_tag . $register_link . $inside_post_tag . "</{$anchor_tag}>";
-    	}
+		$link = $loginout_link;
+		if ($link && $register_link) $link .= $separator;
+		$link .= $register_link;
+		if ($link && $profile_link) $link .= $separator;
+		$link .= $profile_link;
 
-    	/** The profile link. */
-    	$profile_url = self::get_client_area_url();
-    	$profile = $profile && $profile_url!=='';
-    	$profile_link = '<a id="pl_lead_profile_link" target="_blank" href="' . $profile_url . '">My Account</a>';
-    	if ($anchor_tag) {
-    		$profile_link = "<{$anchor_tag} class={$anchor_class}>" . $inside_pre_tag . $profile_link . $inside_post_tag . "</{$anchor_tag}>";
-    	}
-    	// var_dump($profile_link);
+		// Enclose in container tag if set...
+		if ($container_tag) {
+			$link = "<{$container_tag} class={$container_class}>" . $link . "</{$container_tag}>";
+		}
 
-    	$loginout_link = $loginout ? $loginout_link : '';
-    	$register_link = $register ? ( empty($loginout_link) ? $register_link : $separator . $register_link ) : '';
-    	$profile_link = $profile ? ( empty($loginout_link) ? $profile_link : $separator . $profile_link ) : '';
+		// Append the form HTML...
+		if ( !$logged_in && !$no_forms ) {
+			$link .= self::generate_lead_reg_form() . self::generate_login_form();
+		}
 
-    	if ( !is_user_logged_in() && $no_forms == false ) {
-            // Set the URL
-            $url = is_home() ? home_url() : get_permalink();
-
-        	ob_start();
-        	?>
-        		<form name="pl_login_form" id="pl_login_form" action="<?php echo home_url(); ?>/wp-login.php" method="post" class="pl_login_reg_form">
-
-        			<?php pls_do_atomic( 'login_form_before_title' ); ?>
-
-        			<div id="pl_login_form_inner_wrapper">
-        				<h2>Login</h2>
-        				<!-- redirect-uri="<?php //echo $_SERVER["HTTP_REFERER"]; ?>" -->
-        				<!-- <fb:registration fields="name,location,email" width="260"></fb:registration> -->
-
-        				<?php pls_do_atomic( 'login_form_before_email' ); ?>
-
-        				<p class="login-username">
-        					<label for="user_login">Email</label>
-        					<input type="text" name="user_login" id="user_login" class="input" required="required" value="" tabindex="20" data-message="A valid email is needed" placeholder="Email" />
-        				</p>
-
-        				<?php pls_do_atomic( 'login_form_before_password' ); ?>
-
-        				<p class="login-password">
-        					<label for="user_pass">Password</label>
-        					<input type="password" name="user_pass" id="user_pass" class="input" required="required" value="" tabindex="21" data-message="A password is needed" placeholder="Password" />
-        				</p>
-
-        				<?php pls_do_atomic( 'login_form_before_remember' ); ?>
-
-        				<p class="login-remember">
-        					<label><input name="rememberme" type="checkbox" id="rememberme" value="forever" tabindex="22" /> Remember Me</label>
-        				</p>
-
-        				<?php pls_do_atomic( 'login_form_before_submit' ); ?>
-
-        				<p class="login-submit">
-        					<input type="submit" name="wp-submit" id="wp-submit" class="button-primary" value="Log In" tabindex="23" />
-        					<input type="hidden" name="redirect_to" value="<?php echo $url; ?>" />
-        				</p>
-
-        				<?php pls_do_atomic( 'before_login_title' ); ?>
-
-        			</div>
-
-        		</form>
-    		<?php
-
-            // Store form HTML
-    		$login_form = ob_get_clean();
-
-    		// Base link value...
-            $link = $loginout_link . $register_link;
-
-            // Enclose in container tag if set...
-            if ($container_tag) {
-                $link = "<{$container_tag} class={$container_class}>" . $link . "</{$container_tag}>";
-            }
-
-            // Append the form HTML...
-            $link .= self::generate_lead_reg_form() . "<div style='display:none;'>{$login_form}</div>";
-        } 
-        else {
-            // Remove the link to the profile if the current user is not a lead...
-            $link = $is_lead ? ($loginout_link . $profile_link) : $loginout_link;
-            
-            if ($container_tag) {
-                $link = "<{$container_tag} class={$container_class}>" . $link . "</{$container_tag}>";
-            } 
-        }
-
-        return $link;
+		return $link;
 	}
 
 	/*
