@@ -86,18 +86,13 @@ Class PL_HTTP extends WP_Http {
 			$request_string = urldecode($request_string);
 		}
 
-		// NGINX is currently configured with an 8k limit, so 8000 leaves some space for the domain and document
-		// -- the Rails Data API v2.1/listings endpoint can handle either GET or POST
-		if ($method == 'GET' && strlen($request_string) > 8000) {
-			$method = 'POST';
-		}
-
 		// error_log(var_export(debug_backtrace(), true));
 		// error_log("Endpoint logged as: {$method} {$url}?{$request_string}");
 
 		$wp_http = self::_get_object();
 
 		switch ($method) {
+			case 'POST':
 			case 'PUT':
 				$response = $wp_http->post($url, array('body' => $request_string, 'timeout' => self::$timeout, 'method' => $method));
 				if ( is_array($response) && isset($response['body']) ) {
@@ -113,7 +108,6 @@ Class PL_HTTP extends WP_Http {
 				return false;
 
 			case 'GET':
-			case 'POST':
 				$cache = new PL_Cache('http');
 				if ($allow_cache && $transient = $cache->get($url . $request_string)) {
 					// error_log('From cache:  ' . $url . $request_string);
@@ -121,13 +115,16 @@ Class PL_HTTP extends WP_Http {
 				}
 
 				else {
-					if($method == 'GET') {
-						$response = $wp_http->get($url . '?' . $request_string, array('timeout' => self::$timeout));
-					}
-					else {
+					// NGINX is currently configured with an 8k limit, so 8000 leaves some space for the domain and document
+					// -- the Rails Data API v2.1/listings endpoint can handle either GET or POST
+					if (strlen($request_string) > 8000) {
 						$response = $wp_http->post($url, array('body' => $request_string, 'timeout' => self::$timeout));
 					}
+					else {
+						$response = $wp_http->get($url . '?' . $request_string, array('timeout' => self::$timeout));
+					}
 
+					// error_log($url . "?" . $request_string);
 					// error_log(var_export($response, true));
 
 					if ( (is_array($response) && isset($response['headers']) && isset($response['headers']['status'])) || $force_return) {
