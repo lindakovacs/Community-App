@@ -41,59 +41,52 @@ class PL_Membership {
     // NOTE: JavaScript in "js/theme/placester.membership.js"
 	public static function ajax_register_site_user () {
 		$errors = array();
-		
-        // Make sure it's from a form we created
+
+		// Make sure it's from a form we created
 		if ( !wp_verify_nonce($_POST['nonce'], 'placester_true_registration') ) {
 			// Malicious...
 			echo "Sorry, your nonce didn't verify -- try using the form on the site";
 			die();
 		}
-		
+
 		// All validation rules in a single place...
 		$lead_object = self::validate_registration($_POST);
-		
+
 		// Check for lead errors
 		if (!empty($lead_object['errors'])) {
 			$errors = self::process_registration_errors($lead_object['errors']);
-		} 
-        else {
+		}
+		else {
 			// Try to create the lead...
 			$errors = self::create_site_user($lead_object);
 		}
-		
-        $result = empty($errors) ? array("success" => true) : array("success" => false, "errors" => $errors);
-        
-        echo json_encode($result);
-        die();
+
+		$result = empty($errors) ? array("success" => true) : array("success" => false, "errors" => $errors);
+		echo json_encode($result);
+		die();
 	}
 
 	public static function create_site_user ($lead_object) {
 		$errors = array();
 
-        // Create Wordpress user entity for lead...
-        $userdata = array(
-            'user_pass' => $lead_object['password'],
-            'user_login' => $lead_object['username'],
-            'user_email' => $lead_object['metadata']['email'],
-            'role' => 'placester_lead'
-        );
+		// Create Wordpress user entity for lead...
+		$userdata = array(
+			'user_pass' => $lead_object['password'],
+			'user_login' => $lead_object['username'],
+			'user_email' => $lead_object['metadata']['email'],
+			'role' => 'placester_lead'
+		);
 
-        $wordpress_user_id = wp_insert_user($userdata);
-
+		$wordpress_user_id = wp_insert_user($userdata);
 		if ( !is_wp_error($wordpress_user_id) ) {
+
 			// Force blog to be set immediately or MU throws errors
 			$blogs = get_blogs_of_user($wordpress_user_id);
 			$first_blog = current($blogs);
 			update_user_meta($wordpress_user_id, 'primary_blog', $first_blog->userblog_id);
 
-            // Push the new WP user as a lead to the API...
-            if (defined('PL_LEADS_ENABLED')) {
-            	$response = PL_Lead_Helper::add_lead($lead_object);
-            }
-            else {
-				$response = PL_People_Helper::add_person($lead_object);
-			}
-            
+			// Create linked Placester.com account...
+			$response = PL_People_Helper::add_person($lead_object);
 			if (isset($response['code'])) {
 				$errors[] = $response['message'];
 				foreach ($response['validations'] as $key => $validation) {
@@ -104,22 +97,15 @@ class PL_Membership {
 
 			// If the API call was successful, inform the user that his/her password and set the password change
 			if (empty($errors)) {
-				if (defined('PL_LEADS_ENABLED')) {
-					$meta_key = PL_Lead_Helper::USER_META_KEY;
-					$id = $response['uuid'];
-				}
-				else {
-					$meta_key = PL_People_Helper::USER_META_KEY;
-					$id = $response['id'];
-				}
+				$meta_key = PL_People_Helper::USER_META_KEY;
+				$id = $response['id'];
 
 				// Add API key to new user's meta...
 				update_user_meta($wordpress_user_id, $meta_key, $id);
-
-				// Notify blog admin(s) of new user...
-				wp_new_user_notification($wordpress_user_id);
 			}
-			
+
+			// Notify blog admin(s) of new user, send welcome email...
+			wp_new_user_notification($wordpress_user_id);
 			if (PL_Options::get('pls_send_client_option')) {
 				wp_mail($lead_object['username'], 'Your new account on ' . site_url(), PL_Membership_Helper::parse_client_message($lead_object) );
 			}
@@ -127,42 +113,42 @@ class PL_Membership {
 			// Login user if successfully signed-up...
 			wp_set_auth_cookie($wordpress_user_id, true, is_ssl());
 		} 
-        else {
+		else {
 			// Failure...
 			$errors[] = 'wp_user_create_failed';
 		}
 
-        return $errors;
+	return $errors;
 	}
 
 	//  AJAX endpoint for authenticating a site user from the frontend
 	public static function ajax_login_site_user () {
-        extract($_POST);
-        
+		extract($_POST);
+
 		$sanitized_username = sanitize_user($username);
-        $errors = array();
+		$errors = array();
 
 		if (empty($sanitized_username)) {
 			$errors['user_login'] = "An email address is required";
-		} 
-        elseif (empty($password)) {
+		}
+		elseif (empty($password)) {
 			$errors['user_pass'] = "A password is required";
-		} 
-        else {
+		}
+		else {
 			$userdata = get_user_by('login', $sanitized_username);
 
 			if (empty($userdata)) {
-                $errors['user_login'] = "The email address is invalid";
-            }
-            else if ($userdata && !wp_check_password($password, $userdata->user_pass, $userdata->ID)) {
-                $errors['user_pass'] = "The password isn't correct";
+				$errors['user_login'] = "The email address is invalid";
+			}
+			else if ($userdata && !wp_check_password($password, $userdata->user_pass, $userdata->ID)) {
+				$errors['user_pass'] = "The password isn't correct";
 			}
 		}
 
 		if (!empty($errors)) {
 			$result = array("success" => false, "errors" => $errors);
-		} 
-        else {
+		}
+		else {
 			$rememberme = ($remember == "forever") ? true : false;
 
 			// Manually login user
@@ -171,25 +157,12 @@ class PL_Membership {
 			$creds['remember'] = $rememberme;
 
 			$user = wp_signon($creds, true);
-
 			wp_set_current_user($user->ID);
 
-            $result = array("success" => true);
-
-            if (defined('PL_LEADS_ENABLED')) {
-				// Make sure this existing user has a Lead entity...
-				$lead_id = PL_Lead_Helper::get_lead_id($user->ID);
-
-				if (empty($lead_id)) {
-					$response = PL_Lead_Helper::create_lead($creds);
-
-					// Store Lead ID in user meta...
-					update_user_meta($user->ID, PL_Lead_Helper::USER_META_KEY, $response['uuid']);
-				}
-			}
+			$result = array("success" => true);
 		}
 
-        echo json_encode($result);
+		echo json_encode($result);
 		die();
 	}
 
@@ -365,7 +338,6 @@ class PL_Membership {
 
 	// Used for processing errors for the various forms.
 	private static function process_registration_errors ($errors) {
-        // Default value...
 		$error_messages = '';
 
 		foreach ($errors as $error => $type) {
@@ -589,13 +561,6 @@ class PL_Membership {
 
 		$logged_in = is_user_logged_in();
 
-		/** Capture users that just logged on w/ FB registration **/
-//		if (isset($_POST['signed_request'])) {
-//			$signed_request = self::fb_parse_signed_request($_POST['signed_request'], false);
-//			self::connect_fb_with_wp($signed_request);
-//			$logged_in = true;
-//		}
-
 		/** Login/Logout **/
 		if ($loginout) {
 			if (!$logged_in) {
@@ -649,86 +614,4 @@ class PL_Membership {
 
 		return $link;
 	}
-
-	/*
-	 * Facebook user integration functionality
-	 *
-	 * NOTE: Unfinished/untested/not in use...
-	 */
-/*
-	public static function connect_fb_with_wp ($signed_request) {
-		// json_decode signed_request into array
-		$signed_request = json_decode($signed_request, true);
-
-		$user_id = $signed_request['user_id'];
-		$user_email = $signed_request['registration']['email'];
-		$user_name = $signed_request['registration']['name'];
-		$userdata = get_user_by( 'login', $user_id );
-
-		if ($userdata) {
-			wp_set_current_user($user_id);
-			wp_set_auth_cookie($user_id, true);
-		} 
-        else {
-			// Create random password
-			$random_pass = self::random_password();
-
-			// User doesn't exist, create user
-			$userdata = array(
-				'user_pass' => $random_pass,
-				'user_login' => $user_id,
-				'user_url' => $_SERVER["SERVER_NAME"],
-				'user_email' => $user_email,
-				'user_nicename' => $user_name,
-				'role' => 'placester_lead'
-			);
-
-			// Add user to WP user table
-			wp_insert_user( $userdata );
-
-			$user = get_user_by('login', $user_id);
-
-			// Send user email w/ login and password
-			wp_mail($user_email,
-				'Your password for ' . $_SERVER["SERVER_NAME"],
-				"to log into " . $_SERVER["SERVER_NAME"] . " your username is '" . $user_email . "', and your password is '" . $random_pass . "'. However, as long as you are signed into Facebook, you won't need to manually sign in."
-			);
-
-		}
-	}
-
-	// Parse Facebook Signed Request
-	public static function fb_parse_signed_request ($signed_request = '', $return = 'ajax') {
-		if (empty($signed_request)) {
-			extract($_POST);
-		}
-
-		list($encoded_sig, $payload) = explode('.', $signed_request, 2);
-
-		// decode the data
-		$sig = base64_decode(strtr($encoded_sig, '-_', '+/'));
-		$data = base64_decode(strtr($payload, '-_', '+/'));
-
-		if ($return == 'ajax') {
-			echo $data;
-		} 
-        else {
-			return $data;
-		}
-
-	}
-
-	private static function random_password () {
-		$alphabet = "abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
-		$pass = array(); //remember to declare $pass as an array
-		$alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
-		
-        for ($i = 0; $i < 8; $i++) {
-			$n = rand(0, $alphaLength);
-			$pass[] = $alphabet[$n];
-		}
-
-		return implode($pass); //turn the array into a string
-	}
-*/
 }

@@ -58,22 +58,6 @@ class PL_Router {
 		self::router('add-listing.php', array());
 	}
 
-	public static function my_leads () {
-		//index page also doubles as the details page since wp doesn't make it easy to have an "admin"
-		//page that doesn't appear in the main navigation.
-		if (isset($_GET['id']) && isset($_GET['edit']) && $_GET['edit'] === '1') {
-			self::router('leads/lead-edit.php', array());	
-		} elseif ( isset($_GET['id']) && isset($_GET['new_search']) && $_GET['new_search'] === '1' ) {
-			self::router('leads/new-search.php', array());	
-		} elseif ( isset($_GET['id']) && isset($_GET['search_id']) && isset($_GET['edit_search']) && $_GET['edit_search'] === '1' ) {
-			self::router('leads/search-edit.php', array());	
-		} elseif (isset($_GET['id'])) {
-			self::router('leads/lead-details.php', array());	
-		} else {
-			self::router('leads/my-leads.php', array());	
-		}
-	}
-
 	public static function theme_gallery () {
 		if (isset($_GET['theme_url'])) {
 			self::router('install-theme.php', array());	

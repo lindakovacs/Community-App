@@ -176,6 +176,7 @@ include_once('helpers/wordpress.php');
 include_once('helpers/education-com.php');
 include_once('helpers/caching.php');
 include_once('helpers/membership.php');
+//include_once('helpers/saved-search.php');
 include_once('helpers/lead-capture.php');
 include_once('helpers/customizer.php');
 include_once('helpers/logging.php');
@@ -184,17 +185,6 @@ include_once('helpers/logging.php');
 include_once('third-party/tax-meta-class/tax-meta-class.php');
 include_once('third-party/convex-hull/convex-hull.php');
 include_once('third-party/mixpanel/mixpanel.php');
-
-// define('PL_LEADS_ENABLED', true);
-// If constant is set, use the new lead functionality (replaces 'people')...
-if (defined('PL_LEADS_ENABLED')) {
-    include_once('config/api/leads.php');
-    include_once('models/lead.php');
-    include_once('helpers/lead.php');
-
-    // Saved search ONLY works with the new lead ...
-    include_once('lib/saved-search.php');
-}
 
 // Register hook to load blueprint from plugin if the active theme has yet to do so...
 add_action( 'after_setup_theme', 'load_blueprint_from_plugin', 18 );
@@ -230,10 +220,6 @@ function placester_admin_menu () {
     add_submenu_page( 'placester', 'Listings','Listings', 'edit_pages', 'placester_properties', array('PL_Router','my_listings') );
     add_submenu_page( 'placester', 'Add Listing', 'Add Listing', 'edit_pages', 'placester_property_add', array('PL_Router','add_listings') );
     
-    if (defined('PL_LEADS_ENABLED')) {
-        add_submenu_page( 'placester', 'Leads', 'Leads', 'edit_pages', 'placester_my_leads', array('PL_Router','my_leads') );
-    }
-
     // If the site using the plugin is on our hosted network, don't show the theme gallery...
     if ( !defined('HOSTED_PLUGIN_KEY') ) {
     	add_submenu_page( 'placester', '', 'Theme Gallery', 'edit_pages', 'placester_theme_gallery', array('PL_Router','theme_gallery') );

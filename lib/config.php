@@ -30,13 +30,6 @@ class PL_Config {
 		return self::config_finder($PL_API_PEOPLE, $args, $num_args);
 	}
 
-	public static function PL_API_LEAD () {
-		global $PL_API_LEAD;
-		$args = func_get_args();
-		$num_args = func_num_args();
-		return self::config_finder($PL_API_LEAD, $args, $num_args);
-	}
-
 	public static function PL_API_INTEGRATION () {
 		global $PL_API_INTEGRATION;
 		$args = func_get_args();
