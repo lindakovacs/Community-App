@@ -143,7 +143,6 @@ include_once('lib/bootup.php');
 include_once('lib/global-filters.php');
 include_once('lib/listing-customizer.php');
 include_once('lib/dragonfly-resize.php');
-include_once('lib/fav-listings.php');
 include_once('lib/permalink-search.php');
 
 //models
@@ -176,7 +175,8 @@ include_once('helpers/wordpress.php');
 include_once('helpers/education-com.php');
 include_once('helpers/caching.php');
 include_once('helpers/membership.php');
-//include_once('helpers/saved-search.php');
+include_once('helpers/member-listings.php');
+//include_once('helpers/member-search.php');
 include_once('helpers/lead-capture.php');
 include_once('helpers/customizer.php');
 include_once('helpers/logging.php');

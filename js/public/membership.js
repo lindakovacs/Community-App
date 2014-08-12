@@ -238,19 +238,15 @@ jQuery(document).ready(function($) {
 		property_id = $(this).attr('href');
 
 		data = {
-				action: 'add_favorite_property',
-				property_id: property_id.substr(1)
+			action: 'add_favorite_property',
+			property_id: property_id.substr(1)
 		};
 
 		var that = this;
 		$.post(info.ajaxurl, data, function (response) {
 			spinner.hide();
 
-			// This property will only be set if WP determines user is of admin status...
-			if (response && response.is_admin) {
-				alert('Sorry, admins currently aren\'t able to maintain a list of "favorite" listings');
-			}
-			else if (response && response.id) {
+			if (response && response.id) {
 				$(that).parent().find('#pl_add_favorite').hide();
 				$(that).parent().find('#pl_remove_favorite').show();
 			}
@@ -269,18 +265,19 @@ jQuery(document).ready(function($) {
 		property_id = $(this).attr('href');
 
 		data = {
-				action: 'remove_favorite_property',
-				property_id: property_id.substr(1)
+			action: 'remove_favorite_property',
+			property_id: property_id.substr(1)
 		};
 
 		var that = this;
 		$.post(info.ajaxurl, data, function (response) {
 			spinner.hide();
-			// If request successfull
+
 			if (response != 'errors') {
 				$(that).parent().find('#pl_remove_favorite').hide();
 				$(that).parent().find('#pl_add_favorite').show();
 			}
 		}, 'json');
 	});
+
 });

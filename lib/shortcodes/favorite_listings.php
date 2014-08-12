@@ -81,7 +81,7 @@ class PL_Favorite_Listing_CPT extends PL_Search_Listing_CPT {
 		$atts = wp_parse_args($atts, array('limit' => 0, 'sort_type' => ''));
 		$context = empty($atts['context']) ? 'shortcode' : $atts['context'];
 		$atts['context'] = 'favorite_listings_'.$context;
-		$atts['property_ids'] = PL_Favorite_Listings::get_favorite_ids();
+		$atts['property_ids'] = PL_Favorite_Listings::get_favorite_properties();
 		
 		if (!has_filter('pls_listings_' . $atts['context'])) {
 			add_filter('pls_listings_' . $atts['context'], array('PL_Component_Entity','pls_listings_callback'), 10, 5);

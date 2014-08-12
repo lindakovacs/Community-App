@@ -1,14 +1,9 @@
 <?php
 
 PL_Permalink_Search::init();
-
 class PL_Permalink_Search {
 
-	/*
-	 * Search Permalink functionality...
-	 */
-
-	public static $save_extension = 'pl_ss_';
+	public static $search_prefix = 'pl_ss_';
 
 	public static function init () {
 		// Basic AJAX endpoints
@@ -18,17 +13,13 @@ class PL_Permalink_Search {
 
 	public static function generate_key ($search_id) {
 		$hash = sha1($search_id);
-		$key = self::$save_extension . $hash;
-		
+		$key = self::$search_prefix . $hash;
+
 		return $key;
 	}
 
 	public static function save_search ($search_id, $search_filters) {
 		$key = self::generate_key($search_id);
-
-		// error_log("Search ID: $search_id");
-		// error_log("Option key: $key");
-		// error_log(var_export($search_filters, true));
 
 		// Ensure these option-entries are NOT autoloaded on every request...
 		return PL_Options::set($key, $search_filters, false);
@@ -67,14 +58,11 @@ class PL_Permalink_Search {
 		die();
 	}
 
-	// Clear all saved searches stored in the DB...
+	// Clear all saved searches stored in the DB
 	public static function clear () {
 		$saved_searches = $wpdb->get_results('SELECT option_name FROM ' . $wpdb->prefix . 'options ' ."WHERE option_name LIKE 'pl_ss_%'");
-	    foreach ($saved_searches as $option) {
-	        PL_Options::delete($option->option_name);
-	    }
+		foreach ($saved_searches as $option) {
+			PL_Options::delete($option->option_name);
+		}
 	}
-
 }
-
-?>

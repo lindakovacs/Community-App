@@ -10,24 +10,12 @@ class PL_Membership {
 	public static function init () {
 		add_action('wp_ajax_nopriv_pl_register_site_user', array(__CLASS__, 'ajax_register_site_user'));
 		add_action('wp_ajax_nopriv_pl_login_site_user', array(__CLASS__, 'ajax_login_site_user'));
-		// add_action( 'wp_ajax_nopriv_connect_wp_fb', array(__CLASS__, 'connect_fb_with_wp' ));
-		// add_action( 'wp_ajax_nopriv_parse_signed_request', array(__CLASS__, 'fb_parse_signed_request' ));
 
 		add_shortcode('lead_user_navigation', array(__CLASS__, 'placester_lead_control_panel'));
 		add_shortcode('pl_login_block', array(__CLASS__, 'placester_lead_control_panel'));
 		
-		$capabilities = array(
-			'add_roomates' => true,
-			'read_roomates' => true,
-			'delete_roomates' => true,
-			'add_favorites' => true,
-			'delete_roomates' => true,
-			'level_0' => true,
-			'read' => true
-		);
-
 		// Create the "Property lead" role
-		add_role('placester_lead', 'Property Lead', $capabilities);
+		add_role('placester_lead', 'Property Lead', array('read' => true));
 	}
 
 	public static function get_client_area_url () {
@@ -38,7 +26,7 @@ class PL_Membership {
 
 	// Callback function for when the frontend lead register form is submitted
 	//
-    // NOTE: JavaScript in "js/theme/placester.membership.js"
+	// NOTE: JavaScript in "js/theme/placester.membership.js"
 	public static function ajax_register_site_user () {
 		$errors = array();
 
@@ -186,8 +174,6 @@ class PL_Membership {
 
 						//handles all random edge cases
 						$username_validation = self::validate_username($username, $lead_object);
-
-						//split verification array
 						$username = $username_validation['username'];
 						$lead_object = $username_validation['lead_object'];
 
@@ -204,8 +190,6 @@ class PL_Membership {
 						$email['validated'] = '';
 
 						$email_validation = self::validate_email($email, $lead_object);
-
-						//split verification array
 						$email = $email_validation['email'];
 						$lead_object = $email_validation['lead_object'];
 
@@ -222,8 +206,6 @@ class PL_Membership {
 						$password['validated'] = '';
 
 						$password_validation = self::validate_password($password, $confirm_password, $lead_object);
-
-						//split verification array
 						$password = $password_validation['password'];
 						$lead_object = $password_validation['lead_object'];
 
