@@ -205,6 +205,13 @@ function plugin_blueprint_settings () {
     remove_theme_support('pls-default-normalize');
     remove_theme_support('pls-js');
     remove_theme_support('pls-routing-util-templates');
+
+    // for property detail page lead capture
+    add_theme_support( 'pls-js', array(
+        'jquery-ui' => array('script' => true, 'style' => true),
+        'lead-capture' => array('script' => true, 'style' => false)
+      )
+    );
 }
 
 // Build plugin settings tabs/UI...
