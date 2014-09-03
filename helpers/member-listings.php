@@ -134,4 +134,9 @@ class PL_Favorite_Listings {
 		}
 		return $contents;
 	}
+
+// PL_COMPATIBILITY_MODE -- preserve the interface expected by certain previous versions of blueprint
+	public static function get_favorite_ids() {
+		return self::get_favorite_properties();
+	}
 }

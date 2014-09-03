@@ -596,4 +596,12 @@ class PL_Membership {
 
 		return $link;
 	}
+
+// PL_COMPATIBILITY_MODE -- preserve the interface expected by certain previous versions of blueprint
+	static function placester_favorite_link_toggle($args) {
+		return PL_Favorite_Listings::placester_favorite_link_toggle($args);
+	}
+	static function get_favorite_ids() {
+		return PL_Favorite_Listings::get_favorite_properties();
+	}
 }

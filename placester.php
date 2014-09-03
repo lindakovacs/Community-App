@@ -299,4 +299,7 @@ function placester_info_bar () {
     }
 }
 
-?>
+// PL_COMPATIBILITY_MODE -- preserve the interface expected by certain previous versions of blueprint
+function placester_post_slug() {
+  return true;
+}
