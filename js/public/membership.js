@@ -109,6 +109,9 @@ jQuery(document).ready(function($) {
 				// Show success message
 				$("#pl_lead_register_form .success").show('fast');
 
+				// Write lead capture cookie
+				jQuery.cookies.set('lead_capture_visitor', 1); // no expiration set
+
 				// Reload window so it shows new login status
 				setTimeout(function () { window.location.reload(true); }, 1000);
 			}
@@ -157,6 +160,9 @@ jQuery(document).ready(function($) {
 
 				// Show success message
 				// setTimeout(function() { $('#pl_login_form .success').show('fast'); }, 500);
+
+				// Write lead capture cookie
+				jQuery.cookies.set('lead_capture_visitor', 1); // no expiration set
 
 				// Reload window so it shows new login status
 				window.location.reload(true);
