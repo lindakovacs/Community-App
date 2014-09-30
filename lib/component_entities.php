@@ -1381,7 +1381,8 @@ To add some text to your listings:<br />
 	public static function add_js() {
 		$js_files = array();
 
-		foreach(self::$shortcode_groups as $key=>$group) {
+		//foreach(self::$shortcode_groups as $key=>$group) {
+		$group = reset(self::$shortcode_groups); if(!empty($group)) {
 		?>
 		<script type="text/javascript">
 
@@ -1406,7 +1407,7 @@ To add some text to your listings:<br />
 						<?php if (!empty($group['listings'])):?>
 						list: list,
 						<?php endif ?>
-						disable_saved_search: 1, // always // <?php echo count(self::$shortcode_groups)>1 ? '1' : '0' ?>,
+						disable_saved_search: <?php echo $group['listings']['shortcode'] == 'search_listings' ? '0' : '1' ?>,
 						<?php if (!empty($group['map'])):?>
 						map: map,
 						<?php endif ?>
