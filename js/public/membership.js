@@ -238,7 +238,7 @@ jQuery(document).ready(function($) {
 	$('#pl_add_favorite:not(.guest)').live('click', function (event) {
 		event.preventDefault();
 
-		var spinner = $(this).parent().find(".pl_spinner");
+		var spinner = $(this).parent().find(".pl_favorite_property_spinner");
 		spinner.show();
 
 		property_id = $(this).attr('href');
@@ -265,7 +265,7 @@ jQuery(document).ready(function($) {
 	$('#pl_remove_favorite').live('click',function (event) {
 		event.preventDefault();
 
-		var spinner = $(this).parent().find(".pl_spinner");
+		var spinner = $(this).parent().find(".pl_favorite_property_spinner");
 		spinner.show();
 
 		property_id = $(this).attr('href');
@@ -282,6 +282,120 @@ jQuery(document).ready(function($) {
 			if (response != 'errors') {
 				$(that).parent().find('#pl_remove_favorite').hide();
 				$(that).parent().find('#pl_add_favorite').show();
+			}
+		}, 'json');
+	});
+
+/*
+ * My Saved Search functionality...
+ */
+
+	$('#pl_save_favorite_search:not(.guest) > a').live('click', function (event) {
+		event.preventDefault();
+
+		var spinner = $(this).parent().parent().find(".pl_favorite_search_spinner");
+		spinner.css('visibility', 'visible');
+
+		data = {
+			action: 'save_favorite_search',
+			search_url: $(this).parent().parent().find("#pl_favorite_search_link").attr('href') || window.location.href
+		};
+
+		var that = this;
+		$.post(info.ajaxurl, data, function (response) {
+			spinner.css('visibility', 'hidden');
+
+			if (response && response.hash) {
+				$(that).parent().parent().find('#pl_save_favorite_search').hide();
+				$(that).parent().parent().find('#pl_clear_favorite_search').show();
+				if (response.timeout) {
+					$(that).parent().parent().find('#pl_enable_favorite_search').hide();
+					$(that).parent().parent().find('#pl_disable_favorite_search').show();
+				}
+				else {
+					$(that).parent().parent().find('#pl_enable_favorite_search').show();
+					$(that).parent().parent().find('#pl_disable_favorite_search').hide();
+				}
+			}
+			else {
+				console.log("Error saving search..." + (response && response.message ? ' ' + response.message : ''));
+			}
+		}, 'json');
+	});
+
+	$('#pl_clear_favorite_search > a').live('click', function (event) {
+		event.preventDefault();
+
+		var spinner = $(this).parent().parent().find(".pl_favorite_search_spinner");
+		spinner.css('visibility', 'visible');
+
+		data = {
+			action: 'clear_favorite_search',
+			search_hash: $(this).parent().parent().find("#pl_favorite_search_link").attr('href') || window.location.hash
+		};
+
+		var that = this;
+		$.post(info.ajaxurl, data, function (response) {
+			spinner.css('visibility', 'hidden');
+
+			if (response && response.hash) {
+				$(that).parent().parent().find('#pl_clear_favorite_search').hide();
+				$(that).parent().parent().find('#pl_save_favorite_search').show();
+			}
+			else {
+				console.log("Error clearing search..." + (response && response.message ? ' ' + response.message : ''));
+			}
+		}, 'json');
+	});
+
+	$('#pl_enable_favorite_search > a').live('click', function (event) {
+		event.preventDefault();
+
+		var spinner = $(this).parent().parent().parent().find(".pl_favorite_search_spinner");
+		spinner.css('visibility', 'visible');
+
+		data = {
+			action: 'enable_favorite_search',
+			search_hash: $(this).parent().parent().parent().find("#pl_favorite_search_link").attr('href') || window.location.hash,
+			search_enable: 1
+		};
+
+		var that = this;
+		$.post(info.ajaxurl, data, function (response) {
+			spinner.css('visibility', 'hidden');
+
+			if (response && response.hash) {
+				$(that).parent().parent().find('#pl_enable_favorite_search').hide();
+				$(that).parent().parent().find('#pl_disable_favorite_search').show();
+			}
+			else {
+				console.log("Error enabling search..." + (response && response.message ? ' ' + response.message : ''));
+			}
+		}, 'json');
+	});
+
+	$('#pl_disable_favorite_search > a').live('click', function (event) {
+		event.preventDefault();
+
+		var spinner = $(this).parent().parent().parent().find(".pl_favorite_search_spinner");
+		spinner.css('visibility', 'visible');
+
+		data = {
+			action: 'enable_favorite_search',
+			search_hash: $(this).parent().parent().parent().find("#pl_favorite_search_link").attr('href') || window.location.hash,
+			search_enable: 0
+		};
+
+		var that = this;
+		$.post(info.ajaxurl, data, function (response) {
+			spinner.css('visibility', 'hidden');
+
+			if (response && response.hash) {
+				$(that).parent().parent().find('#pl_disable_favorite_search').hide();
+				$(that).parent().parent().find('#pl_enable_favorite_search').show();
+			}
+			else {
+				console.log("Error disabling search..." + (response && response.message ? ' ' + response.message : ''));
 			}
 		}, 'json');
 	});

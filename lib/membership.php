@@ -13,7 +13,7 @@ class PL_Membership {
 
 		add_shortcode('lead_user_navigation', array(__CLASS__, 'placester_lead_control_panel'));
 		add_shortcode('pl_login_block', array(__CLASS__, 'placester_lead_control_panel'));
-		
+
 		// Create the "Property lead" role
 		add_role('placester_lead', 'Property Lead', array('read' => true));
 	}

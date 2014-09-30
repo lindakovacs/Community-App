@@ -32,6 +32,70 @@ class PL_Permalink_Search {
 		return $result;
 	}
 
+	public static function get_listing_attributes() {
+		static $hashed_attributes;
+		if(empty($hashed_attributes)) {
+			$attributes = PL_Shortcode_CPT::get_listing_attributes(true);
+
+			$hashed_attributes = array();
+			foreach ($attributes as $attribute) {
+				$name = $attribute['attribute'];
+				$group = $attribute['group'];
+				switch($group) {
+					case "cur_data":
+					case "uncur_data":
+						$group = "metadata";
+						break;
+				}
+				$hashed_attributes[$group ? $group . '[' . $name . ']' : $name] = $attribute['label'];
+				$hashed_attributes[$group ? $group . '[min_' . $name . ']' : 'min_' . $name] = 'Min ' . $attribute['label'];
+				$hashed_attributes[$group ? $group . '[max_' . $name . ']' : 'max_' . $name] = 'Max ' . $attribute['label'];
+			}
+		}
+
+		return $hashed_attributes;
+	}
+
+	public static function display_saved_search_filters ($search_id) {
+		$filters = self::get_saved_search_filters($search_id);
+		$attributes = self::get_listing_attributes();
+
+		ob_start();
+		if (is_array($filters)) {
+			echo "<ul>";
+			// display top level criteria first -- it looks nicer this way
+			foreach ($filters as $key => $value) {
+				if (!is_array($value)) {
+					switch($key) {
+						case "sort_by":
+						case "sort_type":
+						case "limit":
+						case "offset":
+							continue;
+						default:
+							if ($value && substr($key, -6) != "_match") {
+								if ($label = $attributes[$key]) {
+									echo "<li>{$label}&nbsp;=&nbsp;{$value}</li>";
+								} else {
+									echo "<li>{$key}&nbsp;=&nbsp;{$value}</li>";
+								}}}}}
+
+			// now display the nested criteria
+			foreach ($filters as $key => $value) {
+				if (is_array($value)) {
+					foreach ($value as $k => $v) {
+						if ($v && substr($k, -6) != "_match") {
+							if ($label = $attributes["{$key}[{$k}]"]) {
+								echo "<li>{$label}&nbsp;=&nbsp;$v</li>";
+							} else {
+								echo "<li>{$key}[{$k}]&nbsp;=&nbsp;$v</li>";
+							}}}}}
+
+			echo "</ul>\n";
+		}
+		return ob_get_clean();
+	}
+
 	public static function ajax_get_saved_search_filters () {
 		$result = array();
 		$search_id = $_POST['search_id'];
