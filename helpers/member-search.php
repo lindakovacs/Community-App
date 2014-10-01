@@ -77,7 +77,8 @@ class PL_User_Saved_Search {
 		$favorites["/$hash_id"]['timestamp'] = time() - 43200;
 		if($return = self::update_favorite_searches($favorites)) {
 			wp_clear_scheduled_hook('wp_cron_email_favorite_search', array('user_id' => get_current_user_id(), 'hash_id' => $hash_id));
-			wp_schedule_event(time() + 30 /*43200*/, 'debug' /*'daily'*/, 'wp_cron_email_favorite_search', array('user_id' => get_current_user_id(), 'hash_id' => $hash_id));
+			// wp_schedule_event(time() + 30, 'debug', 'wp_cron_email_favorite_search', array('user_id' => get_current_user_id(), 'hash_id' => $hash_id));
+			wp_schedule_event(time() + 43200, 'daily', 'wp_cron_email_favorite_search', array('user_id' => get_current_user_id(), 'hash_id' => $hash_id));
 		}
 		return $return ? $hash_id : false;
 	}
@@ -169,7 +170,7 @@ class PL_User_Saved_Search {
 
 		if(count($listings['listings']) <= 12) {
 			// when we show all the new listings, we also show the total number that match, old and new
-			$listings = $all_listings = PLS_Plugin_API::get_listings(array_merge(
+			$all_listings = PLS_Plugin_API::get_listings(array_merge(
 				PL_Permalink_Search::get_saved_search_filters('/' . $favorite['hash']),
 				array('sort_by' => 'cur_data.dom', 'sort_type' => 'asc', 'limit' => 1, 'offset' => 0)));
 		}
