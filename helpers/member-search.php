@@ -176,7 +176,6 @@ class PL_User_Saved_Search {
 		}
 
 		$from = 'listings@' . implode('.', array_slice(explode('.', $_SERVER['SERVER_NAME']), -2));
-		$from = 'listings@placester.com';
 		$subject = 'Updated property listings from ' . $_SERVER['SERVER_NAME'];
 		$boundary = 'favorite-search-email-' . md5(time());
 		$criteria = PL_Permalink_Search::display_saved_search_filters('/' . $favorite['hash']);
@@ -268,43 +267,42 @@ class PL_User_Saved_Search {
 		<p style="font-size: 120%; margin-top: .25em;"><?php echo $results; ?></p>
 
 		<table style="vertical-align: top; width=1050px;">
+			<?php foreach ($listings['listings'] as $listing) { ?>
+				<tr style="vertical-align: top; margin: 15px 0;">
 
-		<?php foreach ($listings['listings'] as $listing) { ?>
-			<tr style="vertical-align: top; margin: 15px 0;">
+					<td class="listing-image" style="vertical-align: top; margin=5px; width=210px;">
+						<a href="<?php echo @$listing['cur_data']['url']; ?>">
+							<?php echo PLS_Image::load($listing['images'][0]['url'], array('resize' => array('w' => 210, 'h' => 140), 'fancybox' => true, 'as_html' => true, 'html' => array('alt' => $listing['location']['full_address']))); ?>
+						</a>
+					</td>
 
-				<td class="listing-image" style="vertical-align: top; margin=5px; width=210px;">
-					<a href="<?php echo @$listing['cur_data']['url']; ?>">
-						<?php echo PLS_Image::load($listing['images'][0]['url'], array('resize' => array('w' => 210, 'h' => 140), 'fancybox' => true, 'as_html' => true, 'html' => array('alt' => $listing['location']['full_address']))); ?>
-					</a>
-				</td>
+					<td class="listing-info" style="vertical-align: top;  margin=5px; width=840px;">
+						<a class="listing-address" href="<?php echo @$listing['cur_data']['url']; ?>" style="font-size: 120%;">
+							<?php echo $listing['location']['address'] . ', ' . $listing['location']['locality'] . ', ' . $listing['location']['region'] . ' ' . $listing['location']['postal']; ?>
+						</a>
 
-				<td class="listing-info" style="vertical-align: top;  margin=5px; width=840px;">
-					<a class="listing-address" href="<?php echo @$listing['cur_data']['url']; ?>" style="font-size: 120%;">
-						<?php echo $listing['location']['address'] . ', ' . $listing['location']['locality'] . ', ' . $listing['location']['region'] . ' ' . $listing['location']['postal']  ?>
-					</a>
+						<?php if ($listing['rets']['mls_id'] || $listing['cur_data']['price']): ?>
+							<p class="listing-details" style="font-weight: bold; margin-bottom: 0.25em;">
+								<?php if ($listing['rets']['mls_id']): ?>
+									<span class="mls-id"><span class="label">MLS ID: </span><?php echo @$listing['rets']['mls_id']; ?></span><span class="comma">, </span>
+								<?php endif; ?>
+								<span class="price"><?php echo PLS_Format::number($listing['cur_data']['price'], array('abbreviate' => false, 'add_currency_sign' => true)); ?></span><?php
+								if ($listing['cur_data']['beds']): ?><span class="comma">, </span>
+									<span class="beds"><?php echo @$listing['cur_data']['beds']; ?><span class="label"> beds</span></span><?php
+								endif;
+								if ($listing['cur_data']['baths']): ?><span class="comma">, </span>
+									<span class="baths"><?php echo @$listing['cur_data']['baths'] . ($listing['cur_data']['half_baths'] ? '+' : ''); ?><span class="label"> baths</span></span><?php
+								endif; ?>
+							</p>
+						<?php endif;
 
-			<?php if ($listing['rets']['mls_id'] || $listing['cur_data']['price']): ?>
-					<p class="listing-details" style="font-weight: bold; margin-bottom: 0.25em;">
-				<?php if ($listing['rets']['mls_id']): ?>
-						<span class="mls-id"><span class="label">MLS ID: </span><?php echo @$listing['rets']['mls_id']; ?></span><span class="comma">, </span>
-				<?php endif; ?>
-						<span class="price"><?php echo PLS_Format::number($listing['cur_data']['price'], array('abbreviate' => false, 'add_currency_sign' => true)); ?></span>
-				<?php if ($listing['cur_data']['beds']): ?><span class="comma">, </span>
-						<span class="beds"><?php echo @$listing['cur_data']['beds']; ?><span class="label"> beds</span></span>
-				<?php endif; ?>
-				<?php if ($listing['cur_data']['baths']): ?><span class="comma">, </span>
-						<span class="baths"><?php echo @$listing['cur_data']['baths'] . ($listing['cur_data']['half_baths'] ? '+' : ''); ?><span class="label"> baths</span></span>
-				<?php endif; ?>
-					</p>
-			<?php endif; ?>
+						if ($listing['cur_data']['desc']): ?>
+							<p class="listing-description" style="margin-top: 0.25em;"><?php echo $listing['cur_data']['desc']; ?></p><?php
+						endif; ?>
+					</td>
 
-			<?php if ($listing['cur_data']['desc']): ?>
-					<p class="listing-description" style="margin-top: 0.25em;"><?php echo $listing['cur_data']['desc']; ?></p>
-			<?php endif; ?>
-				</td>
-
-			</tr>
-		<?php } ?>
+				</tr>
+			<?php } ?>
 		</table>
 	</body>
 </html>
