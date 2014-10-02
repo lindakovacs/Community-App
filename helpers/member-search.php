@@ -367,13 +367,13 @@ class PL_User_Saved_Search {
 			<?php } ?>
 			<img class="pl_favorite_search_spinner" src="<?php echo $spinner ?>" alt="ajax-spinner" style="vertical-align:middle; visibility:hidden;">
 			<span id="pl_save_favorite_search" class="pl_favorite_search_link"<?php echo !$display_save ? ' style="display:none;"' : '' ?>>
-				<a><?php echo $save_text ?></a> | <?php echo $enable_text ?></span>
+				<a href="#save-search"><?php echo $save_text ?></a> | <?php echo $enable_text ?></span>
 			<span id="pl_clear_favorite_search" class="pl_favorite_search_link"<?php echo $display_save ? ' style="display:none;"' : '' ?>>
-				<a><?php echo $clear_text ?></a> |
+				<a href="#clear-search"><?php echo $clear_text ?></a> |
 			<span id="pl_enable_favorite_search" class="pl_favorite_search_link"<?php echo !$display_enable ? ' style="display:none;"' : '' ?>>
-				<a><?php echo $enable_text ?></a></span>
+				<a href="#enable-search"><?php echo $enable_text ?></a></span>
 			<span id="pl_disable_favorite_search" class="pl_favorite_search_link"<?php echo $display_enable ? ' style="display:none;"' : '' ?>>
-				<a><?php echo $disable_text ?></a></span></span>
+				<a href="#disable-search"><?php echo $disable_text ?></a></span></span>
 			<?php }
 
 		// Please register for a logged out user
