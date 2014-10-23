@@ -1,6 +1,6 @@
 <?php
 
-define("PL_ANALYTICS_SCRIPT_URL", "https://d3uemyw1e5n0jw.cloudfront.net/assets/analytics-1.0.js");
+//define("PL_ANALYTICS_SCRIPT_URL", "https://d3uemyw1e5n0jw.cloudfront.net/assets/analytics-1.0.js");
 
 global $PL_ANALYTICS_CONFIG;
 $PL_ANALYTICS_CONFIG = array(
