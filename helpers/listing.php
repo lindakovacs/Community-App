@@ -281,6 +281,8 @@ class PL_Listing_Helper {
 	}
 	
 	private static function prepare_post_array () {
+		$_POST = stripslashes_deep($_POST);
+
 		foreach ($_POST as $key => $value) {
 			if (is_int(strpos($key, 'property_type'))) {
 				unset( $_POST[$key] );
