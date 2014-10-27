@@ -52,7 +52,8 @@ class PL_Router {
 	public static function add_listings () {
 		if (isset($_GET['id'])) {
 			// Fetch listing and store it in the POST global...
-			$_POST = PL_Listing_Helper::single_listing($_GET['id']);
+			$listings = PL_Listing::get(array('listing_ids' => array($_GET['id']), 'address_mode' => 'exact'));
+			$_POST = empty($listings['listings']) ? null : $listings['listings'][0];
 		}
 
 		self::router('add-listing.php', array());
