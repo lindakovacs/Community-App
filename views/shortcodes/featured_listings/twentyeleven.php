@@ -5,9 +5,11 @@ $template = array(
 'css' => '
 .pl-tpl-fl-twentyeleven {
 	font-family: "Helvetica Neue", Arial, Helvetica, "Nimbus Sans L", sans-serif;
+	font-style: normal;
 }
 .pl-tpl-fl-twentyeleven .pls-listings {
 	margin: 0 !important;
+	border: 0 !important;
 	padding: 0 !important;
 	width: 100% !important;
 }
@@ -32,10 +34,18 @@ $template = array(
 	margin: 0 !important;
 	border: 1px solid #dfdfdf !important;
 	border-width: 0 0 1px 0 !important;
-	padding: 5px 0 !important;
-	width: 100% !important;
+	padding: 5px 0.5% !important;
+	width: 99% !important;
 	font-size: 14px !important;
 	overflow: hidden !important;
+	background: none !important;
+}
+.pl-tpl-fl-twentyeleven .listing-item>div {
+	width: auto !important;
+}
+.pl-tpl-fl-twentyeleven .listing-item div {
+	border: none !important;
+	background: none !important;
 }
 /* heading */
 .pl-tpl-fl-twentyeleven .listing-head {

@@ -28,17 +28,25 @@ It can be used as a guide for making a custom template that styles output create
 
 /* style each listing... */
 .pl-tpl-sl-twentyten .listing-item {
+	position: relative;
 	display: block !important;
 	float: none !important;
 	clear: both !important;
 	margin: 0 !important;
 	border: none !important;
-	padding: 10px 0 25px 0 !important;
-	background: none !important;
+	padding: 10px 0.5% 25px !important;
+	width: 99% !important;
+	font-size: 14px;
 	font-weight: 300 !important;
 	overflow: hidden !important;
-	font-size: 14px;
-	position: relative;
+	background: none !important;
+}
+.pl-tpl-sl-twentyten .listing-item>div {
+	width: auto !important;
+}
+.pl-tpl-sl-twentyten .listing-item div {
+	border: none !important;
+	background: none !important;
 }
 /* thumbnail */
 .pl-tpl-sl-twentyten .listing-thumbnail {
@@ -99,6 +107,9 @@ It can be used as a guide for making a custom template that styles output create
 	font-size: 14px !important;
 	font-weight: bold !important;
 	font-family: Georgia,"Bitstream Charter",serif !important;
+}
+.pl-tpl-sl-twentyten .basic-details li:before {
+	content: none !important;
 }
 /* description and compliance */
 .pl-tpl-sl-twentyten p.listing-description,
@@ -182,22 +193,27 @@ It can be used as a guide for making a custom template that styles output create
 .pl-tpl-sl-twentyten #container {
 	width: 100% !important;
 }
-.pl-tpl-sl-twentyten table {
+.pl-tpl-sl-twentyten table,
+.pl-tpl-sl-twentyten thead,
+.pl-tpl-sl-twentyten tfoot,
+.pl-tpl-sl-twentyten tbody,
+.pl-tpl-sl-twentyten tr,
+.pl-tpl-sl-twentyten th,
+.pl-tpl-sl-twentyten td {
+	display: block !important;
 	margin: 0 !important;
 	border: 0 !important;
+	padding: 0 !important;
 	width: 100% !important;
 }
 .pl-tpl-sl-twentyten table tr {
 	float: none !important;
-	border: none !important;
-	margin: 0 !important;
-	background: transparent !important;
+	background: none !important;
 }
 .pl-tpl-sl-twentyten table td {
 	border: 1px solid #dfdfdf !important;
 	border-width: 0 0 1px 0 !important;
-	padding: 0 !important;
-	background: transparent !important;
+	background: none !important;
 }
 /* styling for alternate rows */
 .pl-tpl-sl-twentyten table tr.odd td {

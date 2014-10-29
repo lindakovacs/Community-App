@@ -26,10 +26,18 @@ $template = array(
 	clear: both !important;
 	margin: 0 !important;
 	border: none !important;
-	padding: 5px 0 !important;
-	width: 100% !important;
+	padding: 5px 0.5% !important;
+	width: 99% !important;
 	font-size: 14px !important;
 	overflow: hidden !important;
+	background: none !important;
+}
+.pl-tpl-stl-twentyeleven .listing-item>div {
+	width: auto !important;
+}
+.pl-tpl-stl-twentyeleven .listing-item div {
+	border: none !important;
+	background: none !important;
 }
 /* heading */
 .pl-tpl-stl-twentyeleven .listing-head {
@@ -185,22 +193,27 @@ $template = array(
 .pl-tpl-stl-twentyeleven #container {
 	width: 100% !important;
 }
-.pl-tpl-stl-twentyeleven table {
+.pl-tpl-stl-twentyeleven table,
+.pl-tpl-stl-twentyeleven thead,
+.pl-tpl-stl-twentyeleven tfoot,
+.pl-tpl-stl-twentyeleven tbody,
+.pl-tpl-stl-twentyeleven tr,
+.pl-tpl-stl-twentyeleven th,
+.pl-tpl-stl-twentyeleven td {
+	display: block !important;
 	margin: 0 !important;
 	border: 0 !important;
+	padding: 0 !important;
 	width: 100% !important;
 }
 .pl-tpl-stl-twentyeleven table tr {
 	float: none !important;
-	border: none !important;
-	margin: 0 !important;
-	background: transparent !important;
+	background: none !important;
 }
 .pl-tpl-stl-twentyeleven table td {
 	border: 1px solid #dfdfdf !important;
 	border-width: 0 0 1px 0 !important;
-	padding: 0 !important;
-	background: transparent !important;
+	background: none !important;
 }
 /* styling for alternate rows */
 .pl-tpl-stl-twentyeleven table tr.odd td {
