@@ -147,7 +147,7 @@ It can be used as a guide for making a custom template that styles output create
 	bottom: 0;
 	right: 0;
 	margin: 0 !important;
-	padding: 0 !important;
+	padding: 0 0 .2em 0 !important;
 }
 .pl-tpl-fl-twentyten a.more-link {
 	float: right !important;

@@ -113,7 +113,7 @@ It can be used as a guide for making a custom template that styles output create
 }
 /* description and compliance */
 .pl-tpl-sl-twentyten p.listing-description,
-.pl-tpl-sl-twentyten .listing-item .compliance-wrapper p {	
+.pl-tpl-sl-twentyten .listing-item .compliance-wrapper p {
 	float: left !important;
 	margin: 0 0 .2em 0 !important;
 	max-height: 52px !important;
@@ -155,7 +155,7 @@ It can be used as a guide for making a custom template that styles output create
 	margin: .5em 0;
 	padding: 0;
 }
-		
+
 /* controls */
 .pl-tpl-sl-twentyten .sort_item {
 	float: left;
@@ -225,9 +225,9 @@ It can be used as a guide for making a custom template that styles output create
 'snippet_body' => '',
 
 'before_widget' => '<div class="pl-tpl-sl-twentyten">
-  <div id="pls_num_results_found" class="search_results">
-    <span id="pls_num_results"></span> listings match your search
-  </div>',
+<div id="pls_num_results_found" class="search_results">
+	<span id="pls_num_results"></span> listings match your search
+</div>',
 
 'after_widget' => '<div class="pl-tpl-footer">[compliance]</div></div>',
 

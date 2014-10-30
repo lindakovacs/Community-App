@@ -155,7 +155,7 @@ It can be used as a guide for making a custom template that styles output create
 	margin: .5em 0;
 	padding: 0;
 }
-		
+
 /* controls */
 .pl-tpl-stl-twentyten .sort_item {
 	float: left;

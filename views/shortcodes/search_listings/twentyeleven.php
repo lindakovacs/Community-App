@@ -69,12 +69,12 @@ $template = array(
 }
 .pl-tpl-sl-twentyeleven .listing-thumbnail img {
 	display: block !important;
-    -moz-box-sizing: border-box !important;
+	-moz-box-sizing: border-box !important;
 	margin: 0 0 10px 0 !important;
 	border: 0  !important;
-    border-radius: 0 !important;
-    box-shadow: 3px 3px 3px 0 rgba(0, 0, 0, 0.25) !important;
-    background: none repeat scroll 0 0 #F2F2F2 !important;
+	border-radius: 0 !important;
+	box-shadow: 3px 3px 3px 0 rgba(0, 0, 0, 0.25) !important;
+	background: none repeat scroll 0 0 #F2F2F2 !important;
 	padding: 0 !important;
 	width: 180px !important;
 	height: 120px !important;
@@ -270,9 +270,9 @@ $template = array(
 ',
 
 'before_widget' => '<div class="pl-tpl-sl-twentyeleven">
-  <div id="pls_num_results_found" class="search_results">
-    <span id="pls_num_results"></span> listings match your search
-  </div>',
+<div id="pls_num_results_found" class="search_results">
+	<span id="pls_num_results"></span> listings match your search
+</div>',
 
 'after_widget' => '<div class="pl-tpl-footer">[compliance]</div></div>',
 

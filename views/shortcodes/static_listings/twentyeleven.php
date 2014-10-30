@@ -9,6 +9,10 @@ $template = array(
 .pl-tpl-stl-twentyeleven .clear {
 	clear: both;
 }
+.pl-tpl-stl-twentyeleven form {
+	clear: both;
+	padding: 1em 0 0 0;
+}
 .pl-tpl-stl-twentyeleven p {
 	display: block !important;
 	float: none !important;
@@ -18,7 +22,7 @@ $template = array(
 	background: none !important;
 	line-height: 1.2em !important;
 }
-		
+
 /* style each listing... */
 .pl-tpl-stl-twentyeleven .listing-item {
 	display: block !important;
@@ -65,12 +69,12 @@ $template = array(
 }
 .pl-tpl-stl-twentyeleven .listing-thumbnail img {
 	display: block !important;
-    -moz-box-sizing: border-box !important;
+	-moz-box-sizing: border-box !important;
 	margin: 0 0 10px 0 !important;
 	border: 0  !important;
-    border-radius: 0 !important;
-    box-shadow: 3px 3px 3px 0 rgba(0, 0, 0, 0.25) !important;
-    background: none repeat scroll 0 0 #F2F2F2 !important;
+	border-radius: 0 !important;
+	box-shadow: 3px 3px 3px 0 rgba(0, 0, 0, 0.25) !important;
+	background: none repeat scroll 0 0 #F2F2F2 !important;
 	padding: 0 !important;
 	width: 180px !important;
 	height: 120px !important;
