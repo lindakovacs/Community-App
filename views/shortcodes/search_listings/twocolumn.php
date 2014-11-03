@@ -9,8 +9,8 @@ $template = array(
 	clear: both;
 }
 .pl-tpl-sl-twocolumn form {
-	clear: both;
-	padding: 1em 0 0 0;
+	clear: both !important;
+	padding: 1em 0 0 0 !important;
 }
 .pl-tpl-sl-twocolumn p {
 	display: block !important;
@@ -32,7 +32,7 @@ $template = array(
 	border: none !important;
 	padding: 10px 0.5% 0 !important;
 	width: 99% !important;
-	font-size: 14px;
+	font-size: 14px !important;
 	font-weight: 300 !important;
 	overflow: hidden !important;
 	background: none !important;
@@ -137,54 +137,103 @@ $template = array(
 
 /* compliance -shortcode- in the footer */
 .pl-tpl-sl-twocolumn .pl-tpl-footer .compliance-wrapper {
-	margin: .5em 0;
-	padding: 0;
+	margin: 1em 0 !important;
+	padding: 0 !important;
 }
-		
+
 /* controls */
-.pl-tpl-sl-twocolumn .sort_item {
-	float: left;
-	margin: 0 2em 0 0;
-	padding: 0;
+.pl-tpl-sl-twocolumn #pls_num_results_found {
+	float: right !important;
+	font-size: 115% !important;
+	margin: 0 1em 1em 0 !important;
+	padding: 0 !important;
 }
-.pl-tpl-sl-twocolumn .sort_item label {
-	display: inline;
-	padding: 0;
-	line-height: 20px;
-	font-size: 14px;
+.pl-tpl-sl-twocolumn .sort_wrapper {
+	margin: 1em 0 0 1em !important;
+	padding: 0 !important;
+	border: 0 !important;
+	background: none !important;
+	height: auto !important;
+	width: auto !important;
 }
-.pl-tpl-sl-twocolumn .sort_item select {
-	margin: 0;
+.pl-tpl-sl-twocolumn .sort_wrapper::before {
+	content: "Sort by" !important;
+	display: inline-block !important;
+	margin: 0 1em 0 0 !important;
+	padding: 0 !important;
+}
+.pl-tpl-sl-twocolumn .sort_wrapper .sort_item {
+	display: inline-block !important;
+	float: none !important;
+	vertical-align: middle !important;
+	margin: 0 1em 0 0 !important;
+	padding: 0 !important;
+	height: auto !important;
+	width: 130px !important;
+	max-width: 35% !important;
+}
+.pl-tpl-sl-twocolumn .sort_wrapper .sort_item label {
+	display: none !important;
 }
 .pl-tpl-sl-twocolumn .dataTables_length {
-	float: right;
-	margin: -24px 0 0 0;
-	padding: 0;
+	float: right !important;
+	margin: -2.35em 1em 0 0 !important;
+	border: 0 !important;
+	background: none !important;
+	height: auto !important;
+	width: auto !important;
+}
+.pl-tpl-sl-twocolumn .dataTables_length::before {
+	content: "Show" !important;
+	display: inline-block !important;
+	margin: 0 1em 0 0 !important;
+	padding: 0 !important;
 }
 .pl-tpl-sl-twocolumn .dataTables_length label {
-	line-height: 20px;
-	font-size: 14px;
+	display: inline-block !important;
+	float: none !important;
+	vertical-align: middle !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	height: auto !important;
+	width: 85px !important;
+}
+.pl-tpl-sl-twocolumn .dataTables_length span#dataTables_length_show,
+.pl-tpl-sl-twocolumn .dataTables_length span#dataTables_length_results {
+	display: none !important;
+}
+.pl-tpl-sl-twocolumn .sort_wrapper .sort_item .chzn-container,
+.pl-tpl-sl-twocolumn .dataTables_length label .chzn-container {
+	width: 100% !important;
+}
+.pl-tpl-sl-twocolumn .sort_wrapper .sort_item .chzn-drop,
+.pl-tpl-sl-twocolumn .dataTables_length label .chzn-container {
+	width: 94% !important;
+}
+.pl-tpl-sl-twocolumn .dataTables_processing {
+	visibility: hidden !important;
 }
 .pl-tpl-sl-twocolumn .dataTables_info {
-	clear: both !important;
-	border: 0 !important;
-	padding-top: 10px;
-	text-align: center;
+	display: none !important;
 }
 .pl-tpl-sl-twocolumn .dataTables_paginate {
 	clear: both !important;
+	margin: 0 !important;
+	padding: 1em 0 0 0 !important;
 	border: 0 !important;
+	background: none !important;
 }
 .pl-tpl-sl-twocolumn .dataTables_paginate a {
-	margin: 0 1em 0 0;
-	padding: 0;
-	font-weight: 200;
+	margin: 0 0.5em !important;
+	padding: 0 !important;
+	font-weight: 200 !important;
 }
 .pl-tpl-sl-twocolumn .dataTables_paginate a.paginate_active {
-	font-weight: 400;
+	font-weight: 400 !important;
 }
-.pl-tpl-sl-twocolumn .dataTables_paginate a.first, .pl-tpl-sl-twocolumn .dataTables_paginate a.last {
-	display: none;
+.pl-tpl-sl-twocolumn .dataTables_paginate a.first,
+.pl-tpl-sl-twocolumn .dataTables_paginate a.last {
+	display: none !important;
 }
 
 /* table formatting */
@@ -219,6 +268,12 @@ $template = array(
 	background: none !important;
 }
 
+@media (max-width: 479px) {
+	.pl-tpl-sl-twocolumn .dataTables_length,
+	.pl-tpl-sl-twocolumn .dataTables_processing {
+		display: none !important;
+	}
+}
 @media (min-width: 480px) {
 	.pl-tpl-sl-twocolumn table#placester_listings_list tbody tr.odd {
 		clear: both !important;
