@@ -122,6 +122,13 @@ $template = array(
 	font-size: 12px !important;
 }
 /* description and compliance */
+.pl-tpl-fl-twentyeleven .listing-item .compliance-wrapper {
+	clear: both !important;
+}
+.pl-tpl-fl-twentyeleven .listing-item .compliance-wrapper img,
+.pl-tpl-fl-twentyeleven .listing-item .agent-details img {
+	display: none !important;
+}
 .pl-tpl-fl-twentyeleven p.desc,
 .pl-tpl-fl-twentyeleven .listing-item .compliance-wrapper p {
 	margin-bottom: 5px !important;
@@ -160,10 +167,17 @@ $template = array(
 
 /* compliance -shortcode- in the footer */
 .pl-tpl-fl-twentyeleven .pl-tpl-footer .compliance-wrapper {
-	margin: .5em 0;
-	padding: 0;
+	clear: both !important;
+	margin: 2em 0 !important;
+	padding: 0 !important;
 }
-
+.pl-tpl-fl-twentyeleven .pl-tpl-footer .compliance-wrapper img {
+	float: left !important;
+	height: auto !important;
+	width: auto !important;
+	margin: 0 .75em .5em 0 !important;
+	padding: 0 !important;
+}
 ',
 
 'snippet_body' => '

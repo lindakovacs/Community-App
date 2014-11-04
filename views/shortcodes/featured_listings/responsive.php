@@ -2,7 +2,7 @@
 $template = array(
 
 'css' => '
-.pl-tpl-sl-responsive .clear { clear: both; }
+.pl-tpl-fl-responsive .clear { clear: both; }
 .clearfix { *zoom: 1; }
 .clearfix:before { display: table; line-height: 0; content: ""; }
 .clearfix:after { display: table; line-height: 0; content: ""; clear: both; }

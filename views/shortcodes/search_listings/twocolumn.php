@@ -101,6 +101,13 @@ $template = array(
 	content: none !important;
 }
 /* description and compliance */
+.pl-tpl-sl-twocolumn .listing-item .compliance-wrapper {
+	clear: both !important;
+}
+.pl-tpl-sl-twocolumn .listing-item .compliance-wrapper img,
+.pl-tpl-sl-twocolumn .listing-item .agent-details img {
+	display: none !important;
+}
 .pl-tpl-sl-twocolumn p.listing-description,
 .pl-tpl-sl-twocolumn .listing-item .compliance-wrapper p {
 	margin: 0 0 .2em 0 !important;
@@ -113,8 +120,6 @@ $template = array(
 .pl-tpl-sl-twocolumn .listing-item .compliance-wrapper p,
 .pl-tpl-sl-twocolumn .pl-tpl-footer .compliance-wrapper p {
 	font-size: .8em !important;
-}
-.pl-tpl-sl-twocolumn .listing-item .compliance-wrapper {
 }
 .pl-tpl-sl-twocolumn .listing-item .clear {
 	clear: none;
@@ -137,7 +142,15 @@ $template = array(
 
 /* compliance -shortcode- in the footer */
 .pl-tpl-sl-twocolumn .pl-tpl-footer .compliance-wrapper {
-	margin: 1em 0 !important;
+	clear: both !important;
+	margin: 2em 0 !important;
+	padding: 0 !important;
+}
+.pl-tpl-sl-twocolumn .pl-tpl-footer .compliance-wrapper img {
+	float: left !important;
+	height: auto !important;
+	width: auto !important;
+	margin: 0 .75em .5em 0 !important;
 	padding: 0 !important;
 }
 

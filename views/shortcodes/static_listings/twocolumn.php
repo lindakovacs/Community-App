@@ -9,8 +9,8 @@ $template = array(
 	clear: both;
 }
 .pl-tpl-stl-twocolumn form {
-	clear: both;
-	padding: 1em 0 0 0;
+	clear: both !important;
+	padding: 1em 0 0 0 !important;
 }
 .pl-tpl-stl-twocolumn p {
 	display: block !important;
@@ -32,7 +32,7 @@ $template = array(
 	border: none !important;
 	padding: 10px 0.5% 0 !important;
 	width: 99% !important;
-	font-size: 14px;
+	font-size: 14px !important;
 	font-weight: 300 !important;
 	overflow: hidden !important;
 	background: none !important;
@@ -101,6 +101,13 @@ $template = array(
 	content: none !important;
 }
 /* description and compliance */
+.pl-tpl-stl-twocolumn .listing-item .compliance-wrapper {
+	clear: both !important;
+}
+.pl-tpl-stl-twocolumn .listing-item .compliance-wrapper img,
+.pl-tpl-stl-twocolumn .listing-item .agent-details img {
+	display: none !important;
+}
 .pl-tpl-stl-twocolumn p.listing-description,
 .pl-tpl-stl-twocolumn .listing-item .compliance-wrapper p {
 	margin: 0 0 .2em 0 !important;
@@ -137,8 +144,16 @@ $template = array(
 
 /* compliance -shortcode- in the footer */
 .pl-tpl-stl-twocolumn .pl-tpl-footer .compliance-wrapper {
-	margin: .5em 0;
-	padding: 0;
+	clear: both !important;
+	margin: 2em 0 !important;
+	padding: 0 !important;
+}
+.pl-tpl-stl-twocolumn .pl-tpl-footer .compliance-wrapper img {
+	float: left !important;
+	height: auto !important;
+	width: auto !important;
+	margin: 0 .75em .5em 0 !important;
+	padding: 0 !important;
 }
 
 /* controls */
@@ -268,6 +283,12 @@ $template = array(
 	background: none !important;
 }
 
+@media (max-width: 479px) {
+	.pl-tpl-stl-twocolumn .dataTables_length,
+	.pl-tpl-stl-twocolumn .dataTables_processing {
+		display: none !important;
+	}
+}
 @media (min-width: 480px) {
 	.pl-tpl-stl-twocolumn table#placester_listings_list tbody tr.odd {
 		clear: both !important;

@@ -120,6 +120,14 @@ It can be used as a guide for making a custom template that styles output create
 	content: none !important;
 }
 /* description and compliance */
+.pl-tpl-fl-twentyten .listing-item .compliance-wrapper {
+	clear: both !important;
+	float: right;
+}
+.pl-tpl-fl-twentyten .listing-item .compliance-wrapper img,
+.pl-tpl-fl-twentyten .listing-item .agent-details img {
+	display: none !important;
+}
 .pl-tpl-fl-twentyten p.listing-description,
 .pl-tpl-fl-twentyten .listing-item .compliance-wrapper p {	
 	float: left !important;
@@ -134,9 +142,6 @@ It can be used as a guide for making a custom template that styles output create
 .pl-tpl-fl-twentyten .listing-item .compliance-wrapper p,
 .pl-tpl-fl-twentyten .pl-tpl-footer .compliance-wrapper p {
 	font-size: .8em !important;
-}
-.pl-tpl-fl-twentyten .listing-item .compliance-wrapper {
-	float: right;
 }
 .pl-tpl-fl-twentyten .listing-item .clear {
 	clear: none;
@@ -160,8 +165,16 @@ It can be used as a guide for making a custom template that styles output create
 
 /* compliance -shortcode- in the footer */
 .pl-tpl-fl-twentyten .pl-tpl-footer .compliance-wrapper {
-	margin: .5em 0;
-	padding: 0;
+	clear: both !important;
+	margin: 2em 0 !important;
+	padding: 0 !important;
+}
+.pl-tpl-fl-twentyten .pl-tpl-footer .compliance-wrapper img {
+	float: left !important;
+	height: auto !important;
+	width: auto !important;
+	margin: 0 .75em .5em 0 !important;
+	padding: 0 !important;
 }
 ',
 

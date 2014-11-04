@@ -112,8 +112,16 @@ It can be used as a guide for making a custom template that styles output create
 	content: none !important;
 }
 /* description and compliance */
+.pl-tpl-stl-twentyten .listing-item .compliance-wrapper {
+	clear: both !important;
+	float: right;
+}
+.pl-tpl-stl-twentyten .listing-item .compliance-wrapper img,
+.pl-tpl-stl-twentyten .listing-item .agent-details img {
+	display: none !important;
+}
 .pl-tpl-stl-twentyten p.listing-description,
-.pl-tpl-stl-twentyten .listing-item .compliance-wrapper p {	
+.pl-tpl-stl-twentyten .listing-item .compliance-wrapper p {
 	float: left !important;
 	margin: 0 0 .2em 0 !important;
 	max-height: 52px !important;
@@ -126,9 +134,6 @@ It can be used as a guide for making a custom template that styles output create
 .pl-tpl-stl-twentyten .listing-item .compliance-wrapper p,
 .pl-tpl-stl-twentyten .pl-tpl-footer .compliance-wrapper p {
 	font-size: .8em !important;
-}
-.pl-tpl-stl-twentyten .listing-item .compliance-wrapper {
-	float: right;
 }
 .pl-tpl-stl-twentyten .listing-item .clear {
 	clear: none;
@@ -152,8 +157,16 @@ It can be used as a guide for making a custom template that styles output create
 
 /* compliance -shortcode- in the footer */
 .pl-tpl-stl-twentyten .pl-tpl-footer .compliance-wrapper {
-	margin: .5em 0;
-	padding: 0;
+	clear: both !important;
+	margin: 2em 0 !important;
+	padding: 0 !important;
+}
+.pl-tpl-stl-twentyten .pl-tpl-footer .compliance-wrapper img {
+	float: left !important;
+	height: auto !important;
+	width: auto !important;
+	margin: 0 .75em .5em 0 !important;
+	padding: 0 !important;
 }
 
 /* controls */
@@ -269,19 +282,29 @@ It can be used as a guide for making a custom template that styles output create
 	padding: 0 !important;
 	width: 100% !important;
 }
-.pl-tpl-stl-twentyten table tr {
-	float: none !important;
+.pl-tpl-stl-twentyten table#placester_listings_list {
+	position: static !important;
+}
+.pl-tpl-stl-twentyten table#placester_listings_list:after {
+	display: none !important;
+}
+.pl-tpl-stl-twentyten table#placester_listings_list tbody tr {
 	background: none !important;
 }
-.pl-tpl-stl-twentyten table td {
+.pl-tpl-stl-twentyten table#placester_listings_list tbody tr td {
 	border: 1px solid #dfdfdf !important;
 	border-width: 0 0 1px 0 !important;
 	background: none !important;
 }
+
 /* styling for alternate rows */
-.pl-tpl-stl-twentyten table tr.odd td {
+.pl-tpl-stl-twentyten table tbody tr.odd td {
+		clear: both !important;
+		float: none !important;
 }
-.pl-tpl-stl-twentyten table tr.even td {
+.pl-tpl-stl-twentyten table tbody tr.even td {
+		clear: both !important;
+		float: none !important;
 }
 ',
 
