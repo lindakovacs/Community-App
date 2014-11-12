@@ -1,8 +1,8 @@
 === Plugin Name ===
 Contributors: Placester, MattBarba
 Tags: real estate, realestate, home, housing, rentals, properties, neighborhood, map, mortgage, listing, listings, craigslist, rental, google map, mls, idx, rets, agent, broker, leasing, realty, realtor, placester, widget, buddypress, homes, property, property management, estate, realestate, real estate crm, real estate maps
-Requires at least: 3.0
-Tested up to: 3.9
+Requires at least: 3.4
+Tested up to: 4.0
 Stable tag: 1.2.2
 
 Easily create and manage real estate sites powered by WordPress.
@@ -141,6 +141,24 @@ Absolutely, [reach out](mailto:support@placester.com) to us and let us know what
 In general - real-time. But if you use 3rd party property management services, the updates will only be as recent as your provider allows.
 
 == Changelog ==
+
+= 1.2.2 =
+* Fixed a few formatting bugs having to do with compliance info
+* Review and fix of listing sort menus in shortcode templates for responsive themes
+* Added new responsive shortcode tmplates for listings: "twocolumn"
+* Fixed bug having to do with property unit number when adding/editing listings
+* Disabled the Placester pixel, which is no longer served up
+* Added two new compliance message locations on the PDP
+* Added lead capture shortcode functionality
+* Added code to set lead capture cookie on sign up and login (not just within contact form)
+* Made changes for better backward compatibility with already distributed themes
+* Enabled local storage of favorite properties
+* Fixed bug that sometimes caused images to display out of order
+* Changed API client to use POST requests (rather than GETs) for long search queries
+* Fixed paging bugs in the ajax search system
+* Fixed several bugs in the search results map
+* Improved the featured listings picker
+* Additional minor fixes having to do with changes in WP4 relative to WP3.9
 
 = 1.2.1 =
 * Turned caching off by default for off-hosted users (enabled in wp-config)
