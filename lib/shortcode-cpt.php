@@ -536,10 +536,7 @@ class PL_Shortcode_CPT {
 	public static function load_template($id, $shortcode) {
 		$default = array();
 
-		if ($id && $shortcode && !empty(self::$shortcodes[$shortcode])) {
-			// Get template from shortcode's template list in case we are using
-			// default or builtin template
-
+		if ($id && $shortcode) {
 			// get custom template list
 			$option_key = ('pls_' . $shortcode.'_list');
 			$tpl_list = get_option($option_key, array());
@@ -552,20 +549,21 @@ class PL_Shortcode_CPT {
 			if (!in_array($id, $tpls)) {
 				// use twenty ten if there's no template or it's not found
 				$id = 'twentyten';
-			}	
-			if (in_array($id, $tpls)) {
-				$template = array();
-				$filename = (trailingslashit(PL_VIEWS_SHORT_DIR) . trailingslashit($shortcode) . $id . '.php');
-				ob_start();
-				include $filename;
-				$raw = ob_get_clean();
-				// support old style built in templates
-				if (empty($template)) {
-					$template['snippet_body'] = $raw;
-				}
-				return array_merge($template, array('shortcode'=>$shortcode, 'title'=>$id));
 			}
+
+			$template = array();
+			$filename = (trailingslashit(PL_VIEWS_SHORT_DIR) . trailingslashit($shortcode) . $id . '.php');
+
+			ob_start();			// support old style built in templates
+			include $filename;
+			$raw = ob_get_clean();
+			if (empty($template)) {
+				$template['snippet_body'] = $raw;
+			}
+
+			return array_merge($template, array('shortcode'=>$shortcode, 'title'=>$id));
 		}
+
 		return $default;
 	}
 

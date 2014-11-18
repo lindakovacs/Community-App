@@ -59,14 +59,7 @@ For example, to only display user name if it has a value:<br />
 			'type' => 'textarea',
 			'label' => 'HTML',
 			'css' => 'mime_html',
-			'default' => '
-<div class="user-profile-item">
-	<label>Name:</label>[name]
-</div>
-<div class="user-profile-item">
-	<label>Email:</label>[email]
-</div>
-',
+			'default' => '',
 			'description'	=> 'You can use any valid HTML in this field to format the template tags.'
 		),
 
@@ -74,8 +67,7 @@ For example, to only display user name if it has a value:<br />
 			'type' => 'textarea',
 			'label' => 'CSS',
 			'css' => 'mime_css',
-			'default' => '
-			',
+			'default' => '',
 			'description' => 'You can use any valid CSS in this field to customize the form, which will also inherit the CSS from the theme.'
 		),
 

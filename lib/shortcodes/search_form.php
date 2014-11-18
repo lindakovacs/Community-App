@@ -70,28 +70,7 @@ In the following example a search field is created for the custom attribute \'ro
 			'type' => 'textarea',
 			'label' => 'HTML',
 			'css' => 'mime_html',
-			'default' => '
-<div class="search-item">
-	<label>Min Beds:</label>[min_beds]
-</div>
-<div class="search-item">
-	<label>Min Baths:</label>[min_baths]
-</div>
-<div class="search-item">
-	<label>Min Price:</label>[min_price]
-</div>
-<div class="search-item">
-	<label>Max Price:</label>[max_price]
-</div>
-<div class="search-item">
-	<label>City:</label>[cities]
-</div>
-<div class="search-item	">
-	<label>Property Type:</label>[property_type]
-</div>
-<div class="search-item	">
-	<input type="submit" name="submit" value="Search Now!">
-</div>',
+			'default' => '',	// loaded dynamically from views/shortcodes
 			'description'	=> 'You can use any valid HTML in this field to format the template tags.'
 		),
 
@@ -99,26 +78,21 @@ In the following example a search field is created for the custom attribute \'ro
 			'type' => 'textarea',
 			'label' => 'CSS',
 			'css' => 'mime_css',
-			'default' => '
-form.pls_search_form_listings .search-item { float: left; margin-bottom: 20px; width: 30%; display: inline-block; margin-left: 2.9%; }
-@media (max-width: 979px) { form.pls_search_form_listings .search-item { margin-bottom: 5px; } }
-form.pls_search_form_listings .search-item label { float: left; width: 100%; }
-@media (min-width: 768px) and (max-width: 979px) { form.pls_search_form_listings .search-item { margin-left: 2%; } }
-@media (max-width: 767px) { form.pls_search_form_listings .search-item { margin-left: 2%; width: 47%; } }
-@media (max-width: 420px) { form.pls_search_form_listings .search-item { margin-left: 2%; width: 97%; } }
-form.pls_search_form_listings .search-item select, form.pls_search_form_listings .search-item .chzn-container { width: 80% !important; }
-			',
+			'default' => '',	// loaded dynamically from views/shortcodes
 			'description' => 'You can use any valid CSS in this field to customize the form, which will also inherit the CSS from the theme.'
 		),
 
 		'before_widget'	=> array(
 			'type' => 'textarea',
 			'label' => 'Add content before the form',
-			'default' => '<div class="my-searchform">',
+			'default' => '',	// loaded dynamically from views/shortcodes
 			'description' => 'You can use any valid HTML in this field and it will appear before the form. For example, you can wrap the whole form with a <div> element to apply borders, etc, by placing the opening <div> tag in this field and the closing </div> tag in the following field.'
 		),
 
-		'after_widget'	=> array( 'type' => 'textarea', 'label' => 'Add content after the form', 'default' => '<div style="clear:both"></div></div>',
+		'after_widget'	=> array(
+			'type' => 'textarea',
+			'label' => 'Add content after the form',
+			'default' => '',	// loaded dynamically from views/shortcodes
 			'description' => 'You can use any valid HTML in this field and it will appear after the form.'
 		),
 	);

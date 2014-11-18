@@ -50,13 +50,7 @@ class PL_Listing_Slideshow_CPT extends PL_SC_Base {
 			'type' => 'textarea',
 			'label' => 'Caption text for each slideshow image',
 			'css' => 'mime_html',
-			'default' =>
-'
-<div id="caption-[ls_index]" class="orbit-caption">
-	<p class="caption-title"><a href="[ls_url]">[ls_address]</a></p>
-	<p class="caption-subtitle"><span class="price">[ls_beds] beds</span>, <span class="baths">[ls_baths] baths</span></p>
-	<a class="button details" href="[ls_url]"><span></span></a>
-</div>',
+			'default' =>'',	// loaded dynamically from views/shortcodes
 			'description' => 'You can use any valid HTML in this field to format the template tags, but you must ensure that it is contained in a block similar to:
 <div id="caption-[ls_index]" class="orbit-caption">...</div>.'
 		),
@@ -65,47 +59,7 @@ class PL_Listing_Slideshow_CPT extends PL_SC_Base {
 			'type' => 'textarea',
 			'label' => 'CSS to style your slideshow',
 			'css' => 'mime_css',
-			'default' => '
-/* sample div used to wrap the slideshow plus any additional html */
-.my-slideshow {
-	overflow: hidden;;
-}
-/* sample div used to wrap the slideshow */
-.my-slideshow-wrapper {
-	float: left;
-	border: 1px solid #7f7f7f;
-	padding: 5px;
-}
-/* controls background of caption area */
-.orbit-wrapper .orbit-caption {
-	background: none repeat scroll 0 0 rgba(0, 0, 0, 0.6);
-	color: #fff;
-}
-/* controls general layout of caption items */
-.orbit-wrapper .orbit-caption p {
-	margin: 0;
-	padding: 10px 20px 0;
-}
-/* caption title */
-.orbit-wrapper .orbit-caption .caption-title {
-	font-weight: bold;
-	font-size: 1.8em;
-}
-/* caption sub-title */
-.orbit-wrapper .orbit-caption .caption-subtitle {
-	padding-top: 0;
-	padding-bottom: 10px;
-	font-size: 1.2em;
-}
-/* make sure caption links are visible! */
-#main .my-slideshow .orbit-wrapper .orbit-caption a {
-	color: #fff;
-	text-decoration: none;
-}
-#main .my-slideshow .orbit-wrapper .orbit-caption a:hover {
-	color: #fff;
-	text-decoration: underline;
-}',
+			'default' => '',	// loaded dynamically from views/shortcodes
 			'description' => 'You can use any valid CSS in this field to customize the caption, which will also inherit the CSS from the theme.'
 		),
 
@@ -113,9 +67,7 @@ class PL_Listing_Slideshow_CPT extends PL_SC_Base {
 			'type' => 'textarea',
 			'label' => 'Add content before the slideshow',
 			'css' => 'mime_html',
-			'default' => '
-<div class="my-slideshow">
-	<div class="my-slideshow-wrapper">',
+			'default' => '',	// loaded dynamically from views/shortcodes
 			'description'	=> 'You can use any valid HTML in this field and it will appear before the slideshow images.
 For example, you can wrap the whole slideshow with a <div> element to apply borders, etc, by placing the opening <div> tag in this field and the closing </div> tag in the following field.'
 		),
@@ -124,9 +76,7 @@ For example, you can wrap the whole slideshow with a <div> element to apply bord
 			'type' => 'textarea',
 			'label' => 'Add content after the slideshow',
 			'css' => 'mime_html',
-			'default' => '
-	</div>
-</div>',
+			'default' => '',	// loaded dynamically from views/shortcodes
 			'description' => 'You can use any valid HTML in this field and it will appear after the slideshow images.'
 		),
 	);
