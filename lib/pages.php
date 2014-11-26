@@ -129,7 +129,6 @@ class PL_Pages {
 			$response = PL_Listing_Helper::results($args, false);
 			if (!empty($response['listings'][0])) {
 				$query->set('post_type', self::$property_post_type);
-				$query->set('cache_results', true);			// make wp cache our fake property post, see WP-840
 				self::$listing_details = $response['listings'][0];
 			}
 		}
