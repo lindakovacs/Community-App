@@ -8,6 +8,7 @@ This template has no html body because it uses the built in listing renderer.
 It can be used as a guide for making a custom template that styles output created by the built in renderer.
 */
 .pl-tpl-fvl-twentyten {
+	font-style: normal;
 }
 .pl-tpl-fvl-twentyten .clear {
 	clear: both;
@@ -27,19 +28,33 @@ It can be used as a guide for making a custom template that styles output create
 }
 
 /* style each listing... */
+.pl-tpl-fvl-twentyten .pls-listings {
+	margin: 0 !important;
+	border: 0 !important;
+	padding: 0 !important;
+	width: 100% !important;
+}
 .pl-tpl-fvl-twentyten .listing-item {
+	position: relative;
 	display: block !important;
 	float: none !important;
 	clear: both !important;
 	margin: 0 !important;
 	border: 1px solid #dfdfdf !important;
 	border-width: 0 0 1px 0 !important;
-	padding: 10px 0 25px 0 !important;
-	background: none !important;
+	padding: 10px 0.5% 25px !important;
+	width: 99% !important;
+	font-size: 14px;
 	font-weight: 300 !important;
 	overflow: hidden !important;
-	font-size: 14px;
-	position: relative;
+	background: none !important;
+}
+.pl-tpl-fvl-twentyten .listing-item>div {
+	width: auto !important;
+}
+.pl-tpl-fvl-twentyten .listing-item div {
+	border: none !important;
+	background: none !important;
 }
 /* thumbnail */
 .pl-tpl-fvl-twentyten .listing-thumbnail {
@@ -101,9 +116,20 @@ It can be used as a guide for making a custom template that styles output create
 	font-weight: bold !important;
 	font-family: Georgia,"Bitstream Charter",serif !important;
 }
+.pl-tpl-fvl-twentyten .basic-details li:before {
+	content: none !important;
+}
 /* description and compliance */
+.pl-tpl-fvl-twentyten .listing-item .compliance-wrapper {
+	clear: both !important;
+	float: right;
+}
+.pl-tpl-fvl-twentyten .listing-item .compliance-wrapper img,
+.pl-tpl-fvl-twentyten .listing-item .agent-details img {
+	display: none !important;
+}
 .pl-tpl-fvl-twentyten p.listing-description,
-.pl-tpl-fvl-twentyten .listing-item .compliance-wrapper p {	
+.pl-tpl-fvl-twentyten .listing-item .compliance-wrapper p {
 	float: left !important;
 	margin: 0 0 .2em 0 !important;
 	max-height: 52px !important;
@@ -116,9 +142,6 @@ It can be used as a guide for making a custom template that styles output create
 .pl-tpl-fvl-twentyten .listing-item .compliance-wrapper p,
 .pl-tpl-fvl-twentyten .pl-tpl-footer .compliance-wrapper p {
 	font-size: .8em !important;
-}
-.pl-tpl-fvl-twentyten .listing-item .compliance-wrapper {
-	float: right;
 }
 .pl-tpl-fvl-twentyten .listing-item .clear {
 	clear: none;
@@ -142,8 +165,16 @@ It can be used as a guide for making a custom template that styles output create
 
 /* compliance -shortcode- in the footer */
 .pl-tpl-fvl-twentyten .pl-tpl-footer .compliance-wrapper {
-	margin: .5em 0;
-	padding: 0;
+	clear: both !important;
+	margin: 2em 0 !important;
+	padding: 0 !important;
+}
+.pl-tpl-fvl-twentyten .pl-tpl-footer .compliance-wrapper img {
+	float: left !important;
+	height: auto !important;
+	width: auto !important;
+	margin: 0 .75em .5em 0 !important;
+	padding: 0 !important;
 }
 ',
 

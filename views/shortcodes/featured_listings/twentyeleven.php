@@ -5,9 +5,11 @@ $template = array(
 'css' => '
 .pl-tpl-fl-twentyeleven {
 	font-family: "Helvetica Neue", Arial, Helvetica, "Nimbus Sans L", sans-serif;
+	font-style: normal;
 }
 .pl-tpl-fl-twentyeleven .pls-listings {
 	margin: 0 !important;
+	border: 0 !important;
 	padding: 0 !important;
 	width: 100% !important;
 }
@@ -32,10 +34,18 @@ $template = array(
 	margin: 0 !important;
 	border: 1px solid #dfdfdf !important;
 	border-width: 0 0 1px 0 !important;
-	padding: 5px 0 !important;
-	width: 100% !important;
+	padding: 5px 0.5% !important;
+	width: 99% !important;
 	font-size: 14px !important;
 	overflow: hidden !important;
+	background: none !important;
+}
+.pl-tpl-fl-twentyeleven .listing-item>div {
+	width: auto !important;
+}
+.pl-tpl-fl-twentyeleven .listing-item div {
+	border: none !important;
+	background: none !important;
 }
 /* heading */
 .pl-tpl-fl-twentyeleven .listing-head {
@@ -112,6 +122,13 @@ $template = array(
 	font-size: 12px !important;
 }
 /* description and compliance */
+.pl-tpl-fl-twentyeleven .listing-item .compliance-wrapper {
+	clear: both !important;
+}
+.pl-tpl-fl-twentyeleven .listing-item .compliance-wrapper img,
+.pl-tpl-fl-twentyeleven .listing-item .agent-details img {
+	display: none !important;
+}
 .pl-tpl-fl-twentyeleven p.desc,
 .pl-tpl-fl-twentyeleven .listing-item .compliance-wrapper p {
 	margin-bottom: 5px !important;
@@ -150,10 +167,17 @@ $template = array(
 
 /* compliance -shortcode- in the footer */
 .pl-tpl-fl-twentyeleven .pl-tpl-footer .compliance-wrapper {
-	margin: .5em 0;
-	padding: 0;
+	clear: both !important;
+	margin: 2em 0 !important;
+	padding: 0 !important;
 }
-
+.pl-tpl-fl-twentyeleven .pl-tpl-footer .compliance-wrapper img {
+	float: left !important;
+	height: auto !important;
+	width: auto !important;
+	margin: 0 .75em .5em 0 !important;
+	padding: 0 !important;
+}
 ',
 
 'snippet_body' => '

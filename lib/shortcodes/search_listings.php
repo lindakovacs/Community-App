@@ -95,6 +95,8 @@ To add some text to your listings:<br />
 <code>[if group=\'rets\' attribute=\'aid\' value=\'MY_MLS_AGENT_ID\']&lt;span&gt;Featured Listing&lt;/span&gt;[/if]</code>'),
 );
 
+	protected $default_tpls = array('twentyten', 'twentyeleven', 'responsive', 'twocolumn');
+
 	protected $template = array(
 		'snippet_body'	=> array(
 			'type' => 'textarea',
