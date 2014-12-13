@@ -43,10 +43,15 @@
 .form_group#Show_Filters section.pls_search_form label {
   width: 95px;
   float: left;
+  margin-left: 3px
 }
 .form_group#Show_Filters section.pls_search_form input[type="checkbox"] {
-  width: 20px;
-  float: left;
+    display: block;
+    width: 16px;
+    height: 16px;
+    margin: 1px;
+    float: left;
+    clear: both;
 }
 /*Search filter filters*/
 
@@ -74,6 +79,7 @@
 .form_group section.pls_search_form label {
   width: 170px;
   float: left;
+  margin-left: 3px
   background: none;
 }
 .form_group section.pls_search_form input, .form_group section.pls_search_form select {
@@ -81,8 +87,12 @@
   float: left;
 }
 .form_group section.pls_search_form input[type="checkbox"] {
-  width: 20px;
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin: 1px;
   float: left;
+  clear: both;
 }
 
 .form_group h3 {
