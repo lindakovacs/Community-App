@@ -272,6 +272,10 @@ class PL_CRM_Contactually extends PL_CRM_Base {
 		// Set e-mail...
 		$contact["email"] = empty($args["email"]) ? "<none provided>" : $args["email"];
 
+		// Set phone if available
+		if(!empty($args["phone"]))
+			$contact["phone_numbers"] = array(array("label" => "Phone", "value" => $args["phone"]));
+
 		// TODO: Pass the site's URL as a note, push to a site-specific bucket, pass along the message, etc.
 		//
 		// Can't do this until Contactually actually documents their API properly AND gives us the ability to
