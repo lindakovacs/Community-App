@@ -8,13 +8,22 @@ $template = array(
 .basic-property-listing {
 }
 
+.basic-property-listing #main-image img {
+	width: 100% !important;
+	height: auto !important;
+}
+
+.basic-property-listing .amenities-wrapper ul {
+	margin: 0px;
+}
+
 .basic-property-listing .slideshow-wrapper ul {
 	list-style: none !important;
 }
 
 .basic-property-listing .slideshow-wrapper li {
 	display: inline-block;
-	margin: 5px 5px 0 0;
+	margin: 6px 6px 0 0;
 }
 ',
 
@@ -41,14 +50,18 @@ $template = array(
 
 <div class="slideshow-wrapper">
 	<h3></h3>
-	[image width=750 height=500]
-	[gallery]
+	<div id="main-image">
+		[image width=900 height=600]
+	</div>
+	<div id="gallery">
+		[gallery]
+	</div>
 </div>
 
 <div class="details-wrapper">
 	<h3>Basic Details</h3>
 	<ul>
-    	<li><span>Beds: </span>[beds]</li>
+		<li><span>Beds: </span>[beds]</li>
 		<li><span>Baths: </span>[baths]</li>
 		<li><span>Half Baths: </span>[half_baths]</li>
 		<li><span>Square Feet: </span>[sqft]</li>
@@ -63,12 +76,14 @@ $template = array(
 
 <div class="amenities-wrapper">
 	<h3>Listing Amenities</h3>
-	[amenities]
+	[amenities type=\'list\']
+	[amenities type=\'ngb\']
+	[amenities type=\'uncur\']
 </div>
 
 <div class="map-wrapper">
 	<h3>Property Map</h3>
-	[map width=750 height=375]
+	[map width=400 height=300]
 </div>
 ',
 
