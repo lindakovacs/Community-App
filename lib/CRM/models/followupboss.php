@@ -141,11 +141,11 @@ class PL_CRM_Followupboss extends PL_CRM_Base {
 				$newVal = "";
 				if (is_array($value)) {
 					foreach ($value as $item) {
-						$type = empty($item["type"]) ? "" : "(<i>{$item['type']}</i>)<br/>";
-						$val = empty($item["value"]) ? "" : "{$item['value']} ";
-						$newVal .= "{$val}{$type}";
+						if (is_array($item)) {
+							$newVal .= $item['value'] . ", ";
+						}
 					}
-					// $newVal = rtrim($newVal, ", ");
+					$newVal = rtrim($newVal, ", ");
 				}
 				break;
 			case "string":

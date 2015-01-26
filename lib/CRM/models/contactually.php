@@ -53,7 +53,7 @@ class PL_CRM_Contactually extends PL_CRM_Base {
 			),
 			"phone_numbers" => array(
 				"label" => "Phone(s)",
-				"data_format" => "array",
+				"data_format" => "hash_array",
 				"searchable" => false
 			),
 			"company" => array(
@@ -149,6 +149,17 @@ class PL_CRM_Contactually extends PL_CRM_Base {
 				if (is_array($value)) {
 					foreach ($value as $item) {
 						$newVal .= "{$item}, ";
+					}
+					$newVal = rtrim($newVal, ", ");
+				}
+				break;
+			case "hash_array":
+				$newVal = "";
+				if (is_array($value)) {
+					foreach ($value as $item) {
+						if (is_array($item)) {
+							$newVal .= $item['value'] . ", ";
+						}
 					}
 					$newVal = rtrim($newVal, ", ");
 				}
@@ -271,6 +282,10 @@ class PL_CRM_Contactually extends PL_CRM_Base {
 
 		// Set e-mail...
 		$contact["email"] = empty($args["email"]) ? "<none provided>" : $args["email"];
+
+		// Set phone if available
+		if(!empty($args["phone"]))
+			$contact["phone_numbers"] = array(array("label" => "Phone", "value" => $args["phone"]));
 
 		// TODO: Pass the site's URL as a note, push to a site-specific bucket, pass along the message, etc.
 		//

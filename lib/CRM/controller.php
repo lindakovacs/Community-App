@@ -288,8 +288,9 @@ class PL_CRM_Controller {
 	}
 
 	public static function getImageURL ($img_file) {
-		$img_path = trailingslashit(dirname(__FILE__)) . "views/images/{$img_file}";
-		$img_url = plugin_dir_url($img_path) . $img_file;
+		// $img_path = trailingslashit(dirname(__FILE__)) . "views/images/{$img_file}";
+		// $img_url = plugin_dir_url($img_path) . $img_file;
+		$img_url = PL_LIB_URL . 'CRM/views/images/' . $img_file;
 
 		return $img_url;
 	}

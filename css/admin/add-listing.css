@@ -104,7 +104,16 @@ section#location.form_group section {
 	width: 190px;
 }
 .pls_search_form input[type="checkbox"] {
-	width: 20px;
+    display: block;
+    width: 16px;
+    height: 16px;
+    margin: 3px 1px;
+    float: left;
+    clear: both;
+}
+
+section.pls_search_form label {
+    margin-left: 3px
 }
 
 .address {

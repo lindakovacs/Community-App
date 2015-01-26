@@ -85,6 +85,13 @@ abstract class PL_SC_Base {
 
 	public function __construct() {
  		add_action( 'template_redirect', array( $this, 'post_type_templating' ) );
+
+		// Dynamically load default markup for new shortcode templates
+		// Note: This (necessarily) runs after the member variable initializations of the subclass
+		$default_template = PL_Shortcode_CPT::load_template('default', $this->shortcode);
+		foreach($this->template as $key => &$value) {
+			$value['default'] = $default_template[$key];
+		}
 	}
 
 	/**

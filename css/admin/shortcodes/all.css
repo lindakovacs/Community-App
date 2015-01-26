@@ -73,6 +73,8 @@
 }
 .sc-meta-section input[type="checkbox"] {
 	clear: both;
+	height: 16px;
+	width: 16px;
 	margin: .3em .5em 0 0;
 }
 .sc-meta-section input.form_item_int {
