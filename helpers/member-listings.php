@@ -20,6 +20,8 @@ class PL_Favorite_Listings {
 
 		// ...else try the Placester API
 		if(!$favorites) {
+			$favorites = array();
+
 			$lead = PL_People_Helper::person_details();
 			if (isset($lead['fav_listings']) && is_array($lead['fav_listings'])) {
 				$api_favorites = $lead['fav_listings'];
@@ -29,11 +31,6 @@ class PL_Favorite_Listings {
 					$favorites[] = $item['id'];
 				}
 				update_user_option(get_current_user_id(), 'pl_member_listings', $favorites);
-			}
-
-			// None found
-			else {
-				$favorites = array();
 			}
 		}
 
