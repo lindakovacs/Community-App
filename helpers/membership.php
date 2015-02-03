@@ -53,6 +53,7 @@ class PL_Membership_Helper {
 }
 
 // override the default registration notification function from wp-includes/pluggable.php
+if ( !function_exists('wp_new_user_notification') ) :
 function wp_new_user_notification($user_id, $plaintext_pass = '') {
 	$user = get_userdata( $user_id );
 
@@ -76,3 +77,4 @@ function wp_new_user_notification($user_id, $plaintext_pass = '') {
 
 	wp_mail($user->user_email, sprintf(__('[%s] Your username and password'), $blogname), $message);
 }
+endif;
