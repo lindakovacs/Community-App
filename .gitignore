@@ -1,8 +1,4 @@
-blueprint
-.idea/
-.DS_Store
-.sass-cache
-
-.buildpath
-.project
-.settings/*
+.*
+!.git*
+!.svn*
+!.htaccess
