@@ -1,14 +1,11 @@
 <?php
 
 define( 'SOCIAL_DEBUGGER', false );
-define( 'DX_CRONO_POSTER_URL', plugin_dir_path( __FILE__ ) );
+define( 'DX_CRONO_POSTER_PATH', plugin_dir_path( __FILE__ ) );
 
 PL_Social_Networks::init();
 
 class PL_Social_Networks {
-	public static $plugin_dir;
-	public static $plugin_url;
-	
 	// Twitter related variables
 	public static $user_token = NULL;
 	public static $user_token_secret = NULL;
@@ -41,8 +38,6 @@ class PL_Social_Networks {
 		self::$fb_list_icon = PL_IMG_URL . '/social/pls-fb-icon.png';
 		self::$twitter_list_icon = PL_IMG_URL . '/social/pls-twitter-icon.png';
 		
-		self::$plugin_dir = plugin_dir_path( __FILE__ );
-		self::$plugin_url = plugin_dir_url( __FILE__ );
 		add_action( 'admin_init', array( __CLASS__, 'init_admin_redirect_uri' ), 1 );
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_post_metaboxes' ) );
 		add_action( 'save_post', array( __CLASS__, 'save_post_social_messages' ) );
@@ -870,6 +865,6 @@ function pls_debug_socials( $arg, $color = 'black' ) {
 function pls_log_socials( $file, $text ) {
 	if( SOCIAL_DEBUGGER ) {
 		$content = time() . ': ' . $text . "\n";
-		file_put_contents(DX_CRONO_POSTER_URL  . 'logs/' . $file, $content, FILE_APPEND | LOCK_EX);
+		file_put_contents(DX_CRONO_POSTER_PATH  . 'logs/' . $file, $content, FILE_APPEND | LOCK_EX);
 	}
 }
