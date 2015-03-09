@@ -2,8 +2,8 @@
 Contributors: Placester, MattBarba
 Tags: real estate, realestate, home, housing, rentals, properties, neighborhood, map, mortgage, listing, listings, craigslist, rental, google map, mls, idx, rets, agent, broker, leasing, realty, realtor, placester, widget, buddypress, homes, property, property management, estate, realestate, real estate crm, real estate maps
 Requires at least: 3.4
-Tested up to: 4.0
-Stable tag: 1.2.2
+Tested up to: 4.1.1
+Stable tag: 1.3.0
 
 Easily create and manage real estate sites powered by WordPress.
 
@@ -143,19 +143,19 @@ In general - real-time. But if you use 3rd party property management services, t
 == Changelog ==
 
 = 1.3.0 =
- * Fixed issue reading favorite properties via Placester Data API
- * Fixed the destruction of the login / register forms by fancybox
- * Added Basic listing detail template
- * Added phone number to Contactually CRM integration
- * Added lead capture forwarding addresses to new user account notification emails
- * Updated plugin administration stylesheets for WP 4.0.1
- * Cleaned up url generation, see WP Trac Issue #16953
- * Search results now scroll to the top on pagination
- * Fixed incompatibility with WordPress SEO introduced as of their version 1.7.3
- * Added Virtual Tour Link field for listing videos
- * Reorganized plugin initialization for better compatibility
- * Improved listing image selection and display on neighborhood pages
- * Improved the handling of un-mappable properties
+* Fixed issue reading favorite properties via Placester Data API
+* Fixed the destruction of the login / register forms by fancybox
+* Added Basic listing detail template
+* Added phone number to Contactually CRM integration
+* Added lead capture forwarding addresses to new user account notification emails
+* Updated plugin administration stylesheets for WP 4.0.1
+* Cleaned up url generation, see WP Trac Issue #16953
+* Search results now scroll to the top on pagination
+* Fixed incompatibility with WordPress SEO introduced as of their version 1.7.3
+* Added Virtual Tour Link field for listing videos
+* Reorganized plugin initialization for better compatibility
+* Improved listing image selection and display on neighborhood pages
+* Improved the handling of un-mappable properties
 
 = 1.2.2 =
 * Fixed a few formatting bugs having to do with compliance info
