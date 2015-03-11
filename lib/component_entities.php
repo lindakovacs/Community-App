@@ -1473,7 +1473,7 @@ To add some text to your listings:<br />
 				<?php endif ?>
 
 				// if we paginate we want to be able to scroll results to the top
-				$('body').on('click', '#<?php echo $group['listings']['atts']['table_id'] ?>_anchor .paginate_button', function(){
+				$('body').on('click', '#placester_listings_list_wrapper .paginate_button', function(){
 					$('html,body').animate({scrollTop: $('#<?php echo $group['listings']['atts']['table_id'] ?>_anchor').offset().top}, 1000);
 				});
 
