@@ -235,6 +235,9 @@ jQuery(document).ready(function($) {
 	function reset_fancy (selector) {
 		var form = $('#cloned_' + $(selector).attr('href').substring(1));
 		form.before(form.clone(true).attr('id', form.attr('id').substring(7)));
+
+		// remove any styling class attached to the fancybox-wrap (in lead-capture.js)
+		$('#fancybox-wrap').removeClass();
 	}
 
 	/*
