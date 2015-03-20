@@ -12,61 +12,53 @@ require_once('src/php_curl.php');
 require_once('src/connection.php');
 require_once('src/listing.php');
 require_once('src/attribute.php');
-require_once('src/filter.php');
+require_once('src/search.php');
 //require_once('src/sort_filter.php');
 //require_once('src/page_filter.php');
 
 class PDX_API {
 	public static function get_connection($api_key) {
-		return new PDX_API_Connection($api_key, "PHP_Curl");
+		return new PDX_API_Connection($api_key, "WP_Http");
 	}
 
 	public static function create_listing($connection, $listing) {
-		global $pdx_error_msg;
-
 		// debug only
-		if($connection->API_KEY != 'wvkGrh5nHYCPXVFmC17BeDn2KKxD7XE58rfg5BDksHka') return null;
+		if($connection->API_KEY != 'wvkGrh5nHYCPXVFmC17BeDn2KKxD7XE58rfg5BDksHka')
+			return null;
 
-		if($result = $connection->CREATE_LISTING($listing->post_string())) {
-			if($result = json_decode($result)) {
-				if($result->id)
-					return $result->id;
-				else
-					$pdx_error_msg = $result->message;
-			}
-		}
+		return $connection->CREATE_LISTING($listing->post_string());
+	}
+
+	public static function get_listing($connection, $id) {
+		if($result = $connection->GET_LISTING($id))
+			return new PDX_Listing($result);
 
 		return null;
 	}
 
 	public static function update_listing($connection, $listing) {
 		// debug only
-		if($connection->API_KEY != 'wvkGrh5nHYCPXVFmC17BeDn2KKxD7XE58rfg5BDksHka') return null;
+		if($connection->API_KEY != 'wvkGrh5nHYCPXVFmC17BeDn2KKxD7XE58rfg5BDksHka')
+			return null;
 
-		if($result = $connection->UPDATE_LISTING($listing->pdx_id, $listing->post_string())) {
-			return $result;
-		}
-
-		return null;
+		return $connection->UPDATE_LISTING($listing->pdx_id, $listing->post_string());
 	}
 
-	public static function get_listing($connection, $id) {
-		if($result = $connection->GET_LISTING($id)) {
-			return new PDX_Listing($result);
-		}
+	public static function delete_listing($connection, $id) {
+		// debug only
+		if($connection->API_KEY != 'wvkGrh5nHYCPXVFmC17BeDn2KKxD7XE58rfg5BDksHka')
+			return null;
 
-		return null;
+		return $connection->DELETE_LISTING($id);
 	}
 
-	public static function get_listings($connection, $search = null, $sort = null, $offset = null, $count = 12) {
-		$query = $search ? $search->query_string() : '';
-		if($query) $query .= '&'; $query .= 'sort_by=created_at&sort_type=desc';
+	public static function search_listings($connection, $search = null, $sort = null, $offset = null, $count = 12) {
+		$query = $search ? ($search = $search->query_string()) ? $search . '&' : '' : '';
+		$query .= $sort ? ($sort = $sort->query_string()) ? $sort . '&' : '' : 'sort_by=created_at&sort_type=desc&';
+		$query .= $offset ? 'offset=' . $offset . '&' : '';
+		$query .= $count ? 'count=' . $count : '';
 
-		if($result = $connection->GET_LISTINGS($query)) {
-			return json_decode($result);
-		}
-
-		return null;
+		return $connection->SEARCH_LISTINGS($query);
 	}
 }
 
@@ -82,7 +74,7 @@ function connection_shortcode($args) {
 
 	if($api_key) {
 		$global_conn = PDX_API::get_connection($api_key);
-		return "[" . $api_key . "]";
+		return "[connection api_key=" . $api_key . "]";
 	}
 
 	return null;
@@ -107,7 +99,7 @@ function listing_shortcode($args) {
 	else
 		$global_listing = null;
 
-	return $global_listing ? ("[" . $global_listing->pdx_id . "]") : null;
+	return $global_listing ? ("[listing id=" . $global_listing->pdx_id . "]") : null;
 }
 
 function data_shortcode($args) {
@@ -137,14 +129,14 @@ function search_shortcode($args) {
 		}
 	}
 
-	if($global_results = PDX_API::get_listings($global_conn, $search_filter)) {
+	if($global_results = PDX_API::search_listings($global_conn, $search_filter)) {
 		if($global_results->listings) {
 			$global_current = -1;
 		}
 		else {
 			$global_listing = $global_current = null;
 		}
-		return "[" . $global_results->total . " listings found, " . $global_results->count . " listings returned]";
+		return "[search total=" . $global_results->total . " count=" . $global_results->count . "]";
 	}
 
 	return null;
@@ -152,15 +144,33 @@ function search_shortcode($args) {
 
 
 function test_shortcode($args) {
-	extract(shortcode_atts(array('api_key' => null), $args));
+	extract(shortcode_atts(array('api_key' => null, 'test_id' => 0), $args));
 	global $global_listing;
-	global $pdx_error_msg;
 
 	if($api_key) {
 		$test_conn = PDX_API::get_connection($api_key);
-		$test_listing = new PDX_Private_Listing($global_listing); $test_listing->pdx_id = null; $test_listing->price = "FUCK";
-		$test_id = PDX_API::create_listing($test_conn, $test_listing);
-		return "[" . ($test_id ? $test_id : $pdx_error_msg) . "]";
+		$test_listing = new PDX_Private_Listing($global_listing);
+
+		switch($test_id) {
+			case 1:
+				$test_listing->pdx_id = null;
+				$test_result = PDX_API::create_listing($test_conn, $test_listing);
+				$test_result = $test_result ? 'create id=' . $test_result : null;
+				break;
+			case 2:
+				$test_listing->price = $test_listing->price + 10;
+				$test_result = PDX_API::update_listing($test_conn, $test_listing);
+				$test_result = $test_result ? 'update id=' . $test_result : null;
+				break;
+			case 3:
+				$test_listing = $test_listing->pdx_id;
+				$test_result = PDX_API::delete_listing($test_conn, $test_listing);
+				$test_result = $test_result ? 'delete id=' . $test_listing : null;
+				break;
+		}
+
+		if($test_result)
+			return "[" . $test_result . "]";
 	}
 
 	return null;
