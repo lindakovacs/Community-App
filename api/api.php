@@ -18,7 +18,7 @@ require_once('src/search.php');
 
 class PDX_API {
 	public static function get_connection($api_key) {
-		return new PDX_API_Connection($api_key, "WP_Http");
+		return new PDX_API_Connection($api_key, "PHP_Curl");
 	}
 
 	public static function create_listing($connection, $listing) {
@@ -149,20 +149,23 @@ function test_shortcode($args) {
 
 	if($api_key) {
 		$test_conn = PDX_API::get_connection($api_key);
-		$test_listing = new PDX_Private_Listing($global_listing);
 
 		switch($test_id) {
 			case 1:
+				$test_listing = new PDX_Private_Listing($global_listing);
 				$test_listing->pdx_id = null;
 				$test_result = PDX_API::create_listing($test_conn, $test_listing);
 				$test_result = $test_result ? 'create id=' . $test_result : null;
 				break;
 			case 2:
-				$test_listing->price = $test_listing->price + 10;
+				$test_listing = new PDX_Private_Listing();
+				$test_listing->pdx_id = $global_listing->pdx_id;
+				$test_listing->price = $global_listing->price + 500;
 				$test_result = PDX_API::update_listing($test_conn, $test_listing);
 				$test_result = $test_result ? 'update id=' . $test_result : null;
 				break;
 			case 3:
+				$test_listing = new PDX_Private_Listing($global_listing);
 				$test_listing = $test_listing->pdx_id;
 				$test_result = PDX_API::delete_listing($test_conn, $test_listing);
 				$test_result = $test_result ? 'delete id=' . $test_listing : null;
