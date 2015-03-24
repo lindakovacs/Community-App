@@ -327,5 +327,15 @@ class PL_Pages {
 		global $wp_rewrite;
 		$wp_rewrite->flush_rules();
 	}
-	
+}
+
+// PL_COMPATIBILITY_MODE -- preserve the interface expected by certain previous versions of blueprint
+function placester_get_property_url($id) {
+	return PL_Pages::get_url($id);
+}
+
+class PL_Page_Helper {
+	public static function get_url($id) {
+		return PL_Pages::get_url($id);
+	}
 }
