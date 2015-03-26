@@ -296,7 +296,9 @@ jQuery(document).ready(function($){
 	});
 	// date pickers
 	$('#pl_sc_edit .form_item_date').each(function(){
-		$(this).datepicker();
+		$(this).datepicker({
+			dateFormat: "yy-mm-dd"
+		});
 	});
 
 	// setup view based on current shortcode type, etc

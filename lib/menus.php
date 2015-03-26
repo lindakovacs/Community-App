@@ -61,7 +61,7 @@ class PL_Menus {
 						// 'menu-item-type'      => 'post_type',
 						'menu-item-title'     => $the_page->post_title,
 						'menu-item-classes'   => $the_page->post_title,
-						'menu-item-url'       => $the_page->guid,
+						'menu-item-url'       => $the_page->guid,	// should this be a call to get_permalink?
 						'menu-item-status'    => 'publish'
 				);
 				wp_update_nav_menu_item( $menu_id, 0, $args );
