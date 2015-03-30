@@ -237,7 +237,6 @@ jQuery(document).ready(function($) {
 					autoOpen: true,
 					draggable: false,
 					modal: true,
-					position: 'center',
 					title: args.title,
 					width: args.width,
 					buttons: args.buttons,
