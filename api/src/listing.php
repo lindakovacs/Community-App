@@ -44,7 +44,16 @@ class PDX_Listing {
 	}
 
 	protected function set_value($object, $attribute, $value) {
-		return eval('return $object->' . $attribute . ' = $value;');
+		$levels = explode('->', $attribute);
+		while($attribute = array_shift($levels)) {
+
+			// directly assign a property (or auto-create an array)
+			if(count($levels) == 0)
+				return eval('return $object->' . $attribute . ' = $value;');
+
+			// walk down through the structure, create a new object if necessary)
+			$object = $this->get_value($object, $attribute) ?: $this->set_value($object, $attribute, new stdClass());
+		}
 	}
 
 	public function json_string() {
@@ -70,31 +79,34 @@ class PDX_Private_Listing extends PDX_Listing {
 		if(!is_null($property_type = $this->property_type))
 			$post .= '&metadata[prop_type]=' . urlencode($property_type);
 
-		foreach($this->listing->location as $name => $value) {
-			$name = 'location[' . $name . ']';
-			if(is_array($value)) {
-				$name .= '[]';
-				foreach($value as $x)
-					$post .= '&' . $name . '=' . urlencode($x);
+		if(!empty($this->listing->location))
+			foreach($this->listing->location as $name => $value) {
+				$name = 'location[' . $name . ']';
+				if(is_array($value)) {
+					$name .= '[]';
+					foreach($value as $x)
+						$post .= '&' . $name . '=' . urlencode($x);
+				}
+				else if(is_scalar($value)) {
+					$post .= '&' . $name . '=' . urlencode($value);
+				}
 			}
-			else if(is_scalar($value)) {
-				$post .= '&' . $name . '=' . urlencode($value);
-			}
-		}
 
-		foreach($this->listing->cur_data as $name => $value) {
-			$name = 'metadata[' . $name . ']';
-			if(is_scalar($value)) {
-				$post .= '&' . $name . '=' . urlencode($value);
+		if(!empty($this->listing->cur_data))
+			foreach($this->listing->cur_data as $name => $value) {
+				$name = 'metadata[' . $name . ']';
+				if(is_scalar($value)) {
+					$post .= '&' . $name . '=' . urlencode($value);
+				}
 			}
-		}
 
-		foreach($this->listing->uncur_data as $name => $value) {
-			$name = 'metadata[' . $name . ']';
-			if(is_scalar($value)) {
-				$post .= '&' . $name . '=' . urlencode($value);
+		if(!empty($this->listing->uncur_data))
+			foreach($this->listing->uncur_data as $name => $value) {
+				$name = 'metadata[' . $name . ']';
+				if(is_scalar($value)) {
+					$post .= '&' . $name . '=' . urlencode($value);
+				}
 			}
-		}
 
 		// remove initial ampersand
 		return substr($post, 1);
@@ -124,6 +136,30 @@ class PDX_Display_Listing extends PDX_Listing {
 	}
 
 	protected function format_value($attribute, $value) {
+		global $PDX_Value_Table;
+
+		switch($attribute->type) {
+			case PDX_BOOLEAN:
+				return $value ? 'Yes' : 'No';
+
+			case PDX_NUMERIC:
+				return number_format($value);
+
+			case PDX_CURRENCY:
+				return '$' . number_format($value);
+
+			case PDX_TEXT_VALUE:
+				return $PDX_Value_Table[$attribute->name][$value] ?: ucwords(implode(' ', explode('_', $value)));
+
+			case PDX_SHORT_TEXT:
+				return $value;
+
+			case PDX_LONG_TEXT:
+				return $value;
+
+			case PDX_DATE_TIME:
+				return substr($value, 0, 10);
+		}
 		return $value;
 	}
 }

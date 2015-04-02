@@ -18,7 +18,7 @@ require_once('src/search.php');
 
 class PDX_API {
 	public static function get_connection($api_key) {
-		return new PDX_API_Connection($api_key, "PHP_Curl");
+		return new PDX_API_Connection($api_key, "WP_Http");
 	}
 
 	public static function create_listing($connection, $listing) {
@@ -91,10 +91,10 @@ function listing_shortcode($args) {
 		$global_listing = PDX_API::get_listing($global_conn, $id);
 	}
 	else if(!is_null($global_current) && !is_null($index)) {
-		$global_listing = new PDX_Listing($global_results->listings[$global_current = $index]);
+		$global_listing = new PDX_Display_Listing($global_results->listings[$global_current = $index]);
 	}
 	else if(!is_null($global_current) && $next) {
-		$global_listing = new PDX_Listing($global_results->listings[++$global_current]);
+		$global_listing = new PDX_Display_Listing($global_results->listings[++$global_current]);
 	}
 	else
 		$global_listing = null;
@@ -160,7 +160,10 @@ function test_shortcode($args) {
 			case 2:
 				$test_listing = new PDX_Private_Listing();
 				$test_listing->pdx_id = $global_listing->pdx_id;
+				$test_listing->latitude = -50.0;
+				$test_listing->longitude = -50.0;
 				$test_listing->price = $global_listing->price + 500;
+				$test_listing->beds = $global_listing->beds + 1;
 				$test_result = PDX_API::update_listing($test_conn, $test_listing);
 				$test_result = $test_result ? 'update id=' . $test_result : null;
 				break;
