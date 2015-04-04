@@ -9,7 +9,7 @@ class PDX_Listing {
 
 	public function __construct($json = null) {
 		if(!self::$attributes)
-			self::$attributes = new PDX_Attributes();
+			self::$attributes = new PDX_Standard_Attributes();
 
 		// deep copy of existing PDX_Listing object
 		if($json instanceof PDX_Listing)

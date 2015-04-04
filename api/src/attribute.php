@@ -1,12 +1,5 @@
 <?php
 
-define(PDX_BOOLEAN, 1);
-define(PDX_NUMERIC, 2);
-define(PDX_CURRENCY, 3);
-define(PDX_TEXT_VALUE, 4);
-define(PDX_SHORT_TEXT, 5);
-define(PDX_LONG_TEXT, 6);
-define(PDX_DATE_TIME, 7);
 
 class PDX_Attribute {
 	public $name;
@@ -15,314 +8,390 @@ class PDX_Attribute {
 	public $display_group;
 	public $display_name;
 
-	public $sort_name;
-	public $query_name;
-	public $aggregate_name;
-
 	public $access_name;
 
-	// constructors with different default capabilities for convenience
+	public $array_name;
+	public $query_name;
+	public $sort_name;
+	public $aggregate_name;
+
 	static public function create($name, $type, $field_name, $display_group, $display_name, $args = array()) {
+		$attribute = new PDX_Attribute($name, $type, $field_name, $display_group, $display_name, $args);
 
-		if(!isset($args['access_name'])) $args['access_name'] = self::get_default_access_name($field_name);
-		if(!isset($args['sort_name'])) $args['sort_name'] = self::get_default_sort_name($field_name);
-		if(!isset($args['query_name'])) $args['query_name'] = self::get_default_query_name($field_name);
-		if(!isset($args['aggregate_name'])) $args['aggregate_name'] = self::get_default_aggregate_name($field_name);
+		// if a custom access_name is specified we don't calculate default api names
+		if($attribute->access_name)
+			return $attribute;
 
-		return new PDX_Attribute($name, $type, $field_name, $display_group, $display_name, $args);
+		if($attribute->array_name)
+			$attribute->access_name = implode('->', explode('.', $attribute->array_name)) . '[0]';
+		else
+			$attribute->access_name = implode('->', explode('.', $attribute->field_name));
+
+		$api_group = array_shift(explode('.', $attribute->field_name));
+		if($api_group == $attribute->field_name) $api_group = null;
+
+		// by default rets attributes are not searchable, sortable, or aggregable
+		if($api_group == 'rets')
+			return $attribute;
+
+		// if a custom query_name is specified we don't calculate further defaults
+		if($attribute->query_name)
+			return $attribute;
+
+		if($attribute->array_name) {
+			$attribute->query_name = self::construct_query_name($attribute->array_name) . '[]';
+			if(!$attribute->aggregate_name) $attribute->aggregate_name = $attribute->array_name;
+		}
+		else {
+			$attribute->query_name = self::construct_query_name($attribute->field_name);
+			if(!$attribute->sort_name) $attribute->sort_name = $attribute->field_name;
+			if(!$attribute->aggregate_name) $attribute->aggregate_name = $attribute->field_name;
+		}
+
+		return $attribute;
 	}
 
-	// this field will be for data access only, unless otherwise specified
-	static public function create_accessible($name, $type, $field_name, $display_group, $display_name, $args = array()) {
-
-		if(!isset($args['access_name'])) $args['access_name'] = self::get_default_access_name($field_name);
-		if(!isset($args['sort_name'])) $args['sort_name'] = false;
-		if(!isset($args['query_name'])) $args['query_name'] = false;
-		if(!isset($args['aggregate_name'])) $args['aggregate_name'] = false;
-
-		return new PDX_Attribute($name, $type, $field_name, $display_group, $display_name, $args);
+	static protected function construct_query_name($field_name) {
+		$parts = explode('.', $field_name);
+		if(in_array($parts[0], array('cur_data', 'uncur_data'))) $parts[0] = 'metadata';
+		return array_shift($parts) . (count($parts) ? '[' . implode('][', $parts) . ']' : '');
 	}
 
-	// this field will be for data access and search queries
-	static public function create_searchable($name, $type, $field_name, $display_group, $display_name, $args = array()) {
-
-		if(!isset($args['access_name'])) $args['access_name'] = self::get_default_access_name($field_name);
-		if(!isset($args['sort_name'])) $args['sort_name'] = false;
-		if(!isset($args['query_name'])) $args['query_name'] = self::get_default_query_name($field_name);
-		if(!isset($args['aggregate_name'])) $args['aggregate_name'] = false;
-
-		return new PDX_Attribute($name, $type, $field_name, $display_group, $display_name, $args);
-	}
-
-	static protected function get_default_sort_name($field_name) { return $field_name; }
-	static protected function get_default_access_name($field_name) { return implode('->', explode('.', $field_name)); }
-	static protected function get_default_aggregate_name($field_name) { return $field_name; }
-
-	static protected function get_default_query_name($field_name) {
-		$parts = explode('.', $field_name); $first = array_shift($parts);
-		return (in_array($first, array('cur_data', 'uncur_data')) ? 'metadata' : $first) .
-			implode('', array_map(function ($part) { return '[' . $part . ']'; }, $parts));
-	}
-
-	protected function __construct($name, $type, $field_name, $display_group, $display_name, $args = array()) {
+	protected function __construct($name, $type, $field_name, $display_group, $display_name, $api_names = array()) {
 		$this->name = $name;
 		$this->type = $type;
 		$this->field_name = $field_name;
 		$this->display_group = $display_group;
 		$this->display_name = $display_name;
 
-		// different syntax in various api contexts
-		$this->sort_name = $args['sort_name'];
-		$this->query_name = $args['query_name'];
-		$this->aggregate_name = $args['aggregate_name'];
-
 		// PHP accessor on local data object
-		$this->access_name = $args['access_name'];
+		$this->access_name = $api_names['access_name'];
+
+		// different syntax in various api contexts
+		$this->array_name = $api_names['array_name'];
+		$this->query_name = $api_names['query_name'];
+		$this->sort_name = $api_names['sort_name'];
+		$this->aggregate_name = $api_names['aggregate_name'];
 	}
 }
 
+
 class PDX_Attributes {
-	static protected $standard_attributes;	// attributes defined by Placester
-
-	protected $custom_attributes;	// attributes defined for a specific feed
-	protected $populated_attributes;	// attributes actually in use on a feed
-	protected $abandoned_attributes;	// attributes formerly in use on a feed
-	protected $new_custom_attributes;	// attributes defined since the last configuration
-	protected $newly_populated_attributes;	// attributes coming into use since the last configuration
-	protected $newly_abandoned_attributes;	// attributes going out of use since the last configuration
-
-	protected $configured_attributes;	// attributes chosen for use on a site
-
-	public function __construct() {
-		if(!self::$standard_attributes)
-			self::$standard_attributes = self::get_standard_attributes();
-		$this->configured_attributes = self::$standard_attributes;
-	}
+	protected $attributes;
 
 	public function get_attribute($name) {
-		return $this->configured_attributes[$name];
+		return $this->attributes[$name];
 	}
 
 	public function get_attributes() {
-		return $this->configured_attributes;
+		return $this->attributes;
+	}
+}
+
+
+class PDX_Standard_Attributes extends PDX_Attributes {
+	static protected $standard_attributes;	// attributes defined by Placester
+
+	public function __construct() {
+		if(!self::$standard_attributes)
+			self::$standard_attributes = self::construct_standard_attributes();
+
+		$this->attributes = self::$standard_attributes;
 	}
 
-	static protected function get_standard_attributes() {
-		$attributes = array(
+	static protected function construct_standard_attributes() {
+		global $PDX_STANDARD_ATTRIBUTE_LIST;
 
-			// Listing Info
-			PDX_Attribute::create_searchable('pdx_id', PDX_SHORT_TEXT, 'id', 'Listing', 'Placester ID', array(
-				'query_name' => 'listing_ids[]')),
+		$attributes = array();
+		$continuation = false;
+		foreach(array_map('trim', explode("\n", $PDX_STANDARD_ATTRIBUTE_LIST)) as $line) {
+			if(empty($line) || substr($line, 0, 2) == '//')
+				continue;
 
-			PDX_Attribute::create_searchable('mls_id', PDX_SHORT_TEXT, 'rets.mls_id', 'Listing', 'MLS ID'),
-			PDX_Attribute::create('listing_type', PDX_TEXT_VALUE, 'compound_type', 'Listing', 'Listing Type'),
-			PDX_Attribute::create('property_type', PDX_TEXT_VALUE, 'property_type', 'Listing', 'Property Type'),
+			$line = array_map('trim', explode(',', $line));
+			if(!$continuation) {
+				if(count($line) == 5) {
+					$attributes[] = PDX_Attribute::create($line[0], $line[1], $line[2], $line[3], $line[4]);
+					continue;
+				}
 
-			PDX_Attribute::create_searchable('zoning_type', PDX_TEXT_VALUE, 'zoning_type', 'Listing', 'Zoning Type', array(
-				'query_name' => 'zoning_types[]',
-				'aggregate_name' => 'zoning_types',
-				'access_name' => 'zoning_types[0]')),
-			PDX_Attribute::create_searchable('purchase_type', PDX_TEXT_VALUE, 'purchase_type', 'Listing', 'Purchase Type', array(
-				'query_name' => 'purchase_types[]',
-				'aggregate_name' => 'purchase_types',
-				'access_name' => 'purchase_types[0]')),
+				if(count($line) == 6 && empty($line[5])) {
+					$continuation = true;
+					$basic = $line;
+					$extended = array();
+					continue;
+				}
 
-			PDX_Attribute::create('created_at', PDX_DATE_TIME, 'created_at', 'Listing', 'Created at'),
-			PDX_Attribute::create('updated_at', PDX_DATE_TIME, 'updated_at', 'Listing', 'Updated at'),
-			PDX_Attribute::create('status', PDX_TEXT_VALUE, 'cur_data.status', 'Listing', 'Status'),
-			PDX_Attribute::create('dom', PDX_NUMERIC, 'cur_data.dom', 'Listing', 'Days on Market'),
-			PDX_Attribute::create('lst_dte', PDX_DATE_TIME, 'cur_data.lst_dte', 'Listing', 'List Date'),
+				assert(false, "Error parsing attribute {$line[0]}");
+			}
 
-			// Address
-			PDX_Attribute::create('address', PDX_SHORT_TEXT, 'location.address', 'Location', 'Address'),
-			PDX_Attribute::create('unit', PDX_SHORT_TEXT, 'location.unit', 'Location', 'Unit'),
+			$param = array_map('trim', explode('=>', $line[0]));
+			if(count($line) == 1)
+				$continuation = false;
+			elseif(count($line) == 2 && empty($line[1]))
+				$continuation = true;
+			else
+				assert(false, "Error parsing parameter {$param[0]} on attribute {$basic[0]}");
 
-			// Location
-			PDX_Attribute::create('locality', PDX_TEXT_VALUE, 'location.locality', 'Location', 'City'),
-			PDX_Attribute::create('region', PDX_TEXT_VALUE, 'location.region', 'Location', 'State'),
-			PDX_Attribute::create('postal', PDX_TEXT_VALUE, 'location.postal', 'Location', 'Zip'),
-			PDX_Attribute::create('neighborhood', PDX_TEXT_VALUE, 'location.neighborhood', 'Location', 'Neighborhood'),
-			PDX_Attribute::create('county', PDX_TEXT_VALUE, 'location.county', 'Location', 'County'),
-			PDX_Attribute::create('country', PDX_TEXT_VALUE, 'location.country', 'Location', 'Country', array(
-				'aggregate_name' => false)),
-
-			PDX_Attribute::create_accessible('latitude', PDX_NUMERIC, 'location.latitude', 'Location', 'Latitude', array(
-				'access_name' => 'location->coords[0]')),
-			PDX_Attribute::create_accessible('longitude', PDX_NUMERIC, 'location.longitude', 'Location', 'Longitude', array(
-				'access_name' => 'location->coords[1]')),
-
-			// Basic Info
-			PDX_Attribute::create('price', PDX_CURRENCY, 'cur_data.price', 'Basic', 'Price'),
-			PDX_Attribute::create('sqft', PDX_NUMERIC, 'cur_data.sqft', 'Basic', 'Square Feet'),
-			PDX_Attribute::create('beds', PDX_NUMERIC, 'cur_data.beds', 'Basic', 'Bedrooms'),
-			PDX_Attribute::create('beds_avail', PDX_NUMERIC, 'cur_data.beds_avail', 'Basic', 'Beds Available'),
-			PDX_Attribute::create('baths', PDX_NUMERIC, 'cur_data.baths', 'Basic', 'Bathrooms'),
-			PDX_Attribute::create('half_baths', PDX_NUMERIC, 'cur_data.half_baths', 'Basic', 'Half Baths'),
-			PDX_Attribute::create('desc', PDX_LONG_TEXT, 'cur_data.desc', 'Basic', 'Description'),
-			PDX_Attribute::create('short_desc', PDX_SHORT_TEXT, 'cur_data.short_desc', 'Basic', 'Short Description'),
-
-			// Price Info
-			PDX_Attribute::create('price_type', PDX_TEXT_VALUE, 'cur_data.price_type', 'Price', 'Price Type'),
-			PDX_Attribute::create('min_price', PDX_CURRENCY, 'cur_data.min_price', 'Price', 'Minimum Price'),
-			PDX_Attribute::create('max_price', PDX_CURRENCY, 'cur_data.max_price', 'Price', 'Maximum Price'),
-			PDX_Attribute::create('price_range', PDX_SHORT_TEXT, 'cur_data.price_range', 'Price', 'Price Range'),
-
-			// Lease Info
-			PDX_Attribute::create('avail_on', PDX_DATE_TIME, 'cur_data.avail_on', 'Lease', 'Date Available'),
-			PDX_Attribute::create('move_in', PDX_DATE_TIME, 'cur_data.move_in', 'Lease', 'Move-in Date'),
-			PDX_Attribute::create('deposit', PDX_CURRENCY, 'cur_data.deposit', 'Lease', 'Deposit'),
-			PDX_Attribute::create('price_unit', PDX_TEXT_VALUE, 'cur_data.price_unit', 'Lease', 'Price Interval'),
-			PDX_Attribute::create('lse_trms', PDX_TEXT_VALUE, 'cur_data.lse_trms', 'Lease', 'Lease Interval'),
-
-			// Sale Notes
-			PDX_Attribute::create('hoa_fee', PDX_CURRENCY, 'cur_data.hoa_fee', 'Notes', 'HOA Fee'),
-			PDX_Attribute::create('hoa_mand', PDX_BOOLEAN, 'cur_data.hoa_mand', 'Notes', 'HOA Mandatory'),
-			PDX_Attribute::create('lndr_own', PDX_TEXT_VALUE, 'cur_data.lndr_own', 'Notes', 'Lender Owned'),
-
-			// Building Info
-			PDX_Attribute::create('prop_name', PDX_SHORT_TEXT, 'cur_data.prop_name', 'Building', 'Property Name'),
-			PDX_Attribute::create('style', PDX_TEXT_VALUE, 'cur_data.style', 'Building', 'Style'),
-			PDX_Attribute::create('floors', PDX_NUMERIC, 'cur_data.floors', 'Building', 'Floors'),
-			PDX_Attribute::create('year_blt', PDX_NUMERIC, 'cur_data.year_blt', 'Building', 'Year Built'),
-			PDX_Attribute::create('bld_sz', PDX_SHORT_TEXT, 'cur_data.bld_sz', 'Building', 'Building Size'),
-			PDX_Attribute::create('cons_stts', PDX_TEXT_VALUE, 'cur_data.cons_stts', 'Building', 'Construction Status'),
-			PDX_Attribute::create('bld_suit', PDX_BOOLEAN, 'cur_data.bld_suit', 'Building', 'Build to Suit'),
-
-			// Parking Info
-			PDX_Attribute::create('park_type', PDX_TEXT_VALUE, 'cur_data.park_type', 'Parking', 'Parking Type'),
-			PDX_Attribute::create('pk_spce', PDX_NUMERIC, 'cur_data.pk_spce', 'Parking', 'Parking Spaces'),
-			PDX_Attribute::create('pk_lease', PDX_BOOLEAN, 'cur_data.pk_lease', 'Parking', 'Parking Included'),
-			PDX_Attribute::create('valet', PDX_BOOLEAN, 'cur_data.valet', 'Parking', 'Valet'),
-			PDX_Attribute::create('guard', PDX_BOOLEAN, 'cur_data.guard', 'Parking', 'Guarded'),
-			PDX_Attribute::create('heat', PDX_BOOLEAN, 'cur_data.heat', 'Parking', 'Heated'),
-			PDX_Attribute::create('carwsh', PDX_BOOLEAN, 'cur_data.carwsh', 'Parking', 'Carwash'),
-
-			// Pets Info
-			PDX_Attribute::create('cats', PDX_BOOLEAN, 'cur_data.cats', 'Pets', 'Cats Allowed'),
-			PDX_Attribute::create('dogs', PDX_BOOLEAN, 'cur_data.dogs', 'Pets', 'Dogs Allowed'),
-			PDX_Attribute::create('pets_cond', PDX_BOOLEAN, 'cur_data.pets_cond', 'Lot', 'Pets Conditional'),
-
-			// Schools
-			PDX_Attribute::create('sch_dist', PDX_TEXT_VALUE, 'cur_data.sch_dist', 'Schools', 'School District'),
-			PDX_Attribute::create('sch_elm', PDX_TEXT_VALUE, 'cur_data.sch_elm', 'Schools', 'Elementary School'),
-			PDX_Attribute::create('sch_jnr', PDX_TEXT_VALUE, 'cur_data.sch_jnr', 'Schools', 'Middle School'),
-			PDX_Attribute::create('sch_hgh', PDX_TEXT_VALUE, 'cur_data.sch_hgh', 'Schools', 'High School'),
-
-			// Lot Info
-			PDX_Attribute::create('lt_sz', PDX_NUMERIC, 'cur_data.lt_sz', 'Lot', 'Lot Size'),
-			PDX_Attribute::create('lt_sz_unit', PDX_TEXT_VALUE, 'cur_data.lt_sz_unit', 'Lot', 'Lot Size Unit'),
-			PDX_Attribute::create('corner', PDX_BOOLEAN, 'cur_data.corner', 'Lot', 'Corner'),
-			PDX_Attribute::create('wooded', PDX_BOOLEAN, 'cur_data.wooded', 'Lot', 'Wooded'),
-			PDX_Attribute::create('pvd_drv', PDX_BOOLEAN, 'cur_data.pvd_drv', 'Lot', 'Paved Drive'),
-			PDX_Attribute::create('und_st_tnk', PDX_BOOLEAN, 'cur_data.und_st_tnk', 'Lot', 'Underground Storage Tank'),
-			PDX_Attribute::create('stream', PDX_BOOLEAN, 'cur_data.stream', 'Lot', 'Stream'),
-			PDX_Attribute::create('glf_frt', PDX_BOOLEAN, 'cur_data.glf_frt', 'Lot', 'Golf Course Frontage'),
-			PDX_Attribute::create('add_lnd_ava', PDX_BOOLEAN, 'cur_data.add_lnd_ava', 'Lot', 'Additional Land Available'),
-			PDX_Attribute::create('zr_lt_lne', PDX_BOOLEAN, 'cur_data.zr_lt_lne', 'Lot', 'Zero Lot Line'),
-			PDX_Attribute::create('fld_pln', PDX_BOOLEAN, 'cur_data.fld_pln', 'Lot', 'Flood Plain'),
-			PDX_Attribute::create('shrd_drv', PDX_BOOLEAN, 'cur_data.shrd_drv', 'Lot', 'Shared Drive'),
-			PDX_Attribute::create('cty_view', PDX_BOOLEAN, 'cur_data.cty_view', 'Lot', 'City View'),
-			PDX_Attribute::create('clrd', PDX_BOOLEAN, 'cur_data.clrd', 'Lot', 'Cleared'),
-			PDX_Attribute::create('frmlnd', PDX_BOOLEAN, 'cur_data.frmlnd', 'Lot', 'Farmland'),
-			PDX_Attribute::create('fencd_encld', PDX_BOOLEAN, 'cur_data.fencd_encld', 'Lot', 'Fenced/Enclosed'),
-			PDX_Attribute::create('fll_ndd', PDX_BOOLEAN, 'cur_data.fll_ndd', 'Lot', 'Fill Needed'),
-			PDX_Attribute::create('gntl_slpe', PDX_BOOLEAN, 'cur_data.gntl_slpe', 'Lot', 'Gentle Slope'),
-			PDX_Attribute::create('level', PDX_BOOLEAN, 'cur_data.level', 'Lot', 'Level'),
-			PDX_Attribute::create('marsh', PDX_BOOLEAN, 'cur_data.marsh', 'Lot', 'Marsh'),
-			PDX_Attribute::create('sloping', PDX_BOOLEAN, 'cur_data.sloping', 'Lot', 'Sloping'),
-			PDX_Attribute::create('stp_slpe', PDX_BOOLEAN, 'cur_data.stp_slpe', 'Lot', 'Steep Slope'),
-			PDX_Attribute::create('scenic', PDX_BOOLEAN, 'cur_data.scenic', 'Lot', 'Scenic Views'),
-
-			// Amenities
-			PDX_Attribute::create('grnt_tops', PDX_BOOLEAN, 'cur_data.grnt_tops', 'Amenities', 'Granite Countertops'),
-			PDX_Attribute::create('air_cond', PDX_BOOLEAN, 'cur_data.air_cond', 'Amenities', 'Air Conditioning'),
-			PDX_Attribute::create('cent_ac', PDX_BOOLEAN, 'cur_data.cent_ac', 'Amenities', 'Central A/C'),
-			PDX_Attribute::create('frnshed', PDX_BOOLEAN, 'cur_data.frnshed', 'Amenities', 'Furnished'),
-			PDX_Attribute::create('cent_ht', PDX_BOOLEAN, 'cur_data.cent_ht', 'Amenities', 'Central Heat'),
-			PDX_Attribute::create('frplce', PDX_BOOLEAN, 'cur_data.frplce', 'Amenities', 'Fireplace'),
-			PDX_Attribute::create('hv_ceil', PDX_BOOLEAN, 'cur_data.hv_ceil', 'Amenities', 'High/Vaulted Ceiling'),
-			PDX_Attribute::create('wlk_clst', PDX_BOOLEAN, 'cur_data.wlk_clst', 'Amenities', 'Walk-In Closet'),
-			PDX_Attribute::create('hdwdflr', PDX_BOOLEAN, 'cur_data.hdwdflr', 'Amenities', 'Hardwood Floor'),
-			PDX_Attribute::create('tle_flr', PDX_BOOLEAN, 'cur_data.tle_flr', 'Amenities', 'Tile Floor'),
-			PDX_Attribute::create('fm_lv_rm', PDX_BOOLEAN, 'cur_data.fm_lv_rm', 'Amenities', 'Family/Living Room'),
-			PDX_Attribute::create('bns_rec_rm', PDX_BOOLEAN, 'cur_data.bns_rec_rm', 'Amenities', 'Bonus/Rec Room'),
-			PDX_Attribute::create('lft_lyout', PDX_BOOLEAN, 'cur_data.lft_lyout', 'Amenities', 'Loft Layout'),
-			PDX_Attribute::create('off_den', PDX_BOOLEAN, 'cur_data.off_den', 'Amenities', 'Office/Den'),
-			PDX_Attribute::create('dng_rm', PDX_BOOLEAN, 'cur_data.dng_rm', 'Amenities', 'Dining Room'),
-			PDX_Attribute::create('brkfst_nk', PDX_BOOLEAN, 'cur_data.brkfst_nk', 'Amenities', 'Breakfast Nook'),
-			PDX_Attribute::create('dshwsher', PDX_BOOLEAN, 'cur_data.dshwsher', 'Amenities', 'Dishwasher'),
-			PDX_Attribute::create('refrig', PDX_BOOLEAN, 'cur_data.refrig', 'Amenities', 'Refrigerator'),
-			PDX_Attribute::create('stve_ovn', PDX_BOOLEAN, 'cur_data.stve_ovn', 'Amenities', 'Stove/Oven'),
-			PDX_Attribute::create('stnstl_app', PDX_BOOLEAN, 'cur_data.stnstl_app', 'Amenities', 'Stainless Steel Appliances'),
-			PDX_Attribute::create('attic', PDX_BOOLEAN, 'cur_data.attic', 'Amenities', 'Attic'),
-			PDX_Attribute::create('basemnt', PDX_BOOLEAN, 'cur_data.basemnt', 'Amenities', 'Basement'),
-			PDX_Attribute::create('washer', PDX_BOOLEAN, 'cur_data.washer', 'Amenities', 'Washer'),
-			PDX_Attribute::create('dryer', PDX_BOOLEAN, 'cur_data.dryer', 'Amenities', 'Dryer'),
-			PDX_Attribute::create('lndry_in', PDX_BOOLEAN, 'cur_data.lndry_in', 'Amenities', 'Laundry Area - Inside'),
-			PDX_Attribute::create('lndry_gar', PDX_BOOLEAN, 'cur_data.lndry_gar', 'Amenities', 'Laundry Area - Garage'),
-			PDX_Attribute::create('blc_deck_pt', PDX_BOOLEAN, 'cur_data.blc_deck_pt', 'Amenities', 'Balcony/Deck/Patio'),
-			PDX_Attribute::create('yard', PDX_BOOLEAN, 'cur_data.yard', 'Amenities', 'Yard'),
-			PDX_Attribute::create('swm_pool', PDX_BOOLEAN, 'cur_data.swm_pool', 'Amenities', 'Swimming Pool'),
-			PDX_Attribute::create('jacuzzi', PDX_BOOLEAN, 'cur_data.jacuzzi', 'Amenities', 'Jacuzzi/Whirlpool'),
-			PDX_Attribute::create('sauna', PDX_BOOLEAN, 'cur_data.sauna', 'Amenities', 'Sauna'),
-			PDX_Attribute::create('cble_rdy', PDX_BOOLEAN, 'cur_data.cble_rdy', 'Amenities', 'Cable-ready'),
-			PDX_Attribute::create('hghspd_net', PDX_BOOLEAN, 'cur_data.hghspd_net', 'Amenities', 'High-speed Internet'),
-
-			// Local Points of Interest
-			PDX_Attribute::create('ngb_trans', PDX_BOOLEAN, 'cur_data.ngb_trans', 'Local', 'Public Transportation'),
-			PDX_Attribute::create('ngb_shop', PDX_BOOLEAN, 'cur_data.ngb_shop', 'Local', 'Shopping'),
-			PDX_Attribute::create('ngb_pool', PDX_BOOLEAN, 'cur_data.ngb_pool', 'Local', 'Swimming Pool'),
-			PDX_Attribute::create('ngb_court', PDX_BOOLEAN, 'cur_data.ngb_court', 'Local', 'Tennis Court'),
-			PDX_Attribute::create('ngb_park', PDX_BOOLEAN, 'cur_data.ngb_park', 'Local', 'Park'),
-			PDX_Attribute::create('ngb_trails', PDX_BOOLEAN, 'cur_data.ngb_trails', 'Local', 'Walk/Jog Trails'),
-			PDX_Attribute::create('ngb_stbles', PDX_BOOLEAN, 'cur_data.ngb_stbles', 'Local', 'Stables'),
-			PDX_Attribute::create('ngb_golf', PDX_BOOLEAN, 'cur_data.ngb_golf', 'Local', 'Golf Courses'),
-			PDX_Attribute::create('ngb_med', PDX_BOOLEAN, 'cur_data.ngb_med', 'Local', 'Medical Facilities'),
-			PDX_Attribute::create('ngb_bike', PDX_BOOLEAN, 'cur_data.ngb_bike', 'Local', 'Bike Path'),
-			PDX_Attribute::create('ngb_cons', PDX_BOOLEAN, 'cur_data.ngb_cons', 'Local', 'Conservation Area'),
-			PDX_Attribute::create('ngb_hgwy', PDX_BOOLEAN, 'cur_data.ngb_hgwy', 'Local', 'Highway Access'),
-			PDX_Attribute::create('ngb_mar', PDX_BOOLEAN, 'cur_data.ngb_mar', 'Local', 'Marina'),
-			PDX_Attribute::create('ngb_pvtsch', PDX_BOOLEAN, 'cur_data.ngb_pvtsch', 'Local', 'Private School'),
-			PDX_Attribute::create('ngb_pubsch', PDX_BOOLEAN, 'cur_data.ngb_pubsch', 'Local', 'Public School'),
-			PDX_Attribute::create('ngb_uni', PDX_BOOLEAN, 'cur_data.ngb_uni', 'Local', 'University'),
-
-			// Commercial Lease Info
-			PDX_Attribute::create('loc_desc', PDX_LONG_TEXT, 'cur_data.loc_desc', 'Commercial', 'Location Description'),
-			PDX_Attribute::create('zone_desc', PDX_LONG_TEXT, 'cur_data.zone_desc', 'Commercial', 'Zoning Description'),
-			PDX_Attribute::create('spc_ava', PDX_NUMERIC, 'cur_data.spc_ava', 'Commercial', 'Space Available (Sqft)'),
-			PDX_Attribute::create('min_div', PDX_NUMERIC, 'cur_data.min_div', 'Commercial', 'Minimum Divisible'),
-			PDX_Attribute::create('max_cont', PDX_NUMERIC, 'cur_data.max_cont', 'Commercial', 'Maximum Contiguous'),
-			PDX_Attribute::create('lse_type', PDX_TEXT_VALUE, 'cur_data.lse_type', 'Commercial', 'Lease Type'),
-			PDX_Attribute::create('comm_rate_unit', PDX_TEXT_VALUE, 'cur_data.comm_rate_unit', 'Commercial', 'Rental Rate'),
-			PDX_Attribute::create('sublse', PDX_BOOLEAN, 'cur_data.sublse', 'Commercial', 'Sublease'),
-			PDX_Attribute::create('bld_st', PDX_BOOLEAN, 'cur_data.bld_st', 'Commercial', 'Build to Suit'),
-
-			// Vacation Rental Info
-			PDX_Attribute::create('accoms', PDX_LONG_TEXT, 'cur_data.accoms', 'Vacation', 'Accomodates'),
-			PDX_Attribute::create('avail_info', PDX_LONG_TEXT, 'cur_data.avail_info', 'Vacation', 'Availability'),
-
-			// Attribution
-			PDX_Attribute::create_searchable('aid', PDX_TEXT_VALUE, 'rets.aid', 'Attribution', 'Agent ID'),
-			PDX_Attribute::create_accessible('aname', PDX_SHORT_TEXT, 'rets.aname', 'Attribution', 'Agent Name'),
-			PDX_Attribute::create_accessible('aphone', PDX_SHORT_TEXT, 'rets.aphone', 'Attribution', 'Agent Phone'),
-			PDX_Attribute::create_accessible('alicense', PDX_SHORT_TEXT, 'rets.alicense', 'Attribution', 'Agent License'),
-			PDX_Attribute::create_searchable('oid', PDX_TEXT_VALUE, 'rets.oid', 'Attribution', 'Office ID'),
-			PDX_Attribute::create_accessible('oname', PDX_SHORT_TEXT, 'rets.oname', 'Attribution', 'Office Name'),
-			PDX_Attribute::create_accessible('ophone', PDX_SHORT_TEXT, 'rets.ophone', 'Attribution', 'Office Phone'),
-
-			// Co-attribution
-			PDX_Attribute::create_searchable('acoid', PDX_TEXT_VALUE, 'rets.acoid', 'Co-attribution', 'Co-agent ID'),
-			PDX_Attribute::create_accessible('aconame', PDX_SHORT_TEXT, 'rets.aconame', 'Co-attribution', 'Co-agent Name'),
-			PDX_Attribute::create_accessible('acophone', PDX_SHORT_TEXT, 'rets.acophone', 'Co-attribution', 'Co-agent Phone'),
-			PDX_Attribute::create_accessible('acolicense', PDX_SHORT_TEXT, 'rets.acolicense', 'Co-attribution', 'Co-agent License'),
-			PDX_Attribute::create_searchable('ocoid', PDX_TEXT_VALUE, 'rets.ocoid', 'Co-attribution', 'Co-office ID'),
-			PDX_Attribute::create_accessible('oconame', PDX_SHORT_TEXT, 'rets.oconame', 'Co-attribution', 'Co-office Name'),
-			PDX_Attribute::create_accessible('ocophone', PDX_SHORT_TEXT, 'rets.ocophone', 'Co-attribution', 'Co-office Phone'));
+			$extended[$param[0]] = $param[1];
+			if(!$continuation)
+				$attributes[] = PDX_Attribute::create($basic[0], $basic[1], $basic[2], $basic[3], $basic[4], $extended);
+		}
 
 		// turn the array into an associative array with names as the index values
 		return array_combine(array_map(function ($attribute) { return $attribute->name; }, $attributes), $attributes);
 	}
 }
+
+
+class PDX_Connection_Attributes extends PDX_Standard_Attributes {
+	protected $connection;
+
+	public function __construct(PDX_API_Connection $connection) {
+		parent::__construct();
+
+		$this->connection = $connection;
+		$this->attributes = $this->remove_unpopulated_attributes($this->attributes);
+		$this->attributes = $this->add_custom_attributes($this->attributes);
+	}
+
+	protected function remove_unpopulated_attributes($attributes) {
+		foreach($attributes as $attribute) {
+			if(array_shift(explode('.', $attribute->field_name)) == 'cur_data') {
+				switch($attribute->type) {
+					
+				}
+			}
+		}
+
+		return $attributes;
+	}
+
+	protected function add_custom_attributes($attributes) {
+		return $attributes;
+	}
+}
+
+
+$PDX_BOOLEAN = 1;
+$PDX_NUMERIC = 2;
+$PDX_CURRENCY = 3;
+$PDX_TEXT_VALUE = 4;
+$PDX_SHORT_TEXT = 5;
+$PDX_LONG_TEXT = 6;
+$PDX_DATE_TIME = 7;
+
+
+$PDX_STANDARD_ATTRIBUTE_LIST = <<<PDX_STANDARD_ATTRIBUTE_LIST
+	pdx_id,             $PDX_TEXT_VALUE,      id,                         Listing,             Placester ID,
+		query_name      =>   listing_ids[]
+	mls_id,             $PDX_TEXT_VALUE,      rets.mls_id,                Listing,             MLS ID,
+		query_name      =>   rets[mls_id]
+
+	listing_type,       $PDX_TEXT_VALUE,      compound_type,              Listing,             Listing Type
+	property_type,      $PDX_TEXT_VALUE,      property_type,              Listing,             Property Type
+
+	zoning_type,        $PDX_TEXT_VALUE,      zoning_type,                Listing,             Zoning Type,
+		array_name      =>   zoning_types
+	purchase_type,      $PDX_TEXT_VALUE,      purchase_type,              Listing,             Purchase Type,
+		array_name      =>   purchase_types
+
+	created_at,         $PDX_DATE_TIME,       created_at,                 Listing,             Created at
+	updated_at,         $PDX_DATE_TIME,       updated_at,                 Listing,             Updated at
+	status,             $PDX_TEXT_VALUE,      cur_data.status,            Listing,             Status
+	dom,                $PDX_NUMERIC,         cur_data.dom,               Listing,             Days on Market
+	lst_dte,            $PDX_DATE_TIME,       cur_data.lst_dte,           Listing,             List Date
+
+	// Address
+	address,            $PDX_SHORT_TEXT,      location.address,           Location,            Address
+	unit,               $PDX_SHORT_TEXT,      location.unit,              Location,            Unit
+
+	// Location
+	locality,           $PDX_TEXT_VALUE,      location.locality,          Location,            City
+	region,             $PDX_TEXT_VALUE,      location.region,            Location,            State
+	postal,             $PDX_TEXT_VALUE,      location.postal,            Location,            Zip
+	neighborhood,       $PDX_TEXT_VALUE,      location.neighborhood,      Location,            Neighborhood
+	county,             $PDX_TEXT_VALUE,      location.county,            Location,            County
+	country,            $PDX_TEXT_VALUE,      location.country,           Location,            Country
+
+	latitude,           $PDX_NUMERIC,         location.latitude,          Location,            Latitude,
+		access_name     =>   location->coords[0]
+	longitude,          $PDX_NUMERIC,         location.longitude,         Location,            Longitude,
+		access_name     =>   location->coords[1]
+
+	// Basic Info
+	price,              $PDX_CURRENCY,        cur_data.price,             Basic,               Price
+	sqft,               $PDX_NUMERIC,         cur_data.sqft,              Basic,               Square Feet
+	beds,               $PDX_NUMERIC,         cur_data.beds,              Basic,               Bedrooms
+	beds_avail,         $PDX_NUMERIC,         cur_data.beds_avail,        Basic,               Beds Available
+	baths,              $PDX_NUMERIC,         cur_data.baths,             Basic,               Bathrooms
+	half_baths,         $PDX_NUMERIC,         cur_data.half_baths,        Basic,               Half Baths
+	desc,               $PDX_LONG_TEXT,       cur_data.desc,              Basic,               Description
+	short_desc,         $PDX_SHORT_TEXT,      cur_data.short_desc,        Basic,               Short Description
+
+	// Price Info
+	price_type,         $PDX_TEXT_VALUE,      cur_data.price_type,        Price,               Price Type
+	min_price,          $PDX_CURRENCY,        cur_data.min_price,         Price,               Minimum Price
+	max_price,          $PDX_CURRENCY,        cur_data.max_price,         Price,               Maximum Price
+	price_range,        $PDX_SHORT_TEXT,      cur_data.price_range,       Price,               Price Range
+
+	// Lease Info
+	avail_on,           $PDX_DATE_TIME,       cur_data.avail_on,          Lease,               Date Available
+	move_in,            $PDX_DATE_TIME,       cur_data.move_in,           Lease,               Move-in Date
+	deposit,            $PDX_CURRENCY,        cur_data.deposit,           Lease,               Deposit
+	price_unit,         $PDX_TEXT_VALUE,      cur_data.price_unit,        Lease,               Price Interval
+	lse_trms,           $PDX_TEXT_VALUE,      cur_data.lse_trms,          Lease,               Lease Interval
+
+	// Sale Notes
+	hoa_fee,            $PDX_CURRENCY,        cur_data.hoa_fee,           Notes,               HOA Fee
+	hoa_mand,           $PDX_BOOLEAN,         cur_data.hoa_mand,          Notes,               HOA Mandatory
+	lndr_own,           $PDX_TEXT_VALUE,      cur_data.lndr_own,          Notes,               Lender Owned
+
+	// Building Info
+	prop_name,          $PDX_SHORT_TEXT,      cur_data.prop_name,         Building,            Property Name
+	style,              $PDX_TEXT_VALUE,      cur_data.style,             Building,            Style
+	floors,             $PDX_NUMERIC,         cur_data.floors,            Building,            Floors
+	year_blt,           $PDX_NUMERIC,         cur_data.year_blt,          Building,            Year Built
+	bld_sz,             $PDX_SHORT_TEXT,      cur_data.bld_sz,            Building,            Building Size
+	cons_stts,          $PDX_TEXT_VALUE,      cur_data.cons_stts,         Building,            Construction Status
+	bld_suit,           $PDX_BOOLEAN,         cur_data.bld_suit,          Building,            Build to Suit
+
+	// Parking Info
+	park_type,          $PDX_TEXT_VALUE,      cur_data.park_type,         Parking,             Parking Type
+	pk_spce,            $PDX_NUMERIC,         cur_data.pk_spce,           Parking,             Parking Spaces
+	pk_lease,           $PDX_BOOLEAN,         cur_data.pk_lease,          Parking,             Parking Included
+	valet,              $PDX_BOOLEAN,         cur_data.valet,             Parking,             Valet
+	guard,              $PDX_BOOLEAN,         cur_data.guard,             Parking,             Guarded
+	heat,               $PDX_BOOLEAN,         cur_data.heat,              Parking,             Heated
+	carwsh,             $PDX_BOOLEAN,         cur_data.carwsh,            Parking,             Carwash
+
+	// Pets Info
+	cats,               $PDX_BOOLEAN,         cur_data.cats,              Pets,                Cats Allowed
+	dogs,               $PDX_BOOLEAN,         cur_data.dogs,              Pets,                Dogs Allowed
+	pets_cond,          $PDX_BOOLEAN,         cur_data.pets_cond,         Pets,                Pets Conditional
+
+	// Schools
+	sch_dist,           $PDX_TEXT_VALUE,      cur_data.sch_dist,          Schools,             School District
+	sch_elm,            $PDX_TEXT_VALUE,      cur_data.sch_elm,           Schools,             Elementary School
+	sch_jnr,            $PDX_TEXT_VALUE,      cur_data.sch_jnr,           Schools,             Middle School
+	sch_hgh,            $PDX_TEXT_VALUE,      cur_data.sch_hgh,           Schools,             High School
+
+	// Lot Info
+	lt_sz,              $PDX_NUMERIC,         cur_data.lt_sz,             Lot,                 Lot Size
+	lt_sz_unit,         $PDX_TEXT_VALUE,      cur_data.lt_sz_unit,        Lot,                 Lot Size Unit
+	corner,             $PDX_BOOLEAN,         cur_data.corner,            Lot,                 Corner
+	wooded,             $PDX_BOOLEAN,         cur_data.wooded,            Lot,                 Wooded
+	pvd_drv,            $PDX_BOOLEAN,         cur_data.pvd_drv,           Lot,                 Paved Drive
+	und_st_tnk,         $PDX_BOOLEAN,         cur_data.und_st_tnk,        Lot,                 Underground Storage Tank
+	stream,             $PDX_BOOLEAN,         cur_data.stream,            Lot,                 Stream
+	glf_frt,            $PDX_BOOLEAN,         cur_data.glf_frt,           Lot,                 Golf Course Frontage
+	add_lnd_ava,        $PDX_BOOLEAN,         cur_data.add_lnd_ava,       Lot,                 Additional Land Available
+	zr_lt_lne,          $PDX_BOOLEAN,         cur_data.zr_lt_lne,         Lot,                 Zero Lot Line
+	fld_pln,            $PDX_BOOLEAN,         cur_data.fld_pln,           Lot,                 Flood Plain
+	shrd_drv,           $PDX_BOOLEAN,         cur_data.shrd_drv,          Lot,                 Shared Drive
+	cty_view,           $PDX_BOOLEAN,         cur_data.cty_view,          Lot,                 City View
+	clrd,               $PDX_BOOLEAN,         cur_data.clrd,              Lot,                 Cleared
+	frmlnd,             $PDX_BOOLEAN,         cur_data.frmlnd,            Lot,                 Farmland
+	fencd_encld,        $PDX_BOOLEAN,         cur_data.fencd_encld,       Lot,                 Fenced/Enclosed
+	fll_ndd,            $PDX_BOOLEAN,         cur_data.fll_ndd,           Lot,                 Fill Needed
+	gntl_slpe,          $PDX_BOOLEAN,         cur_data.gntl_slpe,         Lot,                 Gentle Slope
+	level,              $PDX_BOOLEAN,         cur_data.level,             Lot,                 Level
+	marsh,              $PDX_BOOLEAN,         cur_data.marsh,             Lot,                 Marsh
+	sloping,            $PDX_BOOLEAN,         cur_data.sloping,           Lot,                 Sloping
+	stp_slpe,           $PDX_BOOLEAN,         cur_data.stp_slpe,          Lot,                 Steep Slope
+	scenic,             $PDX_BOOLEAN,         cur_data.scenic,            Lot,                 Scenic Views
+
+	// Amenities
+	grnt_tops,          $PDX_BOOLEAN,         cur_data.grnt_tops,         Amenities,           Granite Countertops
+	air_cond,           $PDX_BOOLEAN,         cur_data.air_cond,          Amenities,           Air Conditioning
+	cent_ac,            $PDX_BOOLEAN,         cur_data.cent_ac,           Amenities,           Central A/C
+	frnshed,            $PDX_BOOLEAN,         cur_data.frnshed,           Amenities,           Furnished
+	cent_ht,            $PDX_BOOLEAN,         cur_data.cent_ht,           Amenities,           Central Heat
+	frplce,             $PDX_BOOLEAN,         cur_data.frplce,            Amenities,           Fireplace
+	hv_ceil,            $PDX_BOOLEAN,         cur_data.hv_ceil,           Amenities,           High/Vaulted Ceiling
+	wlk_clst,           $PDX_BOOLEAN,         cur_data.wlk_clst,          Amenities,           Walk-In Closet
+	hdwdflr,            $PDX_BOOLEAN,         cur_data.hdwdflr,           Amenities,           Hardwood Floor
+	tle_flr,            $PDX_BOOLEAN,         cur_data.tle_flr,           Amenities,           Tile Floor
+	fm_lv_rm,           $PDX_BOOLEAN,         cur_data.fm_lv_rm,          Amenities,           Family/Living Room
+	bns_rec_rm,         $PDX_BOOLEAN,         cur_data.bns_rec_rm,        Amenities,           Bonus/Rec Room
+	lft_lyout,          $PDX_BOOLEAN,         cur_data.lft_lyout,         Amenities,           Loft Layout
+	off_den,            $PDX_BOOLEAN,         cur_data.off_den,           Amenities,           Office/Den
+	dng_rm,             $PDX_BOOLEAN,         cur_data.dng_rm,            Amenities,           Dining Room
+	brkfst_nk,          $PDX_BOOLEAN,         cur_data.brkfst_nk,         Amenities,           Breakfast Nook
+	dshwsher,           $PDX_BOOLEAN,         cur_data.dshwsher,          Amenities,           Dishwasher
+	refrig,             $PDX_BOOLEAN,         cur_data.refrig,            Amenities,           Refrigerator
+	stve_ovn,           $PDX_BOOLEAN,         cur_data.stve_ovn,          Amenities,           Stove/Oven
+	stnstl_app,         $PDX_BOOLEAN,         cur_data.stnstl_app,        Amenities,           Stainless Steel Appliances
+	attic,              $PDX_BOOLEAN,         cur_data.attic,             Amenities,           Attic
+	basemnt,            $PDX_BOOLEAN,         cur_data.basemnt,           Amenities,           Basement
+	washer,             $PDX_BOOLEAN,         cur_data.washer,            Amenities,           Washer
+	dryer,              $PDX_BOOLEAN,         cur_data.dryer,             Amenities,           Dryer
+	lndry_in,           $PDX_BOOLEAN,         cur_data.lndry_in,          Amenities,           Laundry Area - Inside
+	lndry_gar,          $PDX_BOOLEAN,         cur_data.lndry_gar,         Amenities,           Laundry Area - Garage
+	blc_deck_pt,        $PDX_BOOLEAN,         cur_data.blc_deck_pt,       Amenities,           Balcony/Deck/Patio
+	yard,               $PDX_BOOLEAN,         cur_data.yard,              Amenities,           Yard
+	swm_pool,           $PDX_BOOLEAN,         cur_data.swm_pool,          Amenities,           Swimming Pool
+	jacuzzi,            $PDX_BOOLEAN,         cur_data.jacuzzi,           Amenities,           Jacuzzi/Whirlpool
+	sauna,              $PDX_BOOLEAN,         cur_data.sauna,             Amenities,           Sauna
+	cble_rdy,           $PDX_BOOLEAN,         cur_data.cble_rdy,          Amenities,           Cable-ready
+	hghspd_net,         $PDX_BOOLEAN,         cur_data.hghspd_net,        Amenities,           High-speed Internet
+
+	// Local Points of Interest
+	ngb_trans,          $PDX_BOOLEAN,         cur_data.ngb_trans,         Local,               Public Transportation
+	ngb_shop,           $PDX_BOOLEAN,         cur_data.ngb_shop,          Local,               Shopping
+	ngb_pool,           $PDX_BOOLEAN,         cur_data.ngb_pool,          Local,               Swimming Pool
+	ngb_court,          $PDX_BOOLEAN,         cur_data.ngb_court,         Local,               Tennis Court
+	ngb_park,           $PDX_BOOLEAN,         cur_data.ngb_park,          Local,               Park
+	ngb_trails,         $PDX_BOOLEAN,         cur_data.ngb_trails,        Local,               Walk/Jog Trails
+	ngb_stbles,         $PDX_BOOLEAN,         cur_data.ngb_stbles,        Local,               Stables
+	ngb_golf,           $PDX_BOOLEAN,         cur_data.ngb_golf,          Local,               Golf Courses
+	ngb_med,            $PDX_BOOLEAN,         cur_data.ngb_med,           Local,               Medical Facilities
+	ngb_bike,           $PDX_BOOLEAN,         cur_data.ngb_bike,          Local,               Bike Path
+	ngb_cons,           $PDX_BOOLEAN,         cur_data.ngb_cons,          Local,               Conservation Area
+	ngb_hgwy,           $PDX_BOOLEAN,         cur_data.ngb_hgwy,          Local,               Highway Access
+	ngb_mar,            $PDX_BOOLEAN,         cur_data.ngb_mar,           Local,               Marina
+	ngb_pvtsch,         $PDX_BOOLEAN,         cur_data.ngb_pvtsch,        Local,               Private School
+	ngb_pubsch,         $PDX_BOOLEAN,         cur_data.ngb_pubsch,        Local,               Public School
+	ngb_uni,            $PDX_BOOLEAN,         cur_data.ngb_uni,           Local,               University
+
+	// Commercial Lease Info
+	loc_desc,           $PDX_LONG_TEXT,       cur_data.loc_desc,          Commercial,          Location Description
+	zone_desc,          $PDX_LONG_TEXT,       cur_data.zone_desc,         Commercial,          Zoning Description
+	spc_ava,            $PDX_NUMERIC,         cur_data.spc_ava,           Commercial,          Space Available (Sqft)
+	min_div,            $PDX_NUMERIC,         cur_data.min_div,           Commercial,          Minimum Divisible
+	max_cont,           $PDX_NUMERIC,         cur_data.max_cont,          Commercial,          Maximum Contiguous
+	lse_type,           $PDX_TEXT_VALUE,      cur_data.lse_type,          Commercial,          Lease Type
+	comm_rate_unit,     $PDX_TEXT_VALUE,      cur_data.comm_rate_unit,    Commercial,          Rental Rate
+	sublse,             $PDX_BOOLEAN,         cur_data.sublse,            Commercial,          Sublease
+	bld_st,             $PDX_BOOLEAN,         cur_data.bld_st,            Commercial,          Build to Suit
+
+	// Vacation Rental Info
+	accoms,             $PDX_LONG_TEXT,       cur_data.accoms,            Vacation,            Accomodates
+	avail_info,         $PDX_LONG_TEXT,       cur_data.avail_info,        Vacation,            Availability
+
+	// Attribution
+	aid,                $PDX_TEXT_VALUE,      rets.aid,                   Attribution,         Agent ID,
+		query_name      =>   rets[aid]
+	aname,              $PDX_SHORT_TEXT,      rets.aname,                 Attribution,         Agent Name
+	aphone,             $PDX_SHORT_TEXT,      rets.aphone,                Attribution,         Agent Phone
+	alicense,           $PDX_SHORT_TEXT,      rets.alicense,              Attribution,         Agent License
+	oid,                $PDX_TEXT_VALUE,      rets.oid,                   Attribution,         Office ID,
+		query_name      =>   rets[oid]
+	oname,              $PDX_SHORT_TEXT,      rets.oname,                 Attribution,         Office Name
+	ophone,             $PDX_SHORT_TEXT,      rets.ophone,                Attribution,         Office Phone
+
+	// Co-attribution
+	acoid,              $PDX_TEXT_VALUE,      rets.acoid,                 Co-attribution,      Co-agent ID,
+		query_name      =>   rets[acoid]
+	aconame,            $PDX_SHORT_TEXT,      rets.aconame,               Co-attribution,      Co-agent Name
+	acophone,           $PDX_SHORT_TEXT,      rets.acophone,              Co-attribution,      Co-agent Phone
+	acolicense,         $PDX_SHORT_TEXT,      rets.acolicense,            Co-attribution,      Co-agent License
+	ocoid,              $PDX_TEXT_VALUE,      rets.ocoid,                 Co-attribution,      Co-office ID,
+		query_name      =>   rets[ocoid]
+	oconame,            $PDX_SHORT_TEXT,      rets.oconame,               Co-attribution,      Co-office Name
+	ocophone,           $PDX_SHORT_TEXT,      rets.ocophone,              Co-attribution,      Co-office Phone
+PDX_STANDARD_ATTRIBUTE_LIST;
+
 
 $PDX_Value_Table = array(
 	'listing_type' => array(

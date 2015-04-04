@@ -20,7 +20,7 @@ class PDX_Search_Filter {
 
 	public function __construct() {
 		if(!self::$attributes)
-			self::$attributes = new PDX_Attributes();
+			self::$attributes = new PDX_Standard_Attributes();
 
 		$this->filter = array();
 	}
