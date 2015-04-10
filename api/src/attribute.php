@@ -151,23 +151,62 @@ class PDX_Connection_Attributes extends PDX_Standard_Attributes {
 		parent::__construct();
 
 		$this->connection = $connection;
-		$this->attributes = $this->remove_unpopulated_attributes($this->attributes);
+		//$this->attributes = $this->remove_unpopulated_attributes($this->attributes);
 		$this->attributes = $this->add_custom_attributes($this->attributes);
 	}
 
 	protected function remove_unpopulated_attributes($attributes) {
-		foreach($attributes as $attribute) {
-			if(array_shift(explode('.', $attribute->field_name)) == 'cur_data') {
-				switch($attribute->type) {
-					
+		global $PDX_DATE_TIME;
+
+		foreach($attributes as $attribute)
+			if(in_array(array_shift(explode('.', $attribute->field_name)), array('cur_data', 'uncur_data'))) {
+
+				if($attribute->type == $PDX_DATE_TIME) {
+					$query = $attribute->query_name . '=';
+					$query &= '&' . str_replace($attribute->name, $attribute->name . '_match', $attribute->query_name) . '=ne';
+				}
+				else
+					$query = str_replace($attribute->name, 'min_' . $attribute->name, $attribute->query_name) . '=';
+
+				if($result = $this->connection->SEARCH_LISTINGS($query . '&limit=1')) {
+					if($result->total == 0)
+						unset($attributes[$attribute->name]);
 				}
 			}
-		}
 
 		return $attributes;
 	}
 
 	protected function add_custom_attributes($attributes) {
+		global $PDX_BOOLEAN;
+		global $PDX_NUMERIC;
+		global $PDX_CURRENCY;
+		global $PDX_TEXT_VALUE;
+		global $PDX_SHORT_TEXT;
+		global $PDX_LONG_TEXT;
+		global $PDX_DATE_TIME;
+
+		if($result = $this->connection->ATTRIBUTES()) {
+			foreach($result as $item) {
+
+				$field = 'uncur_data.' . $item->key;
+				switch($item->attr_type) {
+					case 0: $type = $PDX_NUMERIC; break;
+					case 1: $type = $PDX_NUMERIC; break;
+					case 2: $type = $PDX_TEXT_VALUE; break;
+					case 3: $type = $PDX_SHORT_TEXT; break;
+					case 4: $type = $PDX_DATE_TIME; break;
+					case 5: $type = $PDX_SHORT_TEXT; break;
+					case 6: $type = $PDX_BOOLEAN; break;
+					case 7: $type = $PDX_CURRENCY; break;
+					case 8: $type = $PDX_SHORT_TEXT; break;
+					case 9: $type = $PDX_SHORT_TEXT; break;
+					default: $type = $PDX_SHORT_TEXT; break;
+				}
+
+				$attributes[$item->key] = PDX_Attribute::create($item->key, $type, $field, $item->cat, $item->name);
+			}
+		}
 		return $attributes;
 	}
 }

@@ -173,6 +173,12 @@ function test_shortcode($args) {
 				$test_result = PDX_API::delete_listing($test_conn, $test_listing);
 				$test_result = $test_result ? 'delete id=' . $test_listing : null;
 				break;
+			case 4:
+				$test_attributes = new PDX_Connection_Attributes($test_conn);
+				foreach($test_attributes->get_attributes() as $attribute)
+					echo $attribute->name . '<br>';
+				$test_result = $api_key;
+				break;
 		}
 
 		if($test_result)
