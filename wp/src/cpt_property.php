@@ -5,7 +5,7 @@ class PL_CPT_Template {
 	protected $property;
 
 	public function __construct() {
-		$this->connection = new PDX_API_Connection('Kt1ZS3DJzKY1fdimQLHjo2tXiP9jl1ZH9COSLvWY2iMa');
+		$this->connection = new PL_API_Connection('Kt1ZS3DJzKY1fdimQLHjo2tXiP9jl1ZH9COSLvWY2iMa');
 		$this->property = new PL_Property_Listing();
 
 		add_action('init', array($this, 'register_post_type'));

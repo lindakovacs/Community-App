@@ -1,6 +1,7 @@
 <?php
 
-class PDX_API_Connection {
+
+class PL_API_Connection {
 	public $API_KEY;
 	public $NON_IMPORT;
 	public $ADDRESS_MODE;

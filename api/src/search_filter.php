@@ -1,41 +1,39 @@
 <?php
 
-require_once('attribute.php');
+
+require_once('connection_attributes.php');
 
 define(EPSILON, 0);
 
-class PDX_Attribute_Filter {
+
+class PL_Attribute_Filter {
 	public $match;
 	public $value;
 	public $min_value;
 	public $max_value;
 }
 
-// this is the basic class for filtering property listings on the Placester API
-class PDX_Search_Filter {
+
+class PL_Search_Filter {
 	static protected $attributes;
 	protected $filter;
 	protected $empty; // indicates an illogical (empty set) search
 	protected $error; // indicates an illegal (syntax error) search
 
-	public function __construct() {
-		if(!self::$attributes)
-			self::$attributes = new PDX_Standard_Attributes();
-
+	public function __construct(PL_Attributes $attributes) {
+		$this->attributes = $attributes;
 		$this->filter = array();
 	}
 
-	public function get_search_fields() {
+	public function get_filter_options() {
 		$array = array();
-		foreach(self::$attributes->get_attributes() as $attribute) {
-			if($attribute->query_name) {
-				array_push($array, $attribute->name);
-				if(in_array($attribute->type, array(PDX_NUMERIC, PDX_CURRENCY, PDX_DATETIME))) {
-					array_push($array, 'min_' . $attribute->name);
-					array_push($array, 'max_' . $attribute->name);
-				}
-				array_push($array, $attribute->name . '_match');
+		foreach($this->attributes->get_filter_attributes() as $attribute) {
+			array_push($array, $attribute->name);
+			if(in_array($attribute->type, array(PL_NUMERIC, PL_CURRENCY, PL_DATETIME))) {
+				array_push($array, 'min_' . $attribute->name);
+				array_push($array, 'max_' . $attribute->name);
 			}
+			array_push($array, $attribute->name . '_match');
 		}
 		return $array;
 	}
@@ -64,7 +62,7 @@ class PDX_Search_Filter {
 		if(is_null($match) || is_null($variation)) {
 
 			// the attribute must exist and be searchable
-			if(($attribute = self::$attributes->get_attribute($name)) && $attribute->query_name) {
+			if(($attribute = $this->attributes->get_attribute($name)) && $attribute->query_name) {
 
 				// a filter on this attribute exists, combine appropriately
 				if($exists = $this->filter[$name]) {
@@ -146,25 +144,25 @@ class PDX_Search_Filter {
 	}
 
 	protected function set_match($name, $value) {
-		$this->filter[$name] = new PDX_Attribute_Filter();
+		$this->filter[$name] = new PL_Attribute_Filter();
 		$this->filter[$name]->match = $value;
 		return true;
 	}
 
 	protected function set_min($name, $value) {
-		$this->filter[$name] = new PDX_Attribute_Filter();
+		$this->filter[$name] = new PL_Attribute_Filter();
 		$this->filter[$name]->min_value = $value;
 		return true;
 	}
 
 	protected function set_max($name, $value) {
-		$this->filter[$name] = new PDX_Attribute_Filter();
+		$this->filter[$name] = new PL_Attribute_Filter();
 		$this->filter[$name]->max_value = $value;
 		return true;
 	}
 
 	protected function set_scalar($name, $value, $match) {
-		$this->filter[$name] = new PDX_Attribute_Filter();
+		$this->filter[$name] = new PL_Attribute_Filter();
 		$this->filter[$name]->value = $value;
 		$this->filter[$name]->match = $match;
 		return true;
@@ -174,7 +172,7 @@ class PDX_Search_Filter {
 		$value = $this->clean_array_value($value);
 		$match = $this->clean_array_match($match);
 
-		$this->filter[$name] = new PDX_Attribute_Filter();
+		$this->filter[$name] = new PL_Attribute_Filter();
 		$this->filter[$name]->value = $value;
 		$this->filter[$name]->match = $match;
 		return true;
@@ -552,7 +550,7 @@ class PDX_Search_Filter {
 
 		$query = '';
 		foreach($this->filter as $name => $filter) {
-			if(($attribute = self::$attributes->get_attribute($name)) && $attribute->query_name) {
+			if(($attribute = $this->attributes->get_attribute($name)) && $attribute->query_name) {
 
 				if(isset($filter->min_value))
 					$query .= '&' . str_replace($name, 'min_' . $name, $attribute->query_name) . '=' . urlencode($filter->min_value);
