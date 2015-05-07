@@ -72,6 +72,8 @@ function connection_shortcode($args) {
 	if($api_key) {
 		$global_connection = new PL_API_Connection($api_key, "WP_Http");
 		$global_attributes = new PL_Connection_Attributes($global_connection);
+		$global_attributes->add_attribute($global_attributes->get_standard_attributes());
+		$global_attributes->add_attribute($global_attributes->get_custom_attributes());
 		return "[connection api_key=" . $api_key . "]";
 	}
 

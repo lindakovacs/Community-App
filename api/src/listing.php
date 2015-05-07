@@ -2,7 +2,7 @@
 
 
 require_once('connection.php');
-require_once('standard_attributes.php');
+require_once('attribute.php');
 
 
 class PL_Listing {
@@ -16,7 +16,14 @@ class PL_Listing {
 			return;
 		}
 
+		// use standard attributes if attributes not provided
+		if(!$attributes) {
+			$attributes = new PL_Attributes();
+			$attributes->add_attribute($attributes->get_standard_attributes());
+		}
 		$this->attributes = $attributes ?: new PL_Standard_Attributes();
+
+		// json may or may not be already decoded
 		if($data instanceof stdClass)
 			$this->listing = $data;
 		else if(is_string($data))

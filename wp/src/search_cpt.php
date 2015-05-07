@@ -1,6 +1,6 @@
 <?php
 
-class PL_CPT_Search {
+class PDX_Search_CPT {
 	protected $connection;
 	protected $property;
 

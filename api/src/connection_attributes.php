@@ -2,41 +2,33 @@
 
 
 require_once('connection.php');
-require_once('standard_attributes.php');
+require_once('attribute.php');
 
 
-class PL_Connection_Attributes extends PL_Standard_Attributes {
+class PL_Connection_Attributes extends PL_Attributes {
+	protected $custom_attributes;
 	protected $connection;
 
 	public function __construct(PL_API_Connection $connection) {
 		parent::__construct();
 
 		$this->connection = $connection;
-		//$this->attributes = $this->remove_unpopulated_attributes($this->attributes);
-		$this->attributes = $this->add_custom_attributes($this->attributes);
+		$this->custom_attributes = $this->read_custom_attributes();
 	}
 
-	protected function remove_unpopulated_attributes($attributes) {
-		foreach($attributes as $attribute)
-			if(in_array(array_shift(explode('.', $attribute->field_name)), array('cur_data', 'uncur_data'))) {
+	public function add_attribute_by_name($name) {
+		if($result = $this->custom_attributes[$name])
+			return $this->attributes[$name] = $result;
 
-				if($attribute->type == PL_DATE_TIME) {
-					$query = $attribute->query_name . '=';
-					$query &= '&' . str_replace($attribute->name, $attribute->name . '_match', $attribute->query_name) . '=ne';
-				}
-				else
-					$query = str_replace($attribute->name, 'min_' . $attribute->name, $attribute->query_name) . '=';
-
-				if($result = $this->connection->SEARCH_LISTINGS($query . '&limit=1')) {
-					if($result->total == 0)
-						unset($attributes[$attribute->name]);
-				}
-			}
-
-		return $attributes;
+		return parent::add_attribute_by_name($name);
 	}
 
-	protected function add_custom_attributes($attributes) {
+	public function get_custom_attributes() {
+		return $this->custom_attributes;
+	}
+
+	protected function read_custom_attributes() {
+		$attributes = array();
 		if($result = $this->connection->ATTRIBUTES()) {
 			foreach($result as $item) {
 
@@ -58,6 +50,26 @@ class PL_Connection_Attributes extends PL_Standard_Attributes {
 				$attributes[$item->key] = new PL_Attribute($item->key, $type, $field, $item->cat, $item->name);
 			}
 		}
+		return $attributes;
+	}
+
+	protected function remove_unpopulated_attributes($attributes) {
+		foreach($attributes as $attribute)
+			if(in_array(array_shift(explode('.', $attribute->field_name)), array('cur_data', 'uncur_data'))) {
+
+				if($attribute->type == PL_DATE_TIME) {
+					$query = $attribute->query_name . '=';
+					$query &= '&' . str_replace($attribute->name, $attribute->name . '_match', $attribute->query_name) . '=ne';
+				}
+				else
+					$query = str_replace($attribute->name, 'min_' . $attribute->name, $attribute->query_name) . '=';
+
+				if($result = $this->connection->SEARCH_LISTINGS($query . '&limit=1')) {
+					if($result->total == 0)
+						unset($attributes[$attribute->name]);
+				}
+			}
+
 		return $attributes;
 	}
 }

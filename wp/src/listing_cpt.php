@@ -1,6 +1,6 @@
 <?php
 
-class PL_CPT_Template {
+class PDX_Listing_CPT {
 	protected $connection;
 	protected $property;
 
@@ -18,18 +18,18 @@ class PL_CPT_Template {
 
 		// custom post type to hold a customized shortcode
 		$args = array(
-			'name' => 'property',
+			'name' => 'pdx_listing_cpt',
 			'labels' => array(
-				'name' => __('Properties', 'placester'),
-				'singular_name' => __( 'Property', 'placester' ),
-				'add_new_item' => __('Add New Property', 'placester'),
-				'edit_item' => __('Edit Property', 'placester'),
-				'new_item' => __('New Property', 'placester'),
-				'all_items' => __('All Properties', 'placester'),
-				'view_item' => __('View Property', 'placester'),
-				'search_items' => __('Search Properties', 'placester'),
-				'not_found' =>  __('No properties found', 'placester'),
-				'not_found_in_trash' => __('No properties found in Trash', 'placester')),
+				'name' => __('Properties', 'pdx_builder'),
+				'singular_name' => __( 'Property', 'pdx_builder' ),
+				'add_new_item' => __('Add New Property', 'pdx_builder'),
+				'edit_item' => __('Edit Property', 'pdx_builder'),
+				'new_item' => __('New Property', 'pdx_builder'),
+				'all_items' => __('All Properties', 'pdx_builder'),
+				'view_item' => __('View Property', 'pdx_builder'),
+				'search_items' => __('Search Properties', 'pdx_builder'),
+				'not_found' =>  __('No properties found', 'pdx_builder'),
+				'not_found_in_trash' => __('No properties found in Trash', 'pdx_builder')),
 			'public' => true,
 			'has_archive' => true
 		);

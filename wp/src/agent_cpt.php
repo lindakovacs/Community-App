@@ -2,7 +2,7 @@
 
 add_action('init', array('PL_CPT_Agent', 'register_post_type'));
 
-class PL_CPT_Agent {
+class PDX_Agent_CPT {
 
 	static public function register_post_type() {
 		$labels = array(
