@@ -373,11 +373,14 @@ class PL_Shortcodes
 			$filterlogic = $group . '[' . $filterlogic . ']';
 			$av_filter = $group . '.' . $av_filter;
 		}
+		elseif( $filterstr == 'zoning_types' || $filterstr == 'purchase_types') {
+			$filterstr .= '[]';
+		}
 		$jsfilter = '';
 		if (strpos($value, '||') !==false ) {//print_r($atts);die;
 			$values = explode('||', $value);
 			if (count($values) > 1) {
-				$filterstr .= '[]';
+				if (substr($filterstr, -2) != '[]') $filterstr .= '[]';
 				$jsfilter .= apply_filters('pl_filter_wrap_filter', "{ 'name': '" . $filterlogic . "', 'value' : 'in'} ");
 			}
 			foreach ($values as $value) {
