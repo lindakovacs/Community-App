@@ -79,6 +79,14 @@ class PL_People_Helper {
 		return $details;
 	}
 
+// PL_COMPATIBILITY_MODE -- preserve the interface expected by certain previous versions of blueprint
+	public static function update_person_details($args) {
+		return self::update_person($args);
+	}
+	public static function get_favorite_ids() {
+		return PL_Favorite_Listings::get_favorite_properties();
+	}
+	public static function placester_favorite_link_toggle($args) {
+		return PL_Favorite_Listings::placester_favorite_link_toggle($args);
+	}
 }
-
-?>

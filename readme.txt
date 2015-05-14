@@ -142,6 +142,11 @@ In general - real-time. But if you use 3rd party property management services, t
 
 == Changelog ==
 
+= 1.3.1 =
+* Improved compatibility with old versions of Placester themes
+* Improved administrative visual styling under WP 4.1.1
+* Additional minor bug fixes
+
 = 1.3.0 =
 * Fixed issue reading favorite properties via Placester Data API
 * Fixed the destruction of the login / register forms by fancybox
