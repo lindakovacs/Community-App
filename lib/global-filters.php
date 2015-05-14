@@ -79,42 +79,44 @@ class PL_Global_Filters {
 		return $val;
 	}
 
-	private static function render_active_filter ($key, $item, $subkey = null) {
-		// Some translation...
-		$name = is_null($subkey) ? $key : "{$key}[{$subkey}]";
-		$label = is_int($subkey) ? $key : $name;
-		$value = $item;
-		
+	private static function render_active_filter ($name, $value) {
 		ob_start();
 		?>
 			<span id="active_filter_item">
 				<a href="#"  class="remove_filter"></a>
-				<span class="global_dark_label"><?php echo str_replace("_", " ", $label); ?></span> : <?php echo str_replace("_", " ", $value); ?>
+				<span class="global_dark_label"><?php echo str_replace("_", " ", $name); ?></span> : <?php echo str_replace("_", " ", $value); ?>
 				<input type="hidden" name="<?php echo $name; ?>" value="<?php echo $value; ?>">	
 			</span>
 		<?php
-		
 		return ob_get_clean();
 	}
 
 	public static function display_global_filters () {
-		$html = '';
 		$filters = self::get_global_filters();
+		if (empty($filters))
+			return;
 
-		// Sanity check...
-		if (empty($filters)) { return; }
-
+		$html = '';
 		foreach ($filters as $key => $filter) {
 			if (is_array($filter)) {
-				foreach ($filter as $subkey => $item) {
-					if (is_array($item)) {
-						foreach ($item as $k => $v) {
-							$html .= self::render_active_filter($key, $v, $subkey);
+				reset($filter);
+
+				if(key($filter) === 0) {
+					foreach ($filter as $v) {
+						$html .= self::render_active_filter($key, $v);
+					}
+				}
+				else {
+					foreach ($filter as $subkey => $item) {
+						if (is_array($item)) {
+							foreach ($item as $v) {
+								$html .= self::render_active_filter("{$key}[{$subkey}]", $v);
+							}
+						}
+						else {
+							$html .= self::render_active_filter("{$key}[{$subkey}]", $item);
 						}
 					}
-					else {
-						$html .= self::render_active_filter($key, $item, $subkey);
-					} 
 				}
 			}
 			else {

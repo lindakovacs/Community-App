@@ -15,22 +15,20 @@ if ($action == 'delete' && $ID) {
 	die;
 }
 if ($action == 'copy') {
-	$shortcode = (empty($_REQUEST['shortcode'])?'':$_REQUEST['shortcode']);
-	$default = empty($_REQUEST['default']) ? '' : $_REQUEST['default'];
-	$template = array();
-	if ($ID) {
-		$template = PL_Shortcode_CPT::load_custom_template($ID);
+	if(!$template) {
+		$shortcode = empty($_REQUEST['shortcode']) ? '' : $_REQUEST['shortcode'];
+		$default = empty($_REQUEST['default']) ? '' : $_REQUEST['default'];
+		if ($default && $shortcode)
+			$template = PL_Shortcode_CPT::load_template($default, $shortcode);
 	}
-	elseif ($default && $shortcode) {
-		$template = PL_Shortcode_CPT::load_template($default, $shortcode);
-	}
-	if (!empty($template['shortcode'])) {
+	if ($template['title']) {
 		$template['title'] = 'Copy of '.$template['title'];
 		$action = 'edit';
 	}
 	else {
 		$action = '';
 	}
+	$ID = '';
 }
 if ($action == 'edit' && !empty($_POST['save']) && !empty($_POST['shortcode'])) {
 	$data = array_merge($_POST, $_POST[$_POST['shortcode']]);

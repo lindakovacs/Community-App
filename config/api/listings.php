@@ -28,7 +28,7 @@ $PL_API_LISTINGS = array(
 				'bound' => array(
 					'class' => 'PL_Listing_Helper',
 					'method' => 'types_for_options',
-					'params' => array(false, true, 'purchase_types')
+					'params' => array(false, false, 'purchase_types')
 				)
 			),
 			'property_type'  => array(
@@ -40,7 +40,7 @@ $PL_API_LISTINGS = array(
 				'bound' => array(
 					'class' => 'PL_Listing_Helper',
 					'method' => 'types_for_options',
-					'params' => array()
+					'params' => array(false, false, 'property_type')
 				)
 			),
 			// binds to building id
@@ -55,7 +55,7 @@ $PL_API_LISTINGS = array(
 					'bound' => array(
 						'class' => 'PL_Listing_Helper',
 						'method' => 'locations_for_options',
-						'params' => array('postal', false)
+						'params' => array('postal', false, false)
 					),
 				),
 				'region'  => array(
@@ -67,7 +67,7 @@ $PL_API_LISTINGS = array(
 					'bound' => array(
 						'class' => 'PL_Listing_Helper',
 						'method' => 'locations_for_options',
-						'params' => array('region', false)
+						'params' => array('region', false, false)
 					)
 				),
 				'locality'  => array(
@@ -79,7 +79,7 @@ $PL_API_LISTINGS = array(
 					'bound' => array(
 						'class' => 'PL_Listing_Helper',
 						'method' => 'locations_for_options',
-						'params' => array('locality', false)
+						'params' => array('locality', false, false)
 					)
 				),
 				'neighborhood'  => array(
@@ -91,7 +91,7 @@ $PL_API_LISTINGS = array(
 					'bound' => array(
 						'class' => 'PL_Listing_Helper',
 						'method' => 'locations_for_options',
-						'params' => array('neighborhood', false)
+						'params' => array('neighborhood', false, false)
 					)
 				),
 				'county'  => array(
@@ -103,7 +103,7 @@ $PL_API_LISTINGS = array(
 					'bound' => array(
 						'class' => 'PL_Listing_Helper',
 						'method' => 'locations_for_options',
-						'params' => array('county', false)
+						'params' => array('county', false, false)
 					)
 				),
 				'address'  => array(
