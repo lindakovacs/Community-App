@@ -1,10 +1,10 @@
 <?php
 
 require_once('../src/php_curl.php');
-require_once('../src/connection.php');
+require_once('../src/http.php');
 require_once('../src/search.php');
 
-$global_conn = new PL_API_Connection("wvkGrh5nHYCPXVFmC17BeDn2KKxD7XE58rfg5BDksHka", "PHP_Curl");
+$global_conn = new PL_HTTP_Connection("wvkGrh5nHYCPXVFmC17BeDn2KKxD7XE58rfg5BDksHka", "PHP_Curl");
 $global_conn->INCLUDE_DISABLED = true;
 
 echo "<pre>\n";

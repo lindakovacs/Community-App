@@ -3,7 +3,7 @@
 require 'src/php_curl.php';
 require 'src/connection.php';
 
-class PL_API_Connection_Test extends PHPUnit_Framework_TestCase {
+class PL_HTTP_Connection_Test extends PHPUnit_Framework_TestCase {
 
 	public function test_server() {
 		$curl = new PHP_Curl;
@@ -15,7 +15,7 @@ class PL_API_Connection_Test extends PHPUnit_Framework_TestCase {
 
 	/** @depends test_server */
 	public function test_endpoints() {
-		$connection = new PL_API_Connection('xxxinvalidxxx');
+		$connection = new PL_HTTP_Connection('xxxinvalidxxx');
 		$response = $connection->GET_WHOAMI();
 		$this->assertInstanceOf('stdClass', $response);
 		$this->assertObjectHasAttribute('code', $response);
@@ -73,7 +73,7 @@ class PL_API_Connection_Test extends PHPUnit_Framework_TestCase {
 
 	/** @depends test_endpoints */
 	public function test_GET_WHOAMI_returns_account_info() {
-		$connection = new PL_API_Connection('nhuRyCXHfB2ccbE1A97X1U2pHwwWKghFPt1cClehV7rrixTKmZdECxNxWn1bQt9d1lahudsFPj2JPzE1fK00GQaa');
+		$connection = new PL_HTTP_Connection('nhuRyCXHfB2ccbE1A97X1U2pHwwWKghFPt1cClehV7rrixTKmZdECxNxWn1bQt9d1lahudsFPj2JPzE1fK00GQaa');
 		$whoami = $connection->GET_WHOAMI();
 		$this->assertInstanceOf('stdClass', $whoami);
 		$this->assertObjectHasAttribute('id', $whoami);
@@ -83,7 +83,7 @@ class PL_API_Connection_Test extends PHPUnit_Framework_TestCase {
 
 	/** @depends test_endpoints */
 	public function test_GET_LOCATIONS_returns_locations() {
-		$connection = new PL_API_Connection('nhuRyCXHfB2ccbE1A97X1U2pHwwWKghFPt1cClehV7rrixTKmZdECxNxWn1bQt9d1lahudsFPj2JPzE1fK00GQaa');
+		$connection = new PL_HTTP_Connection('nhuRyCXHfB2ccbE1A97X1U2pHwwWKghFPt1cClehV7rrixTKmZdECxNxWn1bQt9d1lahudsFPj2JPzE1fK00GQaa');
 		$locations = $connection->GET_LOCATIONS();
 		$this->assertInstanceOf('stdClass', $locations);
 		$this->assertObjectHasAttribute('id', $locations);

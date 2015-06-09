@@ -1,7 +1,7 @@
 <?php
 
 
-require_once('connection_attributes.php');
+require_once('connection.php');
 
 define(EPSILON, 0);
 
@@ -15,19 +15,19 @@ class PL_Attribute_Filter {
 
 
 class PL_Search_Filter {
-	static protected $attributes;
+	protected $connection;
 	protected $filter;
 	protected $empty; // indicates an illogical (empty set) search
 	protected $error; // indicates an illegal (syntax error) search
 
-	public function __construct(PL_Attributes $attributes) {
-		$this->attributes = $attributes;
+	public function __construct(PL_API_Connection $connection) {
+		$this->connection = $attributes;
 		$this->filter = array();
 	}
 
 	public function get_filter_options() {
 		$array = array();
-		foreach($this->attributes->get_filter_attributes() as $attribute) {
+		foreach($this->connection->get_filter_attributes() as $attribute) {
 			array_push($array, $attribute->name);
 			if(in_array($attribute->type, array(PL_NUMERIC, PL_CURRENCY, PL_DATETIME))) {
 				array_push($array, 'min_' . $attribute->name);
@@ -62,7 +62,7 @@ class PL_Search_Filter {
 		if(is_null($match) || is_null($variation)) {
 
 			// the attribute must exist and be searchable
-			if(($attribute = $this->attributes->get_attribute($name)) && $attribute->query_name) {
+			if(($attribute = $this->connection->get_attribute($name)) && $attribute->query_name) {
 
 				// a filter on this attribute exists, combine appropriately
 				if($exists = $this->filter[$name]) {
@@ -550,7 +550,7 @@ class PL_Search_Filter {
 
 		$query = '';
 		foreach($this->filter as $name => $filter) {
-			if(($attribute = $this->attributes->get_attribute($name)) && $attribute->query_name) {
+			if(($attribute = $this->connection->get_attribute($name)) && $attribute->query_name) {
 
 				if(isset($filter->min_value))
 					$query .= '&' . str_replace($name, 'min_' . $name, $attribute->query_name) . '=' . urlencode($filter->min_value);

@@ -100,42 +100,17 @@ class PL_Attribute {
 
 
 class PL_Attributes {
-	static protected $standard_attributes;	// attributes defined by Placester
 	protected $attributes;
 
 	public function __construct() {
-		if(!self::$standard_attributes)
-			self::$standard_attributes = self::read_standard_attributes();
-
 		$this->attributes = array();
 	}
 
 	public function add_attribute($attribute) {
-		$result = null;
+		if($attribute instanceof PL_Attribute && $attribute->name)
+			return $this->attributes[$attribute->name] = $attribute;
 
-		if(is_array($attribute)) {
-			foreach($attribute as $element)
-				$result = $this->add_attribute($element) ?: $result;
-		}
-		else if(is_string($attribute)) {
-			$result = $this->add_attribute_by_name($attribute);
-		}
-		else if($attribute instanceof PL_Attribute) {
-			if($attribute->name)
-				$result = $this->attributes[$attribute->name] = $attribute;
-		}
-
-		return $result;
-	}
-
-	public function add_attribute_by_name($name) {
-		if($result = self::$standard_attributes[$name])
-			$this->attributes[$name] = $result;
-
-		return $result;
-	}
-
-	public function add_attribute_by_field($field) {
+		return null;
 	}
 
 	public function remove_attribute($name) {
@@ -150,10 +125,6 @@ class PL_Attributes {
 
 	public function get_attributes() {
 		return $this->attributes;
-	}
-
-	public function get_standard_attributes() {
-		return self::$standard_attributes;
 	}
 
 	public function get_filter_attributes() {
@@ -174,49 +145,6 @@ class PL_Attributes {
 			}
 		}
 		return $array;
-	}
-
-	static protected function read_standard_attributes() {
-		global $PL_STANDARD_ATTRIBUTE_LIST;
-
-		$attributes = array();
-		$continuation = false;
-		foreach(array_map('trim', explode("\n", $PL_STANDARD_ATTRIBUTE_LIST)) as $line) {
-			if(empty($line) || substr($line, 0, 2) == '//')
-				continue;
-
-			$line = array_map('trim', explode(',', $line));
-			if(!$continuation) {
-				if(count($line) == 5) {
-					$attributes[] = new PL_Attribute($line[0], $line[1], $line[2], $line[3], $line[4]);
-					continue;
-				}
-
-				if(count($line) == 6 && empty($line[5])) {
-					$continuation = true;
-					$basic = $line;
-					$extended = array();
-					continue;
-				}
-
-				assert(false, "Error parsing attribute {$line[0]}");
-			}
-
-			$param = array_map('trim', explode('=>', $line[0]));
-			if(count($line) == 1)
-				$continuation = false;
-			elseif(count($line) == 2 && empty($line[1]))
-				$continuation = true;
-			else
-				assert(false, "Error parsing parameter {$param[0]} on attribute {$basic[0]}");
-
-			$extended[$param[0]] = $param[1];
-			if(!$continuation)
-				$attributes[] = new PL_Attribute($basic[0], $basic[1], $basic[2], $basic[3], $basic[4], $extended);
-		}
-
-		// turn the array into an associative array with names as the index values
-		return array_combine(array_map(function ($attribute) { return $attribute->name; }, $attributes), $attributes);
 	}
 }
 

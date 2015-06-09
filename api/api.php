@@ -10,8 +10,8 @@ Author URI: https://www.placester.com/
 
 
 require_once('src/php_curl.php');
+require_once('src/http.php');
 require_once('src/connection.php');
-require_once('src/connection_attributes.php');
 require_once('src/listing_display.php');
 require_once('src/search_filter.php');
 require_once('src/search_sort.php');
@@ -70,7 +70,7 @@ function connection_shortcode($args) {
 	global $global_attributes;
 
 	if($api_key) {
-		$global_connection = new PL_API_Connection($api_key, "WP_Http");
+		$global_connection = new PL_HTTP_Connection($api_key, "WP_Http");
 		$global_attributes = new PL_Connection_Attributes($global_connection);
 		$global_attributes->add_attribute($global_attributes->get_standard_attributes());
 		$global_attributes->add_attribute($global_attributes->get_custom_attributes());
