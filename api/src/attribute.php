@@ -135,6 +135,9 @@ class PL_Attributes {
 		return $result;
 	}
 
+	public function add_attribute_by_field($field) {
+	}
+
 	public function remove_attribute($name) {
 		$attribute = $this->attributes[$name];
 		unset($this->attributes[$name]);

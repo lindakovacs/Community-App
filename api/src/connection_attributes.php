@@ -23,6 +23,10 @@ class PL_Connection_Attributes extends PL_Attributes {
 		return parent::add_attribute_by_name($name);
 	}
 
+	public function add_attribute_by_field($field) {
+		return parent::add_attribute_by_field($field);
+	}
+
 	public function get_custom_attributes() {
 		return $this->custom_attributes;
 	}
@@ -50,26 +54,6 @@ class PL_Connection_Attributes extends PL_Attributes {
 				$attributes[$item->key] = new PL_Attribute($item->key, $type, $field, $item->cat, $item->name);
 			}
 		}
-		return $attributes;
-	}
-
-	protected function remove_unpopulated_attributes($attributes) {
-		foreach($attributes as $attribute)
-			if(in_array(array_shift(explode('.', $attribute->field_name)), array('cur_data', 'uncur_data'))) {
-
-				if($attribute->type == PL_DATE_TIME) {
-					$query = $attribute->query_name . '=';
-					$query &= '&' . str_replace($attribute->name, $attribute->name . '_match', $attribute->query_name) . '=ne';
-				}
-				else
-					$query = str_replace($attribute->name, 'min_' . $attribute->name, $attribute->query_name) . '=';
-
-				if($result = $this->connection->SEARCH_LISTINGS($query . '&limit=1')) {
-					if($result->total == 0)
-						unset($attributes[$attribute->name]);
-				}
-			}
-
 		return $attributes;
 	}
 }
