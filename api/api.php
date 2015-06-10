@@ -9,8 +9,8 @@ Author URI: https://www.placester.com/
  */
 
 
+require_once('src/listing.php');
 require_once('src/connection.php');
-require_once('src/listing_display.php');
 require_once('src/search_filter.php');
 require_once('src/search_sort.php');
 require_once('src/search_page.php');
@@ -60,15 +60,15 @@ function listing_shortcode($args) {
 
 	if($id) {
 		if($result = $global_connection->get_private_listing($id))
-			$global_listing = new PL_Listing_Display($result, $global_connection);
+			$global_listing = new PL_Listing($result, $global_connection);
 		else
 			$global_listing = null;
 	}
 	else if(!is_null($global_current) && !is_null($index)) {
-		$global_listing = new PL_Listing_Display($global_results->listings[$global_current = $index], $global_connection);
+		$global_listing = new PL_Listing($global_results->listings[$global_current = $index], $global_connection);
 	}
 	else if(!is_null($global_current) && $next) {
-		$global_listing = new PL_Listing_Display($global_results->listings[++$global_current], $global_connection);
+		$global_listing = new PL_Listing($global_results->listings[++$global_current], $global_connection);
 	}
 	else
 		$global_listing = null;
