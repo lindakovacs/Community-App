@@ -1,16 +1,16 @@
 <?php
 
 
-require_once('connection.php');
+require_once('attribute.php');
 
 
 class PL_Search_Sort {
-	protected $connection;
+	protected $attributes;
 	protected $attribute;
 	protected $direction;
 
 	public function __construct(PL_Attributes $attributes) {
-		$this->connection = $attributes;
+		$this->attributes = $attributes;
 	}
 
 	public function get_sort_options() {
@@ -19,14 +19,14 @@ class PL_Search_Sort {
 
 	public function set($name, $value) {
 		if($name == 'sort_by') {
-			if(($attribute = $this->connection->get_attribute($value)) && $attribute->sort_name)
+			if(($attribute = $this->attributes->get_attribute($value)) && $attribute->sort_name)
 				$this->attribute = $attribute;
 		}
 		else if($name == 'sort_type') {
 			if($value == 'asc' || $value == 'desc')
 				$this->direction = $value;
 		}
-		else if(($attribute = $this->connection->get_attribute($name)) && $attribute->sort_name) {
+		else if(($attribute = $this->attributes->get_attribute($name)) && $attribute->sort_name) {
 			$this->attribute = $attribute;
 			if($value == 'asc' || $value == 'desc')
 				$this->direction = $value;
