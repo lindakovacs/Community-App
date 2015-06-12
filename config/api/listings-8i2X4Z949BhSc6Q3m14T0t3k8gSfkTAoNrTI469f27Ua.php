@@ -351,19 +351,7 @@ $PL_API_LISTINGS = array(
 					'bound' => array(
 						'class' => 'PL_Listing_Helper',
 						'method' => 'types_for_options',
-						'params' => array(false, false, 'uncur_data.sch_elm')
-					)
-				),
-				'sch_hgh' => array(
-					'attr_type' => 'text',
-					'multi' => '1',
-					'label' => 'High School',
-					'type' => 'select',
-					'group' => 'schools',
-					'bound' => array(
-						'class' => 'PL_Listing_Helper',
-						'method' => 'types_for_options',
-						'params' => array(false, false, 'uncur_data.sch_high')
+						'params' => array(false, false, 'cur_data.sch_elm')
 					)
 				),
 				'sch_jnr' => array(
@@ -375,7 +363,19 @@ $PL_API_LISTINGS = array(
 					'bound' => array(
 						'class' => 'PL_Listing_Helper',
 						'method' => 'types_for_options',
-						'params' => array(false, false, 'uncur_data.sch_jnr')
+						'params' => array(false, false, 'cur_data.sch_jnr')
+					)
+				),
+				'sch_hgh' => array(
+					'attr_type' => 'text',
+					'multi' => '1',
+					'label' => 'High School',
+					'type' => 'select',
+					'group' => 'schools',
+					'bound' => array(
+						'class' => 'PL_Listing_Helper',
+						'method' => 'types_for_options',
+						'params' => array(false, false, 'cur_data.sch_hgh')
 					)
 				),
 
