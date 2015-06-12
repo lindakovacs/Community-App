@@ -115,7 +115,7 @@ class PL_Sitemaps {
 		$url_tmpl = PL_Pages::get_link_template();
 
 		while ($rem > 0) {
-			$args = array('offset'=>$offset, 'limit'=>self::$max_prop_entries);
+			$args = array('offset'=>$offset, 'limit'=>min($rem, self::$max_prop_entries), 'sort_by'=>'access_id', 'sort_type'=>'asc');
 			$response = PL_Listing_Helper::results($args);
 
 			foreach($response['listings'] as $listing) {

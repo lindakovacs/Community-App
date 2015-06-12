@@ -1,10 +1,11 @@
-<?php 
+<?php
 
+global $PL_API_SERVER;
 global $PL_API_WORDPRESS;
 $PL_API_WORDPRESS = array(
 	'set' => array(
 		'request' => array(
-			'url' => 'https://api.placester.com/v2/wordpress/filters/',
+			'url' => "$PL_API_SERVER/v2/wordpress/filters/",
 			'type' => 'POST'
 		),
 		'args' => array(
@@ -14,7 +15,7 @@ $PL_API_WORDPRESS = array(
 	),
 	'delete' => array(
 		'request' => array(
-			'url' => 'https://api.placester.com/v2/wordpress/filters/',
+			'url' => "$PL_API_SERVER/v2/wordpress/filters/",
 			'type' => 'delete'
 		),
 		'args' => array(
