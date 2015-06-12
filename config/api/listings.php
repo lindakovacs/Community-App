@@ -5,7 +5,7 @@ global $PL_API_LISTINGS;
 
 // check for specialized feed configuration
 $k = get_option('placester_api_key', null);
-$f = dirname(__FILE__) . '/listings-' . $key . '.php';
+$f = dirname(__FILE__) . '/listings-' . $k . '.php';
 if(is_file($f)) include $f;
 
 if(!$PL_API_LISTINGS) {
