@@ -192,6 +192,43 @@ if(!$PL_API_LISTINGS) {
 						'type' => 'text',
 						'group' => 'basic',
 					),
+
+					'sch_elm' => array(
+						'attr_type' => 'text',
+						'multi' => '1',
+						'label' => 'Elementary School',
+						'type' => 'select',
+						'group' => 'schools',
+						'bound' => array(
+							'class' => 'PL_Listing_Helper',
+							'method' => 'types_for_options',
+							'params' => array(false, false, 'cur_data.sch_elm')
+						)
+					),
+					'sch_jnr' => array(
+						'attr_type' => 'text',
+						'multi' => '1',
+						'label' => 'Middle School',
+						'type' => 'select',
+						'group' => 'schools',
+						'bound' => array(
+							'class' => 'PL_Listing_Helper',
+							'method' => 'types_for_options',
+							'params' => array(false, false, 'cur_data.sch_jnr')
+						)
+					),
+					'sch_hgh' => array(
+						'attr_type' => 'text',
+						'multi' => '1',
+						'label' => 'High School',
+						'type' => 'select',
+						'group' => 'schools',
+						'bound' => array(
+							'class' => 'PL_Listing_Helper',
+							'method' => 'types_for_options',
+							'params' => array(false, false, 'cur_data.sch_hgh')
+						)
+					),
 				),
 
 				'custom' => array(
