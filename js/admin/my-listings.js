@@ -15,9 +15,15 @@ jQuery(document).ready(function($) {
     $('#pls_admin_my_listings_filters input').live('change', function (event) {
         event.preventDefault();
         if ($(this).is(":checked")) {
-        	$('#pls_admin_my_listings section#' + $(this).attr('name')).slideDown();
+            if ($(this).attr('name') == 'custom')
+                $('#pls_admin_my_listings > section').not('#listing_types, #location, #basic, #advanced').slideDown();
+            else
+                $('#pls_admin_my_listings > section#' + $(this).attr('name')).slideDown();
         } else {
-        	$('#pls_admin_my_listings section#' + $(this).attr('name')).hide();
+            if ($(this).attr('name') == 'custom')
+                $('#pls_admin_my_listings > section').not('#listing_types, #location, #basic, #advanced').hide();
+            else
+                $('#pls_admin_my_listings > section#' + $(this).attr('name')).hide();
         }
         var params = {action : 'filter_options'};
         params['filter'] = $(this).attr('id');
@@ -32,9 +38,15 @@ jQuery(document).ready(function($) {
                 $.each(data, function (index, value) {
                     $('input#' + index).prop("checked", value === 'true');
                     if (value === 'true') {
-                        $('#pls_admin_my_listings section#' + index).slideDown();
+                        if (index == 'custom')
+                            $('#pls_admin_my_listings > section').not('#listing_types, #location, #basic, #advanced').slideDown();
+                        else
+                            $('#pls_admin_my_listings > section#' + index).slideDown();
                     } else {
-                        $('#pls_admin_my_listings section#' + index).hide();
+                        if (index == 'custom')
+                            $('#pls_admin_my_listings > section').not('#listing_types, #location, #basic, #advanced').hide();
+                        else
+                            $('#pls_admin_my_listings > section#' + index).hide();
                     }
                 });
             } else {

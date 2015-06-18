@@ -24,7 +24,7 @@ class PL_Form {
 		foreach ($items as $key => $attributes) {
 			if ( isset($attributes['type']) && isset($attributes['group']) ) {
 				$form_group[$attributes['group']][] = self::item($key, $attributes, $method, $parent, $section_prefix);
-			} 
+			}
 			elseif ( !isset($attributes['type']) && is_array($attributes) ) {
 				if ($parent) {
 					$key = $parent.'['.$key.']';
@@ -32,7 +32,18 @@ class PL_Form {
 
 				foreach ($attributes as $child_item => $attribute) {
 					if ( isset($attribute['group']) ) {
-						$form_group[$attribute['group']][] = self::item($child_item, $attribute, $method, $key, $section_prefix);	
+						if($attribute['attr_type'] == 'int' || $attribute['attr_type'] == 'date')
+						{
+							$temp_attribute = $attribute;
+							$temp_attribute['label'] = $attribute['label_min'] ?: 'Min ' . $attribute['label'];
+							$form_group[$attribute['group']][] = self::item($child_item, $temp_attribute, $method, 'min_' . $key, $section_prefix);
+
+							$temp_attribute = $attribute;
+							$temp_attribute['label'] = $attribute['label_max'] ?: 'Max ' . $attribute['label'];
+							$form_group[$attribute['group']][] = self::item($child_item, $temp_attribute, $method, 'max_' . $key, $section_prefix);
+						}
+						else
+							$form_group[$attribute['group']][] = self::item($child_item, $attribute, $method, $key, $section_prefix);
 					}
 				}
 			}

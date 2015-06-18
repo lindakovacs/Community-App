@@ -1,10 +1,11 @@
-<?php 
+<?php
 
+global $PL_API_SERVER;
 global $PL_API_CUST_ATTR;
 $PL_API_CUST_ATTR = array(
 	'get' => array(
 		'request' => array(
-			'url' => 'https://api.placester.com/v2/custom/attributes',
+			'url' => "$PL_API_SERVER/v2/custom/attributes",
 			'type' => 'GET'
 		),
 		'args' => array(

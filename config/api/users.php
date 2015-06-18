@@ -1,10 +1,11 @@
-<?php 
+<?php
 
+global $PL_API_SERVER;
 global $PL_API_USERS;
 $PL_API_USERS = array(
 	'whoami' => array(
 		'request' => array(
-			'url' => 'https://api.placester.com/v2/organizations/whoami',
+			'url' => "$PL_API_SERVER/v2/organizations/whoami",
 			'type' => 'GET'
 		),
 		'args' => array(),
@@ -49,7 +50,7 @@ $PL_API_USERS = array(
 	),
 	'setup' => array(
 		'request' => array(
-			'url' => 'https://api.placester.com/v2/users/setup',
+			'url' => "$PL_API_SERVER/v2/users/setup",
 			'type' => 'POST'
 		),
 		'args' => array(
@@ -81,7 +82,7 @@ $PL_API_USERS = array(
 	),
 	'update' => array(
 		'request' => array(
-			'url' => 'https://api.placester.com/v2/users',
+			'url' => "$PL_API_SERVER/v2/users",
 			'type' => 'PUT'
 		),
 		'args' => array(
@@ -114,7 +115,7 @@ $PL_API_USERS = array(
 	),
 	'subscriptions' => array(
 		'request' => array(
-			'url' => 'http://api.placester.com/v2/subscriptions',
+			'url' => "$PL_API_SERVER/v2/subscriptions",
 			'type' => 'GET'
 		),
 		'args' => array(),
@@ -127,7 +128,7 @@ $PL_API_USERS = array(
 	),
 	'start_subscriptions' => array(
 		'request' => array(
-			'url' => 'http://api.placester.com/v2/subscriptions',
+			'url' => "$PL_API_SERVER/v2/subscriptions",
 			'type' => 'POST'
 		),
 		'args' => array(

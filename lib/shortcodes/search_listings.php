@@ -155,21 +155,23 @@ To add some text to your listings:<br />
 			self::$sl_listing_attributes = PL_Shortcode_CPT::get_listing_attributes(true);
 			self::$sl_sort_list = array();
 			foreach(self::$sl_listing_attributes as $args) {
-				$group = $args['group'];
-				switch($group) {
-					case 'metadata':
-						$group = 'cur_data';
-						break;
-					case 'custom':
-						$group = 'uncur_data';
-						break;
-					case 'rets':
-						continue;
-						break;
+				if($args['attr_type'] && $args['attr_type'] != 'checkbox') {
+					$group = $args['group'];
+					switch($group) {
+						case 'metadata':
+							$group = 'cur_data';
+							break;
+						case 'custom':
+							$group = 'uncur_data';
+							break;
+						case 'rets':
+							continue;
+							break;
 
+					}
+					$key = (empty($group) ? '' : $group.'.').$args['attribute'];
+					self::$sl_sort_list[$key] = $args['label'];
 				}
-				$key = (empty($group) ? '' : $group.'.').$args['attribute'];
-				self::$sl_sort_list[$key] = $args['label'];
 			}
 		}
 		if (!empty(self::$sl_sort_list)) {

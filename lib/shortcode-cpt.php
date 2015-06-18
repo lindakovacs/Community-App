@@ -842,13 +842,14 @@ class PL_Shortcode_CPT {
 					break;
 			}
 			$key .= empty($key) ? '' : '.';
-			$filters[$key.$attr['attribute']] = $attr;
 			if ($attr['attr_type'] == 'int' || $attr['attr_type'] == 'date') {
 				$label = empty($attr['label_min']) ? 'Min ' . $attr['label'] : $attr['label_min'];
 				$filters[$key.$attr['attribute'].'_min'] = array_merge($attr, array('attribute' => 'min_'.$attr['attribute'], 'label' => $label, 'multi'=>false));
 				$label = empty($attr['label_max']) ? 'Max ' . $attr['label'] : $attr['label_max'];
 				$filters[$key.$attr['attribute'].'_max'] = array_merge($attr, array('attribute' => 'max_'.$attr['attribute'], 'label' => $label, 'multi'=>false));
 			}
+			else
+				$filters[$key.$attr['attribute']] = $attr;
 		}
 		
 		return $filters;

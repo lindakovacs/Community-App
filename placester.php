@@ -87,6 +87,10 @@ define( 'PL_THIRD_PARTY_URL', trailingslashit(PL_PARENT_URL) . 'third-party/' );
 define( 'ADMIN_URL', trailingslashit( admin_url() ) );
 define( 'ADMIN_MENU_URL', trailingslashit( ADMIN_URL ) . 'admin.php' );
 
+// API Server
+global $PL_API_SERVER;
+$PL_API_SERVER = defined('PL_API_SERVER') ? PL_API_SERVER : 'https://api.placester.com';
+
 // Demo Account API Key
 define( 'DEMO_API_KEY', '7e63514ebfad7608bbe7b4469ab470ecef4dc651099ae06fc1df6807717f0deacd38809e3c314ca09c085125f773a4c7' );
 
