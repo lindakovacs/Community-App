@@ -3,6 +3,10 @@
 
 require_once('http.php');
 require_once('attribute.php');
+require_once('listing.php');
+require_once('search_filter.php');
+require_once('search_view.php');
+require_once('search_result.php');
 
 
 class PL_API_Connection extends PL_Attributes {
@@ -95,12 +99,33 @@ class PL_API_Connection extends PL_Attributes {
 		if($data = $this->http_connection->UPDATE_LISTING($listing->pdx_id, $listing->post_string())) {
 		}
 	}
+
 	public function delete_listing($id) {
 		// debug only
 		if($this->http_connection->API_KEY != 'wvkGrh5nHYCPXVFmC17BeDn2KKxD7XE58rfg5BDksHka')
 			return null;
 
 		return $this->http_connection->DELETE_LISTING($id);
+	}
+
+	public function new_search_filter() {
+		return new PL_Search_Filter($this);
+	}
+
+	public function new_search_view() {
+		return new PL_Search_View($this);
+	}
+
+	public function search_listings(PL_Search_Filter $filter = null, PL_Search_View $view = null) {
+		$query = $filter ? $filter->query_string() : '';
+		if($view && ($view_query = $view->query_string())) {
+			if($query) $query .= '&';
+			$query .= $view_query;
+		}
+
+		if($data = $this->http_connection->SEARCH_LISTINGS($query))
+			return new PL_Search_Result($data, $this);
+		return null;
 	}
 
 	protected function read_custom_attributes() {

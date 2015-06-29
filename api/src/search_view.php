@@ -4,17 +4,21 @@
 require_once('attribute.php');
 
 
-class PL_Search_Sort {
+class PL_Search_View {
 	protected $attributes;
 	protected $attribute;
 	protected $direction;
+	protected $offset;
+	protected $limit;
 
 	public function __construct(PL_Attributes $attributes) {
-		$this->attributes = $attributes;
+		$this->attributes = $attributes ?: new PL_Standard_Attributes();
+		$this->limit = 12;
+		$this->offset = 0;
 	}
 
-	public function get_sort_options() {
-		return array('sort_by', 'sort_type');
+	public function get_view_options() {
+		return array('sort_by', 'sort_type', 'offset', 'limit');
 	}
 
 	public function set($name, $value) {
@@ -26,10 +30,13 @@ class PL_Search_Sort {
 			if($value == 'asc' || $value == 'desc')
 				$this->direction = $value;
 		}
-		else if(($attribute = $this->attributes->get_attribute($name)) && $attribute->sort_name) {
-			$this->attribute = $attribute;
-			if($value == 'asc' || $value == 'desc')
-				$this->direction = $value;
+		else if($name == 'offset') {
+			if(is_scalar($value))
+				$this->offset = 0 + $value;
+		}
+		else if($name == 'limit') {
+			if(is_scalar($value))
+				$this->limit = 0 + $value;
 		}
 	}
 
@@ -55,9 +62,11 @@ class PL_Search_Sort {
 		if($this->attribute) {
 			if(!$this->direction)
 				$this->direction = $this->get_default_sort_type($this->attribute);
-			return 'sort_by=' . $this->attribute->sort_name . '&sort_type=' . $this->direction;
+			$sort = 'sort_by=' . $this->attribute->sort_name . '&sort_type=' . $this->direction;
 		}
+		else
+			$sort = 'sort_by=created_at&sort_type=desc';
 
-		return '';
+		return $sort . '&' . 'offset=' . max($this->offset, 0) . '&limit=' . max($this->limit, 1);
 	}
 }

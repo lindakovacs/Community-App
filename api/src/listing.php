@@ -5,8 +5,6 @@ require_once('attribute.php');
 
 
 class PL_Listing {
-	static protected $default_attributes;
-
 	protected $attributes;
 	protected $listing;
 
@@ -18,13 +16,7 @@ class PL_Listing {
 		}
 
 		// use standard attributes if attributes not provided
-		if(!$attributes) {
-			if(!self::$default_attributes) {
-				self::$default_attributes = new PL_Standard_Attributes();
-			}
-			$attributes = self::$default_attributes;
-		}
-		$this->attributes = $attributes;
+		$this->attributes = $attributes ?: new PL_Standard_Attributes();
 
 		// json may or may not be already decoded
 		if($data instanceof stdClass)

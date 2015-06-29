@@ -9,24 +9,7 @@ Author URI: https://www.placester.com/
  */
 
 
-require_once('src/listing.php');
 require_once('src/connection.php');
-require_once('src/search_filter.php');
-require_once('src/search_sort.php');
-require_once('src/search_page.php');
-
-
-function search_listings($connection, $filter = null, $sort = null, $page = null) {
-	if($filter) $filter = $filter->query_string();
-	if($sort) $sort = $sort->query_string();
-	if($page) $page = $page->query_string();
-
-	$query = ($filter ? $filter . '&' : '')
-		. ($sort ? $sort : 'sort_by=created_at&sort_type=desc')
-		. ($page ? '&' . $page : '');
-
-	return null; // $connection->SEARCH_LISTINGS($query);
-}
 
 
 add_shortcode('connection', 'connection_shortcode');
@@ -55,7 +38,6 @@ function listing_shortcode($args) {
 	extract(shortcode_atts(array('id' => null, 'index' => null, 'next' => true), $args));
 	global $global_connection;
 	global $global_results;
-	global $global_current;
 	global $global_listing;
 
 	if($id) {
@@ -64,11 +46,11 @@ function listing_shortcode($args) {
 		else
 			$global_listing = null;
 	}
-	else if(!is_null($global_current) && !is_null($index)) {
-		$global_listing = new PL_Listing($global_results->listings[$global_current = $index], $global_connection);
+	else if(!is_null($global_results) && !is_null($index)) {
+		$global_listing = $global_results->get_listing($index);
 	}
-	else if(!is_null($global_current) && $next) {
-		$global_listing = new PL_Listing($global_results->listings[++$global_current], $global_connection);
+	else if(!is_null($global_results) && $next) {
+		$global_listing = $global_results->get_listing();
 	}
 	else
 		$global_listing = null;
@@ -92,39 +74,26 @@ function data_shortcode($args) {
 function search_shortcode($args) {
 	global $global_connection;
 	global $global_results;
-	global $global_current;
-	global $global_listing;
 
-	$search_filter = new PL_Search_Filter($global_connection);
-	$search_sort = new PL_Search_Sort($global_connection);
-	$search_page = new PL_Search_Page();
+	$search_filter = $global_connection->new_search_filter();
+	$search_view = $global_connection->new_search_view();
 
 	$filter_options = array_fill_keys($search_filter->get_filter_options(), null);
-	$sort_options = array_fill_keys($search_sort->get_sort_options(), null);
-	$page_options = array_fill_keys($search_page->get_page_options(), null);
-	$combined_options = array_merge($filter_options, $sort_options, $page_options);
+	$view_options = array_fill_keys($search_view->get_view_options(), null);
+	$combined_options = array_merge($filter_options, $view_options);
 
 	$search_fields = shortcode_atts($combined_options, $args);
 	foreach($search_fields as $field => $value) {
 		if(!is_null($value)) {
-			if(array_key_exists($field, $sort_options))
-				$search_sort->set($field, $value);
-			else if(array_key_exists($field, $page_options))
-				$search_page->set($field, $value);
+			if(array_key_exists($field, $view_options))
+				$search_view->set($field, $value);
 			else
 				$search_filter->set($field, $value);
 		}
 	}
 
-	if($global_results = search_listings($global_connection, $search_filter, $search_sort, $search_page)) {
-		if($global_results->listings) {
-			$global_current = -1;
-		}
-		else {
-			$global_listing = $global_current = null;
-		}
-		return "[search total=" . $global_results->total . " count=" . $global_results->count . "]";
-	}
+	if($global_results = $global_connection->search_listings($search_filter, $search_view))
+		return "[search total=" . $global_results->get_total() . " count=" . $global_results->get_count() . "]";
 
 	return null;
 }
