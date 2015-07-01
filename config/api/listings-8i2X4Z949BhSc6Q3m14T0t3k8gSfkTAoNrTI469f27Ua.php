@@ -269,6 +269,18 @@ $PL_API_LISTINGS = array(
 						'params' => array(false, false, 'uncur_data.pool_type')
 					)
 				),
+				'exterior_features' => array(
+					'attr_type' => 'text',
+					'multi' => '1',
+					'label' => 'Exterior Features',
+					'type' => 'select',
+					'group' => 'exterior',
+					'bound' => array(
+						'class' => 'PL_Listing_Helper',
+						'method' => 'types_for_options',
+						'params' => array(false, false, 'uncur_data.exterior_features')
+					)
+				),
 				'car_storage' => array(
 					'attr_type' => 'text',
 					'multi' => '1',
