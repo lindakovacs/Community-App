@@ -10,3 +10,4 @@ Author URI: https://www.placester.com/
  */
 
 require_once('api/api.php');
+require_once('wp/wp.php');

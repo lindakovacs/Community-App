@@ -1,7 +1,7 @@
 <?php
 
-require 'src/php_curl.php';
-require 'src/connection.php';
+require '../api/php_curl.php';
+require '../api/connection.php';
 
 class PL_HTTP_Connection_Test extends PHPUnit_Framework_TestCase {
 

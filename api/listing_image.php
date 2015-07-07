@@ -45,56 +45,82 @@ class PL_Listing_Image {
 
 
 class PL_Listing_Images implements Countable, ArrayAccess, Iterator {
-	protected $images;
-	protected $index;
+	protected $image_data;
+	protected $image_index;
 
 	protected $private;
 	protected $sorted;
 	protected $dirty;
 
 	public function __construct($data, $private = false) { // internal image array
-		$this->images = is_array($data) ? $data : array();
-		$this->handles = array();
-		$this->index = 0;
+		$this->image_data = is_array($data) ? $data : array();
+		$this->image_index = 0;
 
 		$this->private = $private;
 		$this->sorted = false;
 		$this->dirty = false;
 	}
 
+	public function count()
+	{
+		return count($this->image_data);
+	}
+
+	public function get_image($index = null) {
+		if(is_scalar($index)) {
+			$image = $this->offSetGet($index);
+		}
+		else {
+			$image = $this->current();
+			$this->next();
+		}
+
+		return $image;
+	}
+
+	protected function sort()
+	{
+		$sorted = array();
+		while($element = array_shift($this->image_data))
+			$sorted[$element->order ?: 0][] = $element;
+
+		$this->image_data = array();
+		while($element = array_shift($sorted))
+			$this->image_data = array_merge($this->image_data, $element);
+
+		$this->sorted = true;
+	}
+
+	// Iterator
 	public function current()
 	{
-		return $this->offsetGet($this->index);
+		return $this->offsetGet($this->image_index);
 	}
-
 	public function next()
 	{
-		$this->index++;
+		$this->image_index++;
 	}
-
 	public function key()
 	{
 		if($this->valid())
-			return $this->index;
+			return $this->image_index;
 
 		return null;
 	}
-
 	public function valid()
 	{
-		return $this->offsetExists($this->index);
+		return $this->offsetExists($this->image_index);
 	}
-
 	public function rewind()
 	{
-		$this->index = 0;
+		$this->image_index = 0;
 	}
 
+	// ArrayAccess
 	public function offsetExists($offset)
 	{
 		return $offset >= 0 && $offset < $this->count();
 	}
-
 	public function offsetGet($offset)
 	{
 		if(!$this->offsetExists($offset))
@@ -103,12 +129,11 @@ class PL_Listing_Images implements Countable, ArrayAccess, Iterator {
 		if(!$this->sorted)
 			$this->sort();
 
-		if(!($this->images[$offset] instanceof PL_Listing_Image))
-			$this->images[$offset] = new PL_Listing_Image($this->images[$offset], $this->private);
+		if(!($this->image_data[$offset] instanceof PL_Listing_Image))
+			$this->image_data[$offset] = new PL_Listing_Image($this->image_data[$offset], $this->private);
 
-		return $this->images[$offset];
+		return $this->image_data[$offset];
 	}
-
 	public function offsetSet($offset, $value)
 	{
 		if($this->private && $value instanceof PL_Listing_Image && (is_null($offset) || is_int($offset))) {
@@ -116,16 +141,15 @@ class PL_Listing_Images implements Countable, ArrayAccess, Iterator {
 				$this->sort();
 
 			if(is_null($offset) || (0 + $offset) >= $this->count()) {
-				$this->images[] = $value;
+				$this->image_data[] = $value;
 				$this->dirty = true;
 			}
 			else if((0 + $offset) >= 0) {
-				array_splice($this->images, $offset, 0, array($value));
+				array_splice($this->image_data, $offset, 0, array($value));
 				$this->dirty = true;
 			}
 		}
 	}
-
 	public function offsetUnset($offset)
 	{
 		if(!$this->offsetExists($offset))
@@ -134,25 +158,7 @@ class PL_Listing_Images implements Countable, ArrayAccess, Iterator {
 		if(!$this->sorted)
 			$this->sort();
 
-		array_splice($this->images, $offset, 1);
+		array_splice($this->image_data, $offset, 1);
 		$this->dirty = true;
-	}
-
-	public function count()
-	{
-		return count($this->images);
-	}
-
-	protected function sort()
-	{
-		$sorted = array();
-		while($element = array_shift($this->images))
-			$sorted[$element->order ?: 0][] = $element;
-
-		$this->images = array();
-		while($element = array_shift($sorted))
-			$this->images = array_merge($this->images, $element);
-
-		$this->sorted = true;
 	}
 }

@@ -1,15 +1,11 @@
 <?php
 
-require_once('../src/php_curl.php');
-require_once('../src/http.php');
-require_once('../src/search.php');
+require_once('../api/connection.php');
 
-$global_conn = new PL_HTTP_Connection("wvkGrh5nHYCPXVFmC17BeDn2KKxD7XE58rfg5BDksHka", "PHP_Curl");
-$global_conn->INCLUDE_DISABLED = true;
+$global_conn = new PL_API_Connection("wvkGrh5nHYCPXVFmC17BeDn2KKxD7XE58rfg5BDksHka", "PHP_Curl");
 
-echo "<pre>\n";
 echo "All listings\n";
-$listings = $global_conn->GET_LISTINGS();
+$listings = $global_conn->search_listings();
 if($listings) {
 	foreach($listings->listings as $listing) {
 		echo $listing->id . " " . $listing->location->address . " " . $listing->location->locality . "\n";

@@ -1,7 +1,7 @@
 <?php
 
 
-require_once('../../api/api.php');
+require_once('../api/api.php');
 
 
 class PL_Search_Request {
@@ -20,7 +20,7 @@ class PL_Search_Request {
 		$this->search_view = $connection->new_search_view($request);
 	}
 
-	public function search_listings() {
+	public function search() {
 		return $this->connection->search_listings($this->search_filter, $this->search_view);
 	}
 }

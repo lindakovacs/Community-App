@@ -1,7 +1,7 @@
 <?php
 
 
-require_once('../../api/api.php');
+require_once('../api/api.php');
 
 
 class PL_API_Config {

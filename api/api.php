@@ -9,7 +9,7 @@ Author URI: https://www.placester.com/
  */
 
 
-require_once('src/connection.php');
+require_once('connection.php');
 
 
 add_shortcode('connection', 'connection_shortcode');
@@ -50,11 +50,11 @@ function listing_shortcode($args) {
 		else
 			$global_listing = null;
 	}
-	else if(!is_null($global_results) && !is_null($index)) {
-		$global_listing = $global_results->get_listing($index);
-	}
-	else if(!is_null($global_results) && $next) {
-		$global_listing = $global_results->get_listing();
+	else if(!is_null($global_results)) {
+		if(!is_null($index) || $next)
+			$global_listing = $global_results->get_listing($index);
+		else
+			$global_listing = $global_results->current();
 	}
 	else
 		$global_listing = null;
@@ -125,7 +125,7 @@ function search_shortcode($args) {
 		$search_filter = PL_Search_Filter::combine($global_filter, $search_filter);
 
 	if($global_results = $global_connection->search_listings($search_filter, $search_view))
-		return "[search total=" . $global_results->get_total() . " count=" . $global_results->get_count() . "]";
+		return "[search total=" . $global_results->total() . " count=" . $global_results->count() . "]";
 
 	return null;
 }
@@ -137,7 +137,7 @@ function filter_shortcode($args) {
 
 	$global_filter = $global_connection->new_search_filter($args);
 	if($filter_results = $global_connection->search_listings($global_filter))
-		return "[filter total=" . $filter_results->get_total() . "]";
+		return "[filter total=" . $filter_results->total() . "]";
 
 	return null;
 }

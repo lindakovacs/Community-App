@@ -1,6 +1,6 @@
 <?php
 
-add_action('init', array('PL_CPT_Agent', 'register_post_type'));
+add_action('init', array('PDX_Agent_CPT', 'register_post_type'));
 
 class PDX_Agent_CPT {
 

@@ -1,7 +1,7 @@
 <?php
 
 
-require_once('attribute.php');
+require_once('../api/attribute.php');
 
 
 class PL_Attribute_Format {

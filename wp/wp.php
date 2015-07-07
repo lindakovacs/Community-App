@@ -8,6 +8,6 @@ Version: 0.1
 Author URI: https://www.placester.com/
  */
 
-require_once('src/listing_cpt.php');
-require_once('src/search_cpt.php');
-require_once('src/agent_cpt.php');
+require_once('listing_cpt.php');
+require_once('search_cpt.php');
+require_once('agent_cpt.php');
