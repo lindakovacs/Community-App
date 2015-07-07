@@ -30,7 +30,7 @@ class PL_Search_Filter {
 				case PL_DATETIME:
 					array_push($array, 'min_' . $attribute->name);
 					array_push($array, 'max_' . $attribute->name);
-					if($attribute->type != PL_NUMERIC) break;
+					/* if($attribute->type != PL_NUMERIC) */ break;
 				default:
 					array_push($array, $attribute->name);
 					array_push($array, $attribute->name . '_match');
@@ -39,10 +39,22 @@ class PL_Search_Filter {
 		return $array;
 	}
 
-	protected function allow_min($name) { return true; }
-	protected function allow_max($name) { return true; }
-	protected function allow_array($name) { return true; }
-	protected function allow_match($name, $match = null) { return true; }
+	public function get_empty() { return $this->empty; }
+	public function get_error() { return $this->error; }
+	public function get_closed() { return $this->closed; }
+
+	protected function allow_min($name) {
+		return ($attribute = $this->attributes->get_attribute($name)) && $attribute->min_name;
+	}
+	protected function allow_max($name) {
+		return ($attribute = $this->attributes->get_attribute($name)) && $attribute->max_name;
+	}
+	protected function allow_array($name) {
+		return ($attribute = $this->attributes->get_attribute($name)) && $attribute->array_name;
+	}
+	protected function allow_match($name, $match = null) {
+		return ($attribute = $this->attributes->get_attribute($name)) && $attribute->match_name;
+	}
 
 	public function set($name, $value, $match = null) {
 		if($this->empty || is_null($name) || is_null($value)) return !$this->error;
@@ -100,7 +112,7 @@ class PL_Search_Filter {
 		return !($this->error = true);
 	}
 
-	public function close($force) {
+	public function close($force = false) {
 		if($this->closed) {
 			if($force) $this->error = false;
 			return true;
@@ -112,8 +124,8 @@ class PL_Search_Filter {
 
 		foreach($this->filters as $filter) {
 			$result = $filter->close($force) && $result;
-//			$this->$error = $this->error || $filter->error;
-//			$this->empty = $this->empty || $filter->empty;
+			$this->error = $this->error || $filter->get_error();
+			$this->empty = $this->empty || $filter->get_empty();
 		}
 
 		if($result || $force)
@@ -123,8 +135,24 @@ class PL_Search_Filter {
 	}
 
 	public static function combine(PL_Search_Filter $a, PL_Search_Filter $b) {
+		if(!$a->closed) $a->close(true);
+		if(!$b->closed) $b->close(true);
+
 		if($a->attributes == $b->attributes) {
 			$result = new PL_Search_Filter($a->attributes);
+
+			foreach($a->filters as $name => $filter) {
+				if($b->filters[$name])
+					$result->filters[$name] = PL_Attribute_Filter::combine($filter, $b->filters[$name]);
+				else
+					$result->filters[$name] = $filter;
+			}
+			foreach($b->filters as $name => $filter) {
+				if(!$a->filters[$name])
+					$result->filters[$name] = $filter;
+			}
+
+			$result->close(true);
 			return $result;
 		}
 

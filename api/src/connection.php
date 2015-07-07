@@ -108,12 +108,35 @@ class PL_API_Connection extends PL_Attributes {
 		return $this->http_connection->DELETE_LISTING($id);
 	}
 
-	public function new_search_filter() {
-		return new PL_Search_Filter($this);
+	private static function maybe_explode($value, $delimiter = null) {
+		if(!is_string($delimiter) || strlen($delimiter) == 0)
+			$delimiter = '||';
+
+		return strpos($value, $delimiter) ? explode($delimiter, $value) : $value;
 	}
 
-	public function new_search_view() {
-		return new PL_Search_View($this);
+	public function new_search_filter($args = null, $explode = true) {
+		$filter = new PL_Search_Filter($this);
+		if(is_array($args)) {
+			$filter_options = array_fill_keys($filter->get_filter_options(), true);
+			foreach($args as $field => $value) {
+				if($filter_options[$field])
+					$filter->set($field, $explode ? self::maybe_explode($value, $explode) : $value);
+			}
+		}
+		return $filter;
+	}
+
+	public function new_search_view($args = null) {
+		$view = new PL_Search_View($this);
+		if(is_array($args)) {
+			$view_options = array_fill_keys($view->get_view_options(), true);
+			foreach($args as $field => $value) {
+				if($view_options[$field])
+					$view->set($field, $value);
+			}
+		}
+		return $view;
 	}
 
 	public function search_listings(PL_Search_Filter $filter = null, PL_Search_View $view = null) {
@@ -125,6 +148,17 @@ class PL_API_Connection extends PL_Attributes {
 
 		if($data = $this->http_connection->SEARCH_LISTINGS($query))
 			return new PL_Search_Result($data, $this);
+		return null;
+	}
+
+	public function read_attribute_values($attribute, PL_Search_Filter $filter = null) {
+		if(is_scalar($attribute))
+			if(($attribute = $this->get_attribute($attribute)) && $attribute->aggregate_name) {
+				$request = 'keys[]=' . $attribute->aggregate_name;
+				if($filter) $filter = $filter->query_string();
+				if($data = $this->http_connection->SEARCH_AGGREGATE($request, $filter))
+					return $data->{$attribute->aggregate_name};
+			}
 		return null;
 	}
 

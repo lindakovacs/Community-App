@@ -82,7 +82,7 @@ class PL_HTTP_Connection {
 	}
 
 	public function SEARCH_LISTINGS($search = null) {
-		$endpoint = "http://api.placester.com/v2.1/listings?api_key=$this->API_KEY" .
+		$endpoint = "http://api.placester.com/api/v2.1/listings?api_key=$this->API_KEY" .
 			"&address_mode=" . ($this->ADDRESS_MODE ? $this->ADDRESS_MODE : "exact") .
 			"&include_disabled=" . ($this->INCLUDE_DISABLED ? "1" : "0") .
 			"&non_import=" . ($this->NON_IMPORT ? "1" : "0");
@@ -96,7 +96,7 @@ class PL_HTTP_Connection {
 		return null;
 	}
 
-	public function SEARCH_AGGREGATE($attributes = 'keys[]=compound_type', $search = null) {
+	public function SEARCH_AGGREGATE($attributes, $search = null) {
 		$endpoint = "http://api.placester.com/api/v2.1/listings/aggregate?api_key=$this->API_KEY" .
 			"&address_mode=" . ($this->ADDRESS_MODE ? $this->ADDRESS_MODE : "exact") .	// needed because of PRODUCT-1298
 			"&include_disabled=" . ($this->INCLUDE_DISABLED ? "1" : "0") .

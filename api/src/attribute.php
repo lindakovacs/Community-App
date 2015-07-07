@@ -1,13 +1,13 @@
 <?php
 
 
-define(PL_BOOLEAN, 1);
-define(PL_NUMERIC, 2);
-define(PL_CURRENCY, 3);
-define(PL_TEXT_VALUE, 4);
-define(PL_SHORT_TEXT, 5);
-define(PL_LONG_TEXT, 6);
-define(PL_DATE_TIME, 7);
+define('PL_BOOLEAN', 1);
+define('PL_NUMERIC', 2);
+define('PL_CURRENCY', 3);
+define('PL_TEXT_VALUE', 4);
+define('PL_SHORT_TEXT', 5);
+define('PL_LONG_TEXT', 6);
+define('PL_DATE_TIME', 7);
 
 
 class PL_Attribute {
@@ -19,10 +19,13 @@ class PL_Attribute {
 
 	public $access_name;
 
-	public $array_name;
 	public $query_name;
 	public $sort_name;
 	public $aggregate_name;
+
+	public $min_name;
+	public $max_name;
+	public $match_name;
 
 	public function __construct($name, $type, $field_name, $display_group, $display_name, $api_names = array()) {
 		$this->name = $name;
@@ -35,49 +38,84 @@ class PL_Attribute {
 		$this->access_name = $api_names['access_name'];
 
 		// different syntax in various api contexts
-		$this->array_name = $api_names['array_name'];
 		$this->query_name = $api_names['query_name'];
 		$this->sort_name = $api_names['sort_name'];
 		$this->aggregate_name = $api_names['aggregate_name'];
+		$this->array_name = $api_names['array_name'];
+		$this->min_name = $api_names['min_name'];
+		$this->max_name = $api_names['max_name'];
+		$this->match_name = $api_names['match_name'];
 
 		// if a custom access_name is specified we don't calculate default api names
 		if($this->access_name)
 			return;
 
-		// otherwise fill in api names not specified according to the rules below
-		if($this->array_name)
-			$this->access_name = implode('->', explode('.', $this->array_name)) . '[0]';
-		else
-			$this->access_name = implode('->', explode('.', $this->field_name));
-
-		$api_group = array_shift(explode('.', $this->field_name));
-		if($api_group == $this->field_name) $api_group = null;
-
-		// by default rets attributes are not searchable, sortable, or aggregable
-		if($api_group == 'rets')
-			return;
-
-		// if a custom query_name is specified we don't calculate further defaults
-		if($this->query_name)
-			return;
-
-		if($this->array_name) {
-			$this->query_name = self::construct_query_name($this->array_name) . '[]';
-			if(!$this->aggregate_name) $this->aggregate_name = $this->array_name;
+		// otherwise parse the field name and calculate them
+		$field_parts = explode('.', $this->field_name);
+		if(count($field_parts) == 1) {
+			$group = null;
+			$field = $field_parts[0];
 		}
 		else {
-			$this->query_name = self::construct_query_name($this->field_name);
-			if(!$this->sort_name) $this->sort_name = $this->field_name;
-			if(!$this->aggregate_name) $this->aggregate_name = $this->field_name;
+			$group = $field_parts[0];
+			$field = $field_parts[1];
+		}
+
+		// if the field is an array...
+		if($array = (substr($field, -2) == '[]'))
+			$field = substr($field, 0, strlen($field) - 2);
+
+		$this->access_name = self::construct_access_name($group, $field, $array);
+
+		// if a custom query_name is specified we don't calculate further defaults
+		if(!$this->query_name && $group != 'rets') { // rets fields are not searchable by default
+			$this->query_name = self::construct_query_name($group, $field, $array);
+			$this->sort_name = self::construct_sort_name($group, $field, $array);
+			$this->aggregate_name = self::construct_aggregate_name($group, $field, $array);
+		}
+
+		// variations on query_name for api calls
+		if($this->query_name) {
+			$this->array_name = self::construct_array_name($this->query_name, $group, $field, $array);
+			$this->min_name = self::construct_min_name($this->query_name, $group, $field, $array);
+			$this->max_name = self::construct_max_name($this->query_name, $group, $field, $array);
+			$this->match_name = self::construct_match_name($this->query_name, $group, $field, $array);
 		}
 
 		return;
 	}
 
-	static protected function construct_query_name($field_name) {
-		$parts = explode('.', $field_name);
-		if(in_array($parts[0], array('cur_data', 'uncur_data'))) $parts[0] = 'metadata';
-		return array_shift($parts) . (count($parts) ? '[' . implode('][', $parts) . ']' : '');
+	static protected function construct_access_name($group, $field, $array) {
+		return ($group ? $group . '->' : '') . $field . ($array ? '[0]' : '');
+	}
+
+	static protected function construct_query_name($group, $field, $array) {
+		if(in_array($group, array('cur_data', 'uncur_data'))) $group = 'metadata';
+		return ($group ? $group . '[' . $field . ']' : $field) . ($array ? '[]' : '');
+	}
+
+	static protected function construct_sort_name($group, $field, $array) {
+		return ($group ? $group . '.' : '') . $field;
+	}
+
+	static protected function construct_aggregate_name($group, $field, $array) {
+		return ($group ? $group . '.' : '') . $field;
+	}
+
+	static protected function construct_array_name($query_name, $group, $field, $array) {
+		return $query_name . ($array ? '' : '[]');
+	}
+
+	static protected function construct_min_name($query_name, $group, $field, $array) {
+		return str_replace($field, 'min_' . $field, $array ? substr($query_name, 0, strlen($query_name) - 2) : $query_name);
+	}
+
+	static protected function construct_max_name($query_name, $group, $field, $array) {
+		return str_replace($field, 'max_' . $field, $array ? substr($query_name, 0, strlen($query_name) - 2) : $query_name);
+	}
+
+	static protected function construct_match_name($query_name, $group, $field, $array) {
+		return str_replace($field, $field . '_match', $array ? substr($query_name, 0, strlen($query_name) - 2) : $query_name);
 	}
 
 	protected function initialize($name, $type, $field_name, $display_group, $display_name, $api_names) {
@@ -91,10 +129,13 @@ class PL_Attribute {
 		$this->access_name = $api_names['access_name'];
 
 		// different syntax in various api contexts
-		$this->array_name = $api_names['array_name'];
 		$this->query_name = $api_names['query_name'];
 		$this->sort_name = $api_names['sort_name'];
 		$this->aggregate_name = $api_names['aggregate_name'];
+		$this->array_name = $api_names['array_name'];
+		$this->min_name = $api_names['min_name'];
+		$this->max_name = $api_names['max_name'];
+		$this->match_name = $api_names['match_name'];
 	}
 }
 
@@ -220,12 +261,9 @@ $PL_STANDARD_ATTRIBUTE_LIST = <<<PL_STANDARD_ATTRIBUTE_LIST
 		query_name      =>   rets[mls_id]
 
 	listing_type,       $PL_TEXT_VALUE,      compound_type,              Listing,             Listing Type
-	property_type,      $PL_TEXT_VALUE,      property_type,              Listing,             Property Type
-
-	zoning_type,        $PL_TEXT_VALUE,      zoning_type,                Listing,             Zoning Type,
-		array_name      =>   zoning_types
-	purchase_type,      $PL_TEXT_VALUE,      purchase_type,              Listing,             Purchase Type,
-		array_name      =>   purchase_types
+	property_type,      $PL_TEXT_VALUE,      cur_data.prop_type,         Listing,             Property Type
+	zoning_type,        $PL_TEXT_VALUE,      zoning_types[],             Listing,             Zoning Type
+	purchase_type,      $PL_TEXT_VALUE,      purchase_types[],           Listing,             Purchase Type
 
 	created_at,         $PL_DATE_TIME,       created_at,                 Listing,             Created at
 	updated_at,         $PL_DATE_TIME,       updated_at,                 Listing,             Updated at

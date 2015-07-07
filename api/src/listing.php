@@ -2,11 +2,13 @@
 
 
 require_once('attribute.php');
+require_once('listing_image.php');
 
 
 class PL_Listing {
 	protected $attributes;
 	protected $listing;
+	protected $listing_images;
 
 	public function __construct($data = null, PL_Attributes $attributes = null) {
 		// clone from existing PL_Listing object
@@ -33,10 +35,18 @@ class PL_Listing {
 	}
 
 	public function __get($name) {
+		if($name == 'images') return $this->get_images();
+		if($name == 'total_images') return $this->images->count();
+
 		if(($attribute = $this->attributes->get_attribute($name)) && $attribute->access_name)
 			return $this->get_value($this->listing, $attribute->access_name);
 
 		return null;
+	}
+
+	protected function get_images() {
+		if(!isset($this->listing_images)) $this->listing_images = new PL_Listing_Images($this->listing->images);
+		return $this->listing_images;
 	}
 
 	protected function get_value(stdClass $object, $attribute) {
@@ -68,6 +78,11 @@ class PL_Private_Listing extends PL_Listing {
 			return $this->set_value($this->listing, $attribute->access_name, $value);
 
 		return null;
+	}
+
+	protected function get_images() {
+		if(!isset($this->listing_images)) $this->listing_images = new PL_Listing_Images($this->listing->images, true);
+		return $this->listing_images;
 	}
 
 	public function post_string() {

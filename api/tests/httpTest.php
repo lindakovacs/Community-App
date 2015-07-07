@@ -5,30 +5,33 @@ require 'src/connection.php';
 
 class PL_HTTP_Connection_Test extends PHPUnit_Framework_TestCase {
 
-	public function test_server() {
-		$curl = new PHP_Curl;
-		$response = $curl->get('http://api.placester.com');
-		$this->assertInternalType('array', $response);
-		$this->assertArrayHasKey('body', $response);
-		$this->assertInternalType('string', $response['body']);
-	}
-
-	/** @depends test_server */
 	public function test_endpoints() {
 		$connection = new PL_HTTP_Connection('xxxinvalidxxx');
-		$response = $connection->GET_WHOAMI();
+		$response = $connection->WHOAMI();
 		$this->assertInstanceOf('stdClass', $response);
 		$this->assertObjectHasAttribute('code', $response);
 		$this->assertObjectHasAttribute('message', $response);
 		$this->assertEquals($response->code, 100);
 
-		$response = $connection->GET_LOCATIONS();
+		$response = $connection->LOCATIONS();
 		$this->assertInstanceOf('stdClass', $response);
 		$this->assertObjectHasAttribute('code', $response);
 		$this->assertObjectHasAttribute('message', $response);
 		$this->assertEquals($response->code, 100);
 
-		$response = $connection->GET_ATTRIBUTES();
+		$response = $connection->ATTRIBUTES();
+		$this->assertInstanceOf('stdClass', $response);
+		$this->assertObjectHasAttribute('code', $response);
+		$this->assertObjectHasAttribute('message', $response);
+		$this->assertEquals($response->code, 100);
+
+		$response = $connection->SEARCH_LISTINGS();
+		$this->assertInstanceOf('stdClass', $response);
+		$this->assertObjectHasAttribute('code', $response);
+		$this->assertObjectHasAttribute('message', $response);
+		$this->assertEquals($response->code, 100);
+
+		$response = $connection->SEARCH_AGGREGATE('xxxfieldxxx');
 		$this->assertInstanceOf('stdClass', $response);
 		$this->assertObjectHasAttribute('code', $response);
 		$this->assertObjectHasAttribute('message', $response);
@@ -40,35 +43,23 @@ class PL_HTTP_Connection_Test extends PHPUnit_Framework_TestCase {
 		$this->assertObjectHasAttribute('message', $response);
 		$this->assertEquals($response->code, 100);
 
-		$response = $connection->GET_LISTINGS();
-		$this->assertInstanceOf('stdClass', $response);
-		$this->assertObjectHasAttribute('code', $response);
-		$this->assertObjectHasAttribute('message', $response);
-		$this->assertEquals($response->code, 100);
-
-		$response = $connection->GET_AGGREGATE('xxxfieldxxx');
-		$this->assertInstanceOf('stdClass', $response);
-		$this->assertObjectHasAttribute('code', $response);
-		$this->assertObjectHasAttribute('message', $response);
-		$this->assertEquals($response->code, 100);
-
 		$response = $connection->CREATE_LISTING('xxxdataxxx');
 		$this->assertInstanceOf('stdClass', $response);
 		$this->assertObjectHasAttribute('code', $response);
 		$this->assertObjectHasAttribute('message', $response);
 		$this->assertEquals($response->code, 100);
 
-//		$response = $connection->UPDATE_LISTING('xxxlistingxxx', 'xxxdataxxx');
-//		$this->assertInstanceOf('stdClass', $response);
-//		$this->assertObjectHasAttribute('code', $response);
-//		$this->assertObjectHasAttribute('message', $response);
-//		$this->assertEquals($response->code, 100);
+		$response = $connection->UPDATE_LISTING('xxxlistingxxx', 'xxxdataxxx');
+		$this->assertInstanceOf('stdClass', $response);
+		$this->assertObjectHasAttribute('code', $response);
+		$this->assertObjectHasAttribute('message', $response);
+		$this->assertEquals($response->code, 100);
 
-//		$response = $connection->DELETE_LISTING('xxxlistingxxx');
-//		$this->assertInstanceOf('stdClass', $response);
-//		$this->assertObjectHasAttribute('code', $response);
-//		$this->assertObjectHasAttribute('message', $response);
-//		$this->assertEquals($response->code, 100);
+		$response = $connection->DELETE_LISTING('xxxlistingxxx');
+		$this->assertInstanceOf('stdClass', $response);
+		$this->assertObjectHasAttribute('code', $response);
+		$this->assertObjectHasAttribute('message', $response);
+		$this->assertEquals($response->code, 100);
 	}
 
 	/** @depends test_endpoints */

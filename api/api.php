@@ -13,10 +13,14 @@ require_once('src/connection.php');
 
 
 add_shortcode('connection', 'connection_shortcode');
-add_shortcode('listing', 'listing_shortcode');
-add_shortcode('data', 'data_shortcode');
+add_shortcode('filter', 'filter_shortcode');
 add_shortcode('search', 'search_shortcode');
-add_shortcode('test', 'test_shortcode');
+
+add_shortcode('listing', 'listing_shortcode');
+add_shortcode('image', 'image_shortcode');
+add_shortcode('data', 'data_shortcode');
+
+add_shortcode('test', 'search_test_shortcode');
 
 
 function connection_shortcode($args) {
@@ -70,30 +74,70 @@ function data_shortcode($args) {
 	return null;
 }
 
+function image_shortcode($args) {
+	extract(shortcode_atts(array('index' => null, 'next' => null, 'attribute' => null), $args));
+	global $global_listing;
+	static $last_listing;
+	static $last_index;
+
+	if(!is_null($attribute)) {
+		if(is_null($next))
+			$next = false;
+	}
+	else if(is_null($next)) {
+		$attribute = 'url';
+		$next = true;
+	}
+
+	if($global_listing) {
+		if(!isset($last_listing) || $last_listing != $global_listing) {
+			$last_listing = $global_listing;
+			$last_index = null;
+		}
+
+		if(is_null($index))
+			if(!is_null($last_index))
+				$index = $last_index + ($next ? 1 : 0);
+			else
+				$index = 0;
+
+		if($value = $global_listing->images[$index]) {
+			if(is_scalar($attribute))
+				$value = $value->{$attribute};
+			$last_index = $index;
+		}
+
+		return $value;
+	}
+
+	return null;
+}
 
 function search_shortcode($args) {
 	global $global_connection;
+	global $global_filter;
 	global $global_results;
 
-	$search_filter = $global_connection->new_search_filter();
-	$search_view = $global_connection->new_search_view();
+	$search_filter = $global_connection->new_search_filter($args);
+	$search_view = $global_connection->new_search_view($args);
 
-	$filter_options = array_fill_keys($search_filter->get_filter_options(), null);
-	$view_options = array_fill_keys($search_view->get_view_options(), null);
-	$combined_options = array_merge($filter_options, $view_options);
-
-	$search_fields = shortcode_atts($combined_options, $args);
-	foreach($search_fields as $field => $value) {
-		if(!is_null($value)) {
-			if(array_key_exists($field, $view_options))
-				$search_view->set($field, $value);
-			else
-				$search_filter->set($field, $value);
-		}
-	}
+	if($global_filter)
+		$search_filter = PL_Search_Filter::combine($global_filter, $search_filter);
 
 	if($global_results = $global_connection->search_listings($search_filter, $search_view))
 		return "[search total=" . $global_results->get_total() . " count=" . $global_results->get_count() . "]";
+
+	return null;
+}
+
+
+function filter_shortcode($args) {
+	global $global_connection;
+	global $global_filter;
+
+	$global_filter = $global_connection->new_search_filter($args);
+	if($filter_results = $global_connection->search_listings($global_filter))
+		return "[filter total=" . $filter_results->get_total() . "]";
 
 	return null;
 }
@@ -135,4 +179,78 @@ function test_shortcode($args) {
 	}
 
 	return null;
+}
+
+
+function search_test_shortcode($args) {
+	extract(shortcode_atts(array('field' => ''), $args));
+	global $global_connection;
+	global $global_filter;
+
+	$values = $global_connection->read_attribute_values($field, $global_filter);
+	$result = '';
+
+	if(count($values) > 1) {
+		$args = array($field => $values[0]);
+		$result .= search_shortcode($args) . ' ';
+		foreach($args as $name => $value)
+			$result .= ' (' . $name . '=' . $value . ') ';
+		$result .= '<br>';
+
+		$args = array($field . '_match' => 'ne', $field => $values[0]);
+		$result .= search_shortcode($args) . ' ';
+		foreach($args as $name => $value)
+			$result .= ' (' . $name . '=' . $value . ') ';
+		$result .= '<br>';
+
+		$result .= '<br>';
+		$args = array($field . '_match' => 'like', $field => substr($values[0], 0, 3));
+		$result .= search_shortcode($args) . ' ';
+		foreach($args as $name => $value)
+			$result .= ' (' . $name . '=' . $value . ') ';
+		$result .= '<br>';
+
+		$args = array($field . '_match' => 'and_like', $field => substr($values[0], 0, 3) . '||' . substr($values[0], -3));
+		$result .= search_shortcode($args) . ' ';
+		foreach($args as $name => $value)
+			$result .= ' (' . $name . '=' . $value . ') ';
+		$result .= '<br>';
+
+		$args = array($field . '_match' => 'or_like', $field => substr($values[0], 0, 3) . '||' . substr($values[0], -3));
+		$result .= search_shortcode($args) . ' ';
+		foreach($args as $name => $value)
+			$result .= ' (' . $name . '=' . $value . ') ';
+		$result .= '<br>';
+
+		$result .= '<br>';
+		$args = array('min_' . $field => substr($values[0], 0, 3));
+		$result .= search_shortcode($args) . ' ';
+		foreach($args as $name => $value)
+			$result .= ' (' . $name . '=' . $value . ') ';
+		$result .= '<br>';
+
+		$args = array('max_' . $field => substr($values[0], 0, 3));
+		$result .= search_shortcode($args) . ' ';
+		foreach($args as $name => $value)
+			$result .= ' (' . $name . '=' . $value . ') ';
+		$result .= '<br>';
+	}
+
+	if(count($values) > 2) {
+		$result .= '<br>';
+
+		$args = array($field . '_match' => 'in', $field => $values[0] . '||' . $values[1]);
+		$result .= search_shortcode($args) . ' ';
+		foreach($args as $name => $value)
+			$result .= ' (' . $name . '=' . $value . ') ';
+		$result .= '<br>';
+
+		$args = array($field . '_match' => 'nin', $field => $values[0] . '||' . $values[1]);
+		$result .= search_shortcode($args) . ' ';
+		foreach($args as $name => $value)
+			$result .= ' (' . $name . '=' . $value . ') ';
+		$result .= '<br>';
+	}
+
+	return $result;
 }

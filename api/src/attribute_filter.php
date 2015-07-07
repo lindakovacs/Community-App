@@ -22,6 +22,10 @@ class PL_Attribute_Filter {
 			$this->error = true;
 	}
 
+	public function get_empty() { return $this->empty; }
+	public function get_error() { return $this->error; }
+	public function get_closed() { return $this->closed; }
+
 	public function set_value($value, $match = null) {
 		if($this->closed)
 			return false;
@@ -94,7 +98,7 @@ class PL_Attribute_Filter {
 		}
 		else if(is_array($this->value)) {
 			foreach($this->value as $element)
-				if(is_scalar($this->value))
+				if(is_scalar($element))
 					$value_array[] = $element;
 				else
 					$this->error = true;
@@ -187,10 +191,10 @@ class PL_Attribute_Filter {
 
 			// reduce the case where min = max (when a valid non-empty search)
 			if(!$this->empty && !is_null($min_value) && !is_null($max_value) && $min_value == $max_value) {
-				$match = 'eq';
+				$match = null;
+				$value_array = array($min_value);
 				$min_value = null;
 				$max_value = null;
-				$value_array = array($min_value);
 			}
 		}
 
@@ -198,11 +202,13 @@ class PL_Attribute_Filter {
 		if(count($value_array) > 0 || !is_null($min_value) || !is_null($max_value)) {
 			if(count($value_array) == 0)
 				$match = null;
-			else if(count($value_array) > 1) {
-				if($match == 'like')
-					$match = 'or_like';
-				else if($match = 'eq')
+			else if(count($value_array) > 1 || $this->attribute->query_name == $this->attribute->array_name) {
+				if($match == 'eq')
 					$match = 'in';
+				else if($match == 'ne')
+					$match = 'nin';
+				else if($match == 'like')
+					$match = 'or_like';
 			}
 		}
 
@@ -233,8 +239,11 @@ class PL_Attribute_Filter {
 		// a standalone match parameter on the left sets the match for a standalone value filter on the right
 		if($left->match && count($left->value) == 0 && is_null($right->min_value) && is_null($right->max_value)) {
 			$result = clone $right;
-			if(is_null($right->match) && is_null($right->min_value) && is_null($right->max_value))
+			if(is_null($right->match) && is_null($right->min_value) && is_null($right->max_value)) {
+				$result->closed = false;
 				$result->match = $left->match;
+				$result->close(true);
+			}
 			return $result;
 		}
 
@@ -262,9 +271,11 @@ class PL_Attribute_Filter {
 
 		// other supported combinations
 		$require = $all = $include = $exclude = $like = $or_like = null;
+		$is_array_attribute = $result->attribute->query_name == $result->attribute->array_name;
+
 		foreach(array($result, $right) as $filter) {
 			$match = $filter->match;
-			if(is_null($match) || in_array('eq', 'in'))
+			if(is_null($match) || in_array($match, array('eq', 'in')))
 				$match = count($filter->value) > 1 ? 'in' : 'eq';
 
 			switch($match) {
@@ -274,7 +285,7 @@ class PL_Attribute_Filter {
 					if(!$require)
 						$require = $filter->value;
 					else
-						$require = $require + $filter->value; // array union
+						$require = array_merge($require, array_diff($filter->value, $require)); // array union
 					break;
 				case 'in':
 					if(!$include)
@@ -287,14 +298,14 @@ class PL_Attribute_Filter {
 					if(!$exclude)
 						$exclude = $filter->value;
 					else
-						$exclude = $exclude + $filter->value;
+						$exclude = array_merge($exclude, array_diff($filter->value, $exclude));
 					break;
 				case 'like':
 				case 'and_like':
 					if(!$like)
 						$like = $filter->value;
 					else
-						$like = $like + $filter->value;
+						$like = array_merge($like, array_diff($filter->value, $like));
 					break;
 				case 'or_like':
 					if(!$or_like)
@@ -304,7 +315,6 @@ class PL_Attribute_Filter {
 		}
 
 		if($require) {
-			$is_array_attribute = false; // add type check for array data values
 			if(count($require) > 1 && !($all || $is_array_attribute)) {
 				$result->empty = true; // cannot require more than one value without 'all'
 			}
@@ -350,7 +360,7 @@ class PL_Attribute_Filter {
 			if($like || $or_like)
 				$result->error = true;
 
-			$result->match = 'ne';
+			$result->match = count($like) > 1 || $is_array_attribute ? 'nin' : 'ne';
 			$result->value = $exclude;
 		}
 
@@ -358,7 +368,7 @@ class PL_Attribute_Filter {
 			if($or_like)
 				$result->error = true;
 
-			$result->match = 'like';
+			$result->match = count($like) > 1 ? 'and_like' : 'like';
 			$result->value = $like;
 		}
 
@@ -389,38 +399,48 @@ class PL_Attribute_Filter {
 		$error = $result->error;
 		$result->close(true);
 		$result->error = $error;
+		return $result;
 	}
 
 	public function query_string() {
 		if(!$this->closed) $this->close(true);
 		$query = '';
 
-		$name = $this->attribute->name;
-		$query_name = $this->attribute->query_name;
-
 		if(isset($this->min_value))
-			$query .= '&' . str_replace($name, 'min_' . $name, $query_name) . '=' . urlencode($this->min_value);
+			$query .= '&' . $this->attribute->min_name . '=' . urlencode($this->min_value);
 
 		if(isset($this->max_value))
-			$query .= '&' . str_replace($name, 'max_' . $name, $query_name) . '=' . urlencode($this->max_value);
+			$query .= '&' . $this->attribute->max_name . '=' . urlencode($this->max_value);
 
-		if(isset($this->match))
-			$query .= '&' . str_replace($name, $name . '_match', $query_name) . '=' . urlencode($this->match);
-
-		if(is_scalar($this->value))
-			$query .= '&' . $query_name . '=' . urlencode($this->value);
-
-		else if(is_array($this->value)) {
-			if(count($this->value) == 1)
-				$query .= '&' . $query_name . '=' . urlencode($this->value[0]);
-
-			else if(count($this->value) > 1) {
-				if(strpos($query_name, '[]') != strlen($query_name) - 2)
-					$query_name .= '[]';
-				foreach($this->value as $value) {
-					$query .= '&' . $query_name . '=' . urlencode($value);
-				}
+		if($count = count($this->value)) {
+			$match = $this->match;
+			if($count > 1) {
+				$query_name = $this->attribute->array_name;
+				if(!$match) $match = 'in';
 			}
+			else {
+				$query_name = $this->attribute->query_name;
+				if($this->attribute->array_name != $this->attribute->query_name)
+					switch($match) {
+						case 'all':
+						case 'in':
+							$match = 'eq';
+							break;
+						case 'nin':
+							$match = 'ne';
+							break;
+						case 'and_like':
+						case 'or_like':
+							$match = 'like';
+							break;
+					}
+			}
+
+			if($match)
+				$query .= '&' . $this->attribute->match_name . '=' . urlencode($match);
+
+			foreach($this->value as $value)
+				$query .= '&' . $query_name . '=' . urlencode($value);
 		}
 
 		// remove initial ampersand
