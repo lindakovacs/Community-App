@@ -1,7 +1,7 @@
 <?php
 
 
-require_once('../api/api.php');
+require_once(BUILDER . 'api/connection.php');
 
 
 class PL_Search_Request {

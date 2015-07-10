@@ -9,5 +9,6 @@ Version: 0.1
 Author URI: https://www.placester.com/
  */
 
-require_once('api/api.php');
-require_once('wp/wp.php');
+define('BUILDER', __DIR__ . '/');
+
+require_once(BUILDER . 'shortcodes/api_shortcodes.php');

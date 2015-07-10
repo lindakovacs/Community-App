@@ -43,16 +43,16 @@ class PL_Search_Filter {
 	public function get_error() { return $this->error; }
 	public function get_closed() { return $this->closed; }
 
-	protected function allow_min($name) {
+	public function allow_min($name) {
 		return ($attribute = $this->attributes->get_attribute($name)) && $attribute->min_name;
 	}
-	protected function allow_max($name) {
+	public function allow_max($name) {
 		return ($attribute = $this->attributes->get_attribute($name)) && $attribute->max_name;
 	}
-	protected function allow_array($name) {
+	public function allow_array($name) {
 		return ($attribute = $this->attributes->get_attribute($name)) && $attribute->array_name;
 	}
-	protected function allow_match($name, $match = null) {
+	public function allow_match($name, $match = null) {
 		return ($attribute = $this->attributes->get_attribute($name)) && $attribute->match_name;
 	}
 

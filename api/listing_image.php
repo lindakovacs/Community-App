@@ -67,13 +67,11 @@ class PL_Listing_Images implements Countable, ArrayAccess, Iterator {
 	}
 
 	public function get_image($index = null) {
-		if(is_scalar($index)) {
-			$image = $this->offSetGet($index);
-		}
-		else {
-			$image = $this->current();
-			$this->next();
-		}
+		if(is_scalar($index) && $this->valid($index))
+			$this->image_index = $index;
+
+		$image = $this->current();
+		$this->next();
 
 		return $image;
 	}

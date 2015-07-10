@@ -108,21 +108,16 @@ class PL_API_Connection extends PL_Attributes {
 		return $this->http_connection->DELETE_LISTING($id);
 	}
 
-	private static function maybe_explode($value, $delimiter = null) {
-		if(!is_string($delimiter) || strlen($delimiter) == 0)
-			$delimiter = '||';
-
-		return strpos($value, $delimiter) ? explode($delimiter, $value) : $value;
-	}
-
-	public function new_search_filter($args = null, $explode = true) {
+	public function new_search_filter($args = null) {
 		$filter = new PL_Search_Filter($this);
 		if(is_array($args)) {
 			$filter_options = array_fill_keys($filter->get_filter_options(), true);
-			foreach($args as $field => $value) {
-				if($filter_options[$field])
-					$filter->set($field, $explode ? self::maybe_explode($value, $explode) : $value);
-			}
+			foreach($args as $field => $value)
+				if($filter_options[$field]) {
+					if(is_array($value) && !($filter->allow_array($field)))
+						continue;
+					$filter->set($field, $value);
+				}
 		}
 		return $filter;
 	}

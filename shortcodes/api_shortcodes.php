@@ -9,7 +9,7 @@ Author URI: https://www.placester.com/
  */
 
 
-require_once('connection.php');
+require_once(BUILDER . 'api/connection.php');
 
 
 add_shortcode('connection', 'connection_shortcode');
@@ -19,6 +19,9 @@ add_shortcode('search', 'search_shortcode');
 add_shortcode('listing', 'listing_shortcode');
 add_shortcode('image', 'image_shortcode');
 add_shortcode('data', 'data_shortcode');
+
+add_shortcode('foreach:listing', 'foreach_listing_shortcode');
+add_shortcode('foreach:image', 'foreach_image_shortcode');
 
 add_shortcode('test', 'search_test_shortcode');
 
@@ -39,78 +42,144 @@ function connection_shortcode($args) {
 
 
 function listing_shortcode($args) {
-	extract(shortcode_atts(array('id' => null, 'index' => null, 'next' => true), $args));
+	extract(shortcode_atts(array('id' => null, 'index' => null, 'next' => null), $args));
 	global $global_connection;
 	global $global_results;
 	global $global_listing;
 
-	if($id) {
+	if($id && $global_connection) {
 		if($result = $global_connection->get_private_listing($id))
 			$global_listing = new PL_Listing($result, $global_connection);
 		else
 			$global_listing = null;
 	}
-	else if(!is_null($global_results)) {
-		if(!is_null($index) || $next)
-			$global_listing = $global_results->get_listing($index);
-		else
-			$global_listing = $global_results->current();
-	}
-	else
+	else if(!$global_results) {
 		$global_listing = null;
+		return null;
+	}
+	else if(is_null($global_listing) || $next || !is_null($index))
+		$global_listing = $global_results->get_listing($index);
 
-	return $global_listing ? ("[listing id=" . $global_listing->pdx_id . "]") : null;
+	if($global_listing) {
+		if(!$content)
+			return "[listing id=" . $global_listing->pdx_id . "]";
+
+		return do_shortcode($content);
+	}
+
+	return null;
+}
+
+function foreach_listing_shortcode($args, $content) {
+	extract(shortcode_atts(array('index' => null, 'count' => null), $args));
+	global $global_results;
+	global $global_listing;
+
+	if(!$global_results) {
+		$global_listing = null;
+		return null;
+	}
+
+	$value = '';
+
+	$global_listing = $global_results->get_listing($index);
+	if(is_null($count)) $count = $global_results->count();
+	if(!is_numeric($count)) $count = 0;
+
+	while($content && $global_listing && $count-- > 0) {
+		$value .= do_shortcode($content);
+		$global_listing = $global_results->get_listing();
+	}
+
+	return $value;
+}
+
+function image_shortcode($args, $content) {
+	extract(shortcode_atts(array('index' => null, 'next' => null), $args));
+	global $global_listing;
+	global $global_image;
+	global $global_image_in_context;
+
+	if(!$global_listing) {
+		$global_image = null;
+		return null;
+	}
+
+	if(is_null($global_image) || $next || !is_null($index))
+		$global_image = $global_listing->images->get_image($index);
+
+	if($global_image) {
+		if(!$content)
+			return $global_image->url;
+
+		$image_in_context = $global_image_in_context;
+		$global_image_in_context = true;
+		$value = do_shortcode($content);
+		$global_image_in_context = $image_in_context;
+		return $value;
+	}
+
+	return null;
+}
+
+function foreach_image_shortcode($args, $content) {
+	extract(shortcode_atts(array('index' => null, 'count' => null), $args));
+	global $global_listing;
+	global $global_image;
+	global $global_image_in_context;
+
+	if(!$global_listing) {
+		$global_image = null;
+		return null;
+	}
+
+	$value = '';
+	$image_in_context = $global_image_in_context;
+	$global_image_in_context = true;
+
+	$global_image = $global_listing->images->get_image($index);
+	if(is_null($count)) $count = $global_listing->images->count();
+	if(!is_numeric($count)) $count = 0;
+
+	while($content && $global_image && $count-- > 0) {
+		$value .= do_shortcode($content);
+		$global_image = $global_listing->images->get_image();
+	}
+
+	$global_image_in_context = $image_in_context;
+	return $value;
 }
 
 function data_shortcode($args) {
 	extract(shortcode_atts(array('attribute' => null), $args));
 	global $global_listing;
+	global $global_image;
+	global $global_image_in_context;
 
-	if($global_listing && $attribute) {
+	if($global_image && $global_image_in_context && in_array($attribute, array('id', 'url', 'caption')))
+		$value = $global_image->{$attribute};
+
+	else if($global_listing && $attribute)
 		$value = $global_listing->{$attribute};
-		return $value;
-	}
 
-	return null;
+	else
+		$value = null;
+
+	return $value;
 }
 
-function image_shortcode($args) {
-	extract(shortcode_atts(array('index' => null, 'next' => null, 'attribute' => null), $args));
-	global $global_listing;
-	static $last_listing;
-	static $last_index;
-
-	if(!is_null($attribute)) {
-		if(is_null($next))
-			$next = false;
+function new_shortcode_search_filter(PL_API_Connection $connection, $args) {
+	$filter = $connection->new_search_filter();
+	if(is_array($args)) {
+		$filter_options = array_fill_keys($filter->get_filter_options(), true);
+		foreach($args as $field => $value)
+			if($filter_options[$field]) {
+				if(is_string($value) && $filter->allow_array($field))
+					$value = explode('||', $value);
+				$filter->set($field, $value);
+			}
 	}
-	else if(is_null($next)) {
-		$attribute = 'url';
-		$next = true;
-	}
-
-	if($global_listing) {
-		if(!isset($last_listing) || $last_listing != $global_listing) {
-			$last_listing = $global_listing;
-			$last_index = null;
-		}
-
-		if(is_null($index))
-			if(!is_null($last_index))
-				$index = $last_index + ($next ? 1 : 0);
-			else
-				$index = 0;
-
-		if($value = $global_listing->images[$index]) {
-			if(is_scalar($attribute))
-				$value = $value->{$attribute};
-			$last_index = $index;
-		}
-
-		return $value;
-	}
-
-	return null;
+	return $filter;
 }
 
 function search_shortcode($args) {
@@ -118,7 +187,7 @@ function search_shortcode($args) {
 	global $global_filter;
 	global $global_results;
 
-	$search_filter = $global_connection->new_search_filter($args);
+	$search_filter = new_shortcode_search_filter($global_connection, $args);
 	$search_view = $global_connection->new_search_view($args);
 
 	if($global_filter)
@@ -130,12 +199,11 @@ function search_shortcode($args) {
 	return null;
 }
 
-
 function filter_shortcode($args) {
 	global $global_connection;
 	global $global_filter;
 
-	$global_filter = $global_connection->new_search_filter($args);
+	$global_filter = new_shortcode_search_filter($global_connection, $args);
 	if($filter_results = $global_connection->search_listings($global_filter))
 		return "[filter total=" . $filter_results->total() . "]";
 
