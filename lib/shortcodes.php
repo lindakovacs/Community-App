@@ -144,7 +144,7 @@ class PL_Shortcodes
 	public static function compliance_shortcode_handler( $atts ) {
 		ob_start();
 		PLS_Listing_Helper::get_compliance(array(
-			'context' => 'listings'
+			'context' => 'search'
 		));
 		$content = ob_get_clean();
 
