@@ -326,7 +326,7 @@ abstract class PL_SC_Base {
 			case 'checkbox':
 				?>
 				<input id="<?php echo $id ?>" <?php echo $class ?> type="<?php echo $attr['type'] ?>"
-						name="<?php echo $name ?>" value="<?php echo (empty($attr['value']) ? 'true' : $attr['value']) ?>" />
+						name="<?php echo $name ?>[]" value="<?php echo (empty($attr['value']) ? 'true' : $attr['value']) ?>" />
 				<?php
 				break;
 			case 'radio':
