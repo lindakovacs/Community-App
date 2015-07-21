@@ -142,9 +142,11 @@ class PL_Shortcodes
 	 * [compliance] handler
 	 */
 	public static function compliance_shortcode_handler( $atts ) {
+		$context = PL_Listing_Helper::get_listing_in_loop() ? 'listings' : 'search';
+
 		ob_start();
 		PLS_Listing_Helper::get_compliance(array(
-			'context' => 'listings'
+			'context' => $context
 		));
 		$content = ob_get_clean();
 
