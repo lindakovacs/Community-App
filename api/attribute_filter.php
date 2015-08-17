@@ -26,6 +26,11 @@ class PL_Attribute_Filter {
 	public function get_error() { return $this->error; }
 	public function get_closed() { return $this->closed; }
 
+	public function get_value() { return $this->value; }
+	public function get_match() { return $this->match; }
+	public function get_min() { return $this->min_value; }
+	public function get_max() { return $this->max_value; }
+
 	public function set_value($value, $match = null) {
 		if($this->closed)
 			return false;

@@ -1,7 +1,7 @@
 <?php
 
 
-require_once('attribute.php');
+require_once('attribute_map.php');
 require_once('listing_image.php');
 
 
@@ -10,7 +10,7 @@ class PL_Listing {
 	protected $listing;
 	protected $listing_images;
 
-	public function __construct($data = null, PL_Attributes $attributes = null) {
+	public function __construct($data = null, PL_Attribute_Map $attributes = null) {
 		// clone from existing PL_Listing object
 		if($data instanceof PL_Listing) {
 			$this->construct_from_PL_Listing($data);

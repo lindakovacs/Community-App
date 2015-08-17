@@ -2,14 +2,12 @@
 
 
 require_once('http.php');
-require_once('attribute.php');
-require_once('listing.php');
 require_once('search_filter.php');
 require_once('search_view.php');
 require_once('search_result.php');
 
 
-class PL_API_Connection extends PL_Attributes {
+class PL_API_Connection extends PL_Attribute_Map {
 	protected $http_connection;
 	protected $custom_attributes;
 
@@ -20,38 +18,39 @@ class PL_API_Connection extends PL_Attributes {
 		$this->custom_attributes = $this->read_custom_attributes();
 	}
 
-	public function get_standard_attributes() {
-		return self::$standard_attributes;
-	}
-
 	public function get_custom_attributes() {
 		return $this->custom_attributes;
 	}
 
 	public function enable_attribute($name) {
 		if(is_array($name)) {
+			$result = true;
 			foreach($name as $item)
-				$this->enable_attribute($item);
-			return true;
+				$result = $result && $this->enable_attribute($item);
 		}
 
-		if($result = $this->custom_attributes[$name])
-			return $this->attributes[$name] = $result;
+		else if($result = $this->custom_attributes[$name])
+			$this->attributes[$name] = $result;
 
-		if($result = self::$standard_attributes[$name])
-			return $this->attributes[$name] = $result;
+		else if($result = self::$standard_attributes[$name])
+			$this->attributes[$name] = $result;
 
-		return null;
+		if($result) $this->filter_options = null; // cached value is dirty
+		return $result;
 	}
 
 	public function disable_attribute($name) {
 		if(is_array($name)) {
+			$result = true;
 			foreach($name as $item)
-				$this->disable_attribute($item);
-			return true;
+				$result = $result && $this->disable_attribute($item);
 		}
 
-		return $this->remove_attribute($name);
+		else
+			$result = $this->remove_attribute($name);
+
+		if($result) $this->filter_options = null; // cached value is dirty
+		return $result;
 	}
 
 	public function new_private_listing($id = null) {
@@ -111,7 +110,7 @@ class PL_API_Connection extends PL_Attributes {
 	public function new_search_filter($args = null) {
 		$filter = new PL_Search_Filter($this);
 		if(is_array($args)) {
-			$filter_options = array_fill_keys($filter->get_filter_options(), true);
+			$filter_options = $filter->get_filter_options_array(true);
 			foreach($args as $field => $value)
 				if($filter_options[$field]) {
 					if(is_array($value) && !($filter->allow_array($field)))
@@ -125,7 +124,7 @@ class PL_API_Connection extends PL_Attributes {
 	public function new_search_view($args = null) {
 		$view = new PL_Search_View($this);
 		if(is_array($args)) {
-			$view_options = array_fill_keys($view->get_view_options(), true);
+			$view_options = $view->get_view_options_array(true);
 			foreach($args as $field => $value) {
 				if($view_options[$field])
 					$view->set($field, $value);

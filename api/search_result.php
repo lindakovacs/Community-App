@@ -1,7 +1,7 @@
 <?php
 
 
-require_once('connection.php');
+require_once('listing.php');
 
 
 class PL_Search_Result implements Countable, ArrayAccess, Iterator {
@@ -10,7 +10,7 @@ class PL_Search_Result implements Countable, ArrayAccess, Iterator {
 	protected $listing_index;
 
 
-	public function __construct($data, PL_Attributes $attributes = null) {
+	public function __construct($data, PL_Attribute_Map $attributes = null) {
 		$this->attributes = $attributes ?: new PL_Standard_Attributes();
 		$this->listing_data = $data;
 		$this->listing_index = 0;

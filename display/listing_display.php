@@ -9,7 +9,7 @@ class PL_Listing_Display extends PL_Listing {
 	protected $formats;
 	protected $display;
 
-	public function __construct($data, PL_Attributes $attributes = null, PL_Attribute_Formats $formats = null) {
+	public function __construct($data, PL_Attribute_Map $attributes = null, PL_Attribute_Formats $formats = null) {
 		parent::__construct($data, $attributes);
 		$this->formats = $formats ?: new PL_Standard_Formats();
 		$this->display = array();

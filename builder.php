@@ -12,3 +12,6 @@ Author URI: https://www.placester.com/
 define('BUILDER', __DIR__ . '/');
 
 require_once(BUILDER . 'shortcodes/api_shortcodes.php');
+require_once(BUILDER . 'shortcodes/www_shortcodes.php');
+
+require_once(BUILDER . 'transitional/compatibility-api.php');

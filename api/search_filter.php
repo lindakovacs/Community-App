@@ -2,6 +2,7 @@
 
 
 require_once('attribute_filter.php');
+require_once('attribute_map.php');
 
 
 class PL_Search_Filter {
@@ -12,7 +13,7 @@ class PL_Search_Filter {
 	protected $error;
 	protected $closed;
 
-	public function __construct(PL_Attributes $attributes) {
+	public function __construct(PL_Attribute_Map $attributes) {
 		$this->attributes = $attributes ?: new PL_Standard_Attributes();
 		$this->filters = array();
 
@@ -21,27 +22,20 @@ class PL_Search_Filter {
 		$this->closed = false;
 	}
 
-	public function get_filter_options() {
-		$array = array();
-		foreach($this->attributes->get_filter_attributes() as $attribute)
-			switch($attribute->type) {
-				case PL_NUMERIC:
-				case PL_CURRENCY:
-				case PL_DATETIME:
-					array_push($array, 'min_' . $attribute->name);
-					array_push($array, 'max_' . $attribute->name);
-					/* if($attribute->type != PL_NUMERIC) */ break;
-				default:
-					array_push($array, $attribute->name);
-					array_push($array, $attribute->name . '_match');
-					break;
-			}
-		return $array;
-	}
-
 	public function get_empty() { return $this->empty; }
 	public function get_error() { return $this->error; }
 	public function get_closed() { return $this->closed; }
+
+	public function get_filter_options() {
+		if($attributes = $this->attributes->get_filter_attributes())
+			return array_keys($attributes);
+		return null;
+	}
+	public function get_filter_options_array($fill_value = null) {
+		if($options = $this->get_filter_options())
+			return array_fill_keys($options, $fill_value);
+		return null;
+	}
 
 	public function allow_min($name) {
 		return ($attribute = $this->attributes->get_attribute($name)) && $attribute->min_name;
@@ -54,6 +48,23 @@ class PL_Search_Filter {
 	}
 	public function allow_match($name, $match = null) {
 		return ($attribute = $this->attributes->get_attribute($name)) && $attribute->match_name;
+	}
+
+	public function get($name) {
+		// handle the attribute search syntax of the Placester Data API
+		if(strpos($name, 'min_') === 0)
+			$method = 'get_min';
+		else if(strpos($name, 'max_') === 0)
+			$method = 'get_max';
+		else if(strpos($name, '_match') === strlen($name) - 6)
+			$method = 'get_match';
+		else
+			$method = 'get_value';
+
+		if($filter = $this->filters[$name])
+			return $filter->{$method}();
+
+		return null;
 	}
 
 	public function set($name, $value, $match = null) {
@@ -97,8 +108,8 @@ class PL_Search_Filter {
 						break;
 
 					default:
-						$result = !is_array($value) || $this->allow_array($name) &&
-							is_null($match) || $this->allow_match($name, $match) ?
+						$result = (!is_array($value) || $this->allow_array($name)) &&
+							(is_null($match) || $this->allow_match($name, $match)) ?
 							$filter->set_value($value, $match) : false;
 						break;
 				}

@@ -1,7 +1,7 @@
 <?php
 
 
-require_once('attribute.php');
+require_once('attribute_map.php');
 
 
 class PL_Search_View {
@@ -11,7 +11,7 @@ class PL_Search_View {
 	protected $offset;
 	protected $limit;
 
-	public function __construct(PL_Attributes $attributes) {
+	public function __construct(PL_Attribute_Map $attributes) {
 		$this->attributes = $attributes ?: new PL_Standard_Attributes();
 		$this->limit = 12;
 		$this->offset = 0;
@@ -20,23 +20,59 @@ class PL_Search_View {
 	public function get_view_options() {
 		return array('sort_by', 'sort_type', 'offset', 'limit');
 	}
+	public function get_view_options_array($fill_value = null) {
+		return array_fill_keys($this->get_view_options(), $fill_value);
+	}
+
+	public function get_view_option_values($option) {
+		switch($option) {
+			case 'sort_by':
+				return array_keys($this->attributes->get_sort_attributes());
+				break;
+			case 'sort_type':
+				return array('asc', 'desc');
+				break;
+		}
+		return null;
+	}
+
+	public function get($name) {
+		switch($name) {
+			case 'sort_by':
+				if($this->attribute) return $this->attribute->name;
+				break;
+			case 'sort_type':
+				return $this->direction;
+				break;
+			case 'offset':
+				return $this->offset;
+				break;
+			case 'limit':
+				return $this->limit;
+				break;
+		}
+
+		return null;
+	}
 
 	public function set($name, $value) {
-		if($name == 'sort_by') {
-			if(($attribute = $this->attributes->get_attribute($value)) && $attribute->sort_name)
-				$this->attribute = $attribute;
-		}
-		else if($name == 'sort_type') {
-			if($value == 'asc' || $value == 'desc')
-				$this->direction = $value;
-		}
-		else if($name == 'offset') {
-			if(is_scalar($value))
-				$this->offset = 0 + $value;
-		}
-		else if($name == 'limit') {
-			if(is_scalar($value))
-				$this->limit = 0 + $value;
+		switch($name) {
+			case 'sort_by':
+				if(($attribute = $this->attributes->get_attribute($value)) && $attribute->sort_name)
+					$this->attribute = $attribute;
+				break;
+			case 'sort_type':
+				if($value == 'asc' || $value == 'desc')
+					$this->direction = $value;
+				break;
+			case 'offset':
+				if(is_scalar($value))
+					$this->offset = 0 + $value;
+				break;
+			case 'limit':
+				if(is_scalar($value))
+					$this->limit = 0 + $value;
+				break;
 		}
 	}
 
@@ -45,7 +81,7 @@ class PL_Search_View {
 			case PL_BOOLEAN:
 			case PL_NUMERIC:
 			case PL_CURRENCY:
-			case PL_DATETIME:
+			case PL_DATE_TIME:
 				$direction = 'desc';
 				break;
 			case PL_TEXT_VALUE:

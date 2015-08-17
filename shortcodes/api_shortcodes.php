@@ -11,6 +11,9 @@ Author URI: https://www.placester.com/
 
 require_once(BUILDER . 'api/connection.php');
 
+require_once(BUILDER . 'www/input.php');
+require_once(BUILDER . 'www/image.php');
+
 
 add_shortcode('connection', 'connection_shortcode');
 add_shortcode('filter', 'filter_shortcode');
@@ -22,8 +25,6 @@ add_shortcode('data', 'data_shortcode');
 
 add_shortcode('foreach:listing', 'foreach_listing_shortcode');
 add_shortcode('foreach:image', 'foreach_image_shortcode');
-
-add_shortcode('test', 'search_test_shortcode');
 
 
 function connection_shortcode($args) {
@@ -110,7 +111,7 @@ function image_shortcode($args, $content) {
 
 	if($global_image) {
 		if(!$content)
-			return $global_image->url;
+			return $global_image->id;
 
 		$image_in_context = $global_image_in_context;
 		$global_image_in_context = true;
@@ -171,7 +172,7 @@ function data_shortcode($args) {
 function new_shortcode_search_filter(PL_API_Connection $connection, $args) {
 	$filter = $connection->new_search_filter();
 	if(is_array($args)) {
-		$filter_options = array_fill_keys($filter->get_filter_options(), true);
+		$filter_options = $filter->get_filter_options_array(true);
 		foreach($args as $field => $value)
 			if($filter_options[$field]) {
 				if(is_string($value) && $filter->allow_array($field))
@@ -204,7 +205,8 @@ function filter_shortcode($args) {
 	global $global_filter;
 
 	$global_filter = new_shortcode_search_filter($global_connection, $args);
-	if($filter_results = $global_connection->search_listings($global_filter))
+	$filter_view = $global_connection->new_search_view(array('count' => 1));
+	if($filter_results = $global_connection->search_listings($global_filter, $filter_view))
 		return "[filter total=" . $filter_results->total() . "]";
 
 	return null;
