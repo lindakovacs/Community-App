@@ -100,7 +100,7 @@ class PL_Listing_Helper {
 	}
 
 	public static function obscure_address($address) {
-		return preg_replace('{^([0-9]|# ?)([0-9A-Za-z]| ?([\#\&\-\/\,\.]|and) ?)* ([A-DF-MO-R-T-Z] )?}', '', $address);
+		return preg_replace('{^([0-9]|# ?)([0-9A-Za-z]| ?([\#\&\-\/\,\.]|and) ?)* ([A-DF-MO-RT-Za-df-mo-rt-z] )?}', '', $address);
 	}
 
 	public static function append_address_unit($address, $unit) {
