@@ -126,9 +126,9 @@ In the following example a search field is created for the custom attribute \'ro
 		}
 		elseif ($tag == 'custom' && !empty($attr['attribute'])) {
 			$attr = wp_parse_args($attr, array('group'=>'metadata', 'type'=>'text', 'strict_match' => '', 'value' => '', 'css_class' => ''));
-			$field = $m[1] . self::form_item($attr['attribute'], $attr, $attr['value'], $attr['group']) . $m[6];
+			$field = $m[1] . self::form_item($attr['group'], $attr['attribute'], $attr) . $m[6];
 			if (!empty($attr['strict_match']) && $attr['strict_match']=='false')  {
-				$field .= self::form_item($attr['attribute'].'_match', array('type'=>'hidden'), 'like', $attr['group']);
+				$field .= self::form_item($attr['group'], $attr['attribute'].'_match', array('type' => 'hidden', 'value' => 'like'));
 			}
 			return self::wrap( 'search_form_sub', $field );
 		}

@@ -306,35 +306,64 @@ abstract class PL_SC_Base {
 		return preg_replace_callback( "/$pattern/s", array($class, 'templatetag_callback'), $content );
 	}
 
-	protected static function form_item($item, $attr, $value = '', $parent = false, $echo = false) {
+	protected static function form_item($parent, $item, $attr) {
 		$name = $item;
 		$name = preg_replace('/[^a-zA-Z\-_\[\]]/', '_', $name);
+
 		if (empty($parent)) {
-			if (!empty($_REQUEST[$name])) $value = $_REQUEST[$name];
+			$request_value = $_REQUEST[$name];
 		}
 		else {
 			$parent = preg_replace('/[^a-zA-Z\-_\[\]]/', '_', $parent);
-			if (!empty($_REQUEST[$parent][$name])) $value = $_REQUEST[$parent][$name];
+			$request_value = $_REQUEST[$parent][$name];
 			$name = $parent.'['.$name.']';
 		}
+
 		$id = str_replace(array('[',']'), array('-',''), $name);
-		$attr = $attr + array('type' => 'text', 'options' => '', 'css_class' => '');
 		$class = empty($attr['css']) ? '' : 'class="'. $attr['css'] .'"';
+		$value = isset($request_value) ? $request_value : $attr['value'];
+		$checked = ''; $multiple = '';
 
 		ob_start();
 		switch ($attr['type']) {
 			case 'checkbox':
+				$name .= '[]';
+			case 'radio':
+				if(!$attr['value']) $attr['value'] = 'true';
+				$id .= '-' . preg_replace('/[^a-zA-Z\-_\[\]]/', '_', $attr['value']);
+				if(is_scalar($request_value) && $request_value == $attr['value'] ||
+					is_array($request_value) && in_array($attr['value'], $request_value))
+					$checked = 'checked';
 				?>
 				<input id="<?php echo $id ?>" <?php echo $class ?> type="<?php echo $attr['type'] ?>"
-						name="<?php echo $name ?>[]" value="<?php echo (empty($attr['value']) ? 'true' : $attr['value']) ?>" />
+					name="<?php echo $name ?>" value="<?php echo $attr['value'] ?>" <?php echo $checked ?> />
 				<?php
 				break;
-			case 'radio':
+
+			case 'multiselect':
+				$name .= '[]';
+				$multiple = 'multiple';
+			case 'select':
+				$options = self::_option_explode($attr['options']);
+				$value = is_array($request_value) ? $request_value : self::_value_explode($value);
 				?>
-				<input id="<?php echo $id.'-'.preg_replace('/[^a-zA-Z\-_\[\]]/', '_', $value) ?>" <?php echo $class ?> type="radio"
-					name="<?php echo $name ?>" value="<?php echo $value ?>" />
+				<select id="<?php echo $id ?>" <?php echo $class ?> <?php echo $multiple ?> name="<?php echo $name ?>">
+				<?php foreach ($options as $key => $text): ?>
+					<option value="<?php echo htmlentities($key) ?>" <?php echo in_array($key, $value) ? 'selected' : '' ?>>
+						<?php echo htmlentities($text) ?>
+					</option>
+				<?php endforeach ?>
+				</select>
 				<?php
 				break;
+
+			case 'hidden':
+				?>
+				<input id="<?php echo $id ?>" type="hidden" name="<?php echo $name ?>"
+					value="<?php echo htmlentities($value) ?>" />
+				<?php
+				break;
+
 			case 'textarea':
 				$rows = ! empty ( $attributes ['rows'] ) ? $attributes ['rows'] : 2;
 				$cols = ! empty ( $attributes ['cols'] ) ? $attributes ['cols'] : 20;
@@ -343,38 +372,8 @@ abstract class PL_SC_Base {
 					rows="<?php echo $rows ?>" cols="<?php echo $cols ?>"><?php echo $value ?></textarea>
 				<?php
 				break;
-			case 'select':
-				$options = self::_option_explode($attr['options']);
-				?>
-				<select id="<?php echo $id ?>" <?php echo $class ?> name="<?php echo $name ?>">
-				<?php foreach ($options as $key => $text): ?>
-					<option value="<?php echo htmlentities($key) ?>"
-					<?php echo ($key == $value ? 'selected="selected"' : '' ) ?>><?php echo htmlentities($text) ?></option>
-				<?php endforeach ?>
-				</select>
-				<?php
-				break;
-			case 'multiselect':
-				$options = self::_option_explode($attr['options']);
-				if (!is_array($value)) {
-					$value = self::_option_explode($value);
-				}
-				?>
-				<select id="<?php echo $id ?>" <?php echo $class ?> multiple="multiple" name="<?php echo $name ?>[]">
-				<?php foreach ($options as $key => $text): ?>
-					<option value="<?php echo htmlentities($key) ?>"
-					<?php echo ((is_array($value) && in_array($key, $value) ) ? 'selected="selected"' : '' ) ?>><?php echo htmlentities($text) ?></option>
-				<?php endforeach ?>
-				</select>
-				<?php
-				break;
-			case 'hidden':
-				?>
-				<input id="<?php echo $id ?>" type="hidden" name="<?php echo $name ?>"
-						value="<?php echo htmlentities($value) ?>" />
-				<?php
-				break;
-			case 'date':
+
+			case 'text':
 			default:
 				?>
 				<input id="<?php echo $id ?>" <?php echo $class ?> type="text"
@@ -393,16 +392,29 @@ abstract class PL_SC_Base {
 		do_action( $shortcode . '_post_footer' );
 		return ob_get_clean();
 	}
-	
+
 	private static function _option_explode($option) {
-		// TODO: regex?
-		$options = array_map('trim', explode(',', $option));
-		$vals = array();
-		foreach ($options as $option) {
-			$ex = array_map('trim', explode('|', $option, 2));
-			if (empty($ex[1])) $ex[1] = $ex[0];
-			$vals[$ex[0]] = $ex[1];
+		if(!is_scalar($option)) return array();
+
+		$options = array();
+		$pairs = array_map('trim', explode(',', $option));
+		foreach ($pairs as $pair) {
+			$parts = array_map('trim', explode('|', $pair, 2));
+			if (empty($parts[1])) $parts[1] = $parts[0];
+			$options[$parts[0]] = $parts[1];
 		}
-		return $vals;
+		return $options;
+	}
+
+	private static function _value_explode($value) {
+		if(!is_scalar($value)) return array();
+
+		$values = array();
+		$pairs = array_map('trim', explode(',', $value));
+		foreach ($pairs as $pair) {
+			$parts = array_map('trim', explode('|', $pair, 2));
+			$values[] = $parts[0];
+		}
+		return $values;
 	}
 }

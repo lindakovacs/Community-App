@@ -424,9 +424,9 @@ if(!$PL_API_LISTINGS) {
 					'pk_lease' => array('type' => 'checkbox', 'group' => 'lease details', 'label' => 'Parking Included'),
 					'deposit' => array('type' => 'text', 'group' => 'Transation Details', 'label' => 'Deposit'),
 					'floors' => array('type' => 'text', 'group' => 'basic Details', 'label' => 'Floors'),
-					'hoa_mand' => array('type' => 'checkbox', 'group' => 'finacial details', 'label' => 'HOA Mandatory'),
-					'hoa_fee' => array('type' => 'text', 'group' => 'finacial details', 'label' => 'HOA Fee'),
-					'lndr_own' => array('type' => 'select','options' => array('false' => 'Not Set','true' => 'Yes', 'false' => 'No', 'undis' => 'Undisclosed'), 'group' => 'finacial details', 'label' => 'Floors'),
+					'hoa_mand' => array('type' => 'checkbox', 'group' => 'financial details', 'label' => 'HOA Mandatory'),
+					'hoa_fee' => array('type' => 'text', 'group' => 'financial details', 'label' => 'HOA Fee'),
+					'lndr_own' => array('type' => 'select','options' => array('false' => 'Not Set','true' => 'Yes', 'false' => 'No', 'undis' => 'Undisclosed'), 'group' => 'financial details', 'label' => 'Floors'),
 					'style' => array('type' => 'select','options' => array('false' => 'Not Set','bungal' => 'Bungalow', 'cape' => 'Cape Cod', 'colonial' => 'Colonial' ,'contemp' => 'Contemporary', 'cott' => 'Cottage', 'farmh' => 'Farmhouse','fnt_bk_splt' => 'Front to Back Split', 'gamb_dutc'=>'Gambrel/Dutch','garrison' => 'Garrison', 'greek_rev' => 'Greek Revival', 'loft_splt' => 'Lofted Split','mult_lvl' => 'Multi-level','rai_ranch' => 'Raised Ranch','ranch' => 'Ranch','saltb' => 'Saltbox', 'split_ent' => 'Split Entry', 'tudor' => 'Tudor', 'victor' => 'Victorian', 'antiq' => 'Antique'), 'group' => 'structure details', 'label' => 'Style'),
 					//Pet Details
 					'cats' => array('type' => 'checkbox', 'group' => 'Pets', 'label' => 'Cats'),

@@ -23,10 +23,10 @@ class PL_Listing {
 	public static function get ($args = array()) {
 		// merge incoming args with preset options, basically api key at this point.
 		$request = array_merge(array("api_key" => self::api_key()), PL_Validate::request($args, PL_Config::PL_API_LISTINGS('get', 'args')));
-		if ( defined('HOSTED_PLUGIN_KEY') ) {
-			$request['hosted_key'] = HOSTED_PLUGIN_KEY;
-		}
-		
+//		if ( defined('HOSTED_PLUGIN_KEY') ) {
+//			$request['hosted_key'] = HOSTED_PLUGIN_KEY;
+//		}
+
 		// sent request, use details from config.
 		$response = PL_HTTP::send_request(PL_Config::PL_API_LISTINGS('get', 'request', 'url'), $request, PL_Config::PL_API_LISTINGS('get', 'request', 'type'));
 		// validate response. 
@@ -78,20 +78,20 @@ class PL_Listing {
 	public static function locations ($args = array()) {
 		$config = PL_Config::PL_API_LISTINGS('get.locations');
 		$request = array_merge(array("api_key" => self::api_key()), PL_Validate::request($args, $config['args']));
-		if (defined('HOSTED_PLUGIN_KEY')) {
-			$request['hosted_key'] = HOSTED_PLUGIN_KEY;
-		}
-		
+//		if (defined('HOSTED_PLUGIN_KEY')) {
+//			$request['hosted_key'] = HOSTED_PLUGIN_KEY;
+//		}
+
 		return PL_Validate::attributes(PL_HTTP::send_request($config['request']['url'], $request), $config['returns']);
 	}
 	
 	public static function aggregates ($args = array()) {
 		$config = PL_Config::PL_API_LISTINGS('get.aggregate');
 		$request = array_merge(array("api_key" => self::api_key()), PL_Validate::request($args, $config['args']));
-		if (defined('HOSTED_PLUGIN_KEY')) {
-			$request['hosted_key'] = HOSTED_PLUGIN_KEY;
-		}
-		
+//		if (defined('HOSTED_PLUGIN_KEY')) {
+//			$request['hosted_key'] = HOSTED_PLUGIN_KEY;
+//		}
+
 		return PL_Validate::attributes(PL_HTTP::send_request($config['request']['url'], $request), $config['returns']);
 	}
 
