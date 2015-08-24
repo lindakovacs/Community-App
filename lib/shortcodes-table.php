@@ -2,7 +2,8 @@
 /**
  * Construct a table to manage custom shortcode templates
  */
-class PL_Shortcodes_Table extends WP_List_Table {
+require_once PL_THIRD_PARTY_DIR . 'wp-core/class-wp-list-table.php';
+class PL_Shortcodes_Table extends PL_List_Table {
 
 	private $post_type = 'pl_general_widget';
 	private $base_page;

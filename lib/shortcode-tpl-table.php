@@ -2,7 +2,8 @@
 /**
  * Construct a table to manage custom shortcode templates
  */
-class PL_Shortcode_Tpl_Table extends WP_List_Table {
+require_once PL_THIRD_PARTY_DIR . 'wp-core/class-wp-list-table.php';
+class PL_Shortcode_Tpl_Table extends PL_List_Table {
 
 	private $base_page;
 	private $per_page = 20;
