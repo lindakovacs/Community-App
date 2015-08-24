@@ -3,7 +3,8 @@
  * Based on WP Terms List Table class.
  * 
  */
-class PL_Property_Terms_Table extends WP_List_Table {
+require_once PL_THIRD_PARTY_DIR . 'wp-core/class-wp-list-table.php';
+class PL_Property_Terms_Table extends PL_List_Table {
 
 	var $callback_args;
 	private $base_page;
