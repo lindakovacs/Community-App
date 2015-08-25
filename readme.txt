@@ -1,9 +1,9 @@
 === Plugin Name ===
 Contributors: Placester, MattBarba
 Tags: real estate, realestate, home, housing, rentals, properties, neighborhood, map, mortgage, listing, listings, craigslist, rental, google map, mls, idx, rets, agent, broker, leasing, realty, realtor, placester, widget, buddypress, homes, property, property management, estate, realestate, real estate crm, real estate maps
-Requires at least: 3.4
-Tested up to: 4.1.1
-Stable tag: 1.3.1
+Requires at least: 3.9
+Tested up to: 4.3
+Stable tag: 1.3.2
 
 Easily create and manage real estate sites powered by WordPress.
 
@@ -141,6 +141,12 @@ Absolutely, [reach out](mailto:support@placester.com) to us and let us know what
 In general - real-time. But if you use 3rd party property management services, the updates will only be as recent as your provider allows.
 
 == Changelog ==
+
+= 1.3.2 =
+* Fixed incompatibility with WP 4.3
+* Improvements to shortcode administration
+* Provisions for specialized data server configurations
+* Additional minor bug fixes
 
 = 1.3.1 =
 * Improved compatibility with old versions of Placester themes

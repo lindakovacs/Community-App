@@ -13,7 +13,7 @@ class PL_Membership {
 
 		add_shortcode('lead_user_navigation', array(__CLASS__, 'placester_lead_control_panel'));
 		add_shortcode('pl_login_block', array(__CLASS__, 'placester_lead_control_panel'));
-
+		
 		// Create the "Property lead" role
 		add_role('placester_lead', 'Property Lead', array('read' => true));
 	}
@@ -459,7 +459,6 @@ class PL_Membership {
 			?>
 			<div style='display:none;'>
 				<form name="pl_login_form" id="pl_login_form" action="<?php echo home_url(); ?>/wp-login.php" method="post" class="pl_login_reg_form">
-
 					<?php pls_do_atomic( 'login_form_before_title' ); ?>
 
 					<div id="pl_login_form_inner_wrapper">
