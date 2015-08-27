@@ -170,12 +170,14 @@ function data_shortcode($args) {
 }
 
 function new_shortcode_search_filter(PL_API_Connection $connection, $args) {
-	$filter = $connection->new_search_filter();
+	$filter = $connection->new_search_request();
+	$filter->set('limit', 1);
+
 	if(is_array($args)) {
 		$filter_options = $filter->get_filter_options_array(true);
 		foreach($args as $field => $value)
 			if($filter_options[$field]) {
-				if(is_string($value) && $filter->allow_array($field))
+				if(is_string($value) && strpos($value, '||') !== false)
 					$value = explode('||', $value);
 				$filter->set($field, $value);
 			}
@@ -183,18 +185,32 @@ function new_shortcode_search_filter(PL_API_Connection $connection, $args) {
 	return $filter;
 }
 
+function new_shortcode_search_request(PL_API_Connection $connection, $args) {
+	$request = $connection->new_search_request();
+
+	if(is_array($args)) {
+		$request_options = $request->get_request_options_array(true);
+		foreach($args as $field => $value)
+			if($request_options[$field]) {
+				if(is_string($value) && strpos($value, '||') !== false)
+					$value = explode('||', $value);
+				$request->set($field, $value);
+			}
+	}
+	return $request;
+}
+
 function search_shortcode($args) {
 	global $global_connection;
 	global $global_filter;
 	global $global_results;
 
-	$search_filter = new_shortcode_search_filter($global_connection, $args);
-	$search_view = $global_connection->new_search_view($args);
+	$search_request = new_shortcode_search_request($global_connection, $args);
 
 	if($global_filter)
-		$search_filter = PL_Search_Filter::combine($global_filter, $search_filter);
+		$search_request = PL_Search_Request::combine($global_filter, $search_request);
 
-	if($global_results = $global_connection->search_listings($search_filter, $search_view))
+	if($global_results = $global_connection->search_listings($search_request))
 		return "[search total=" . $global_results->total() . " count=" . $global_results->count() . "]";
 
 	return null;
@@ -205,8 +221,7 @@ function filter_shortcode($args) {
 	global $global_filter;
 
 	$global_filter = new_shortcode_search_filter($global_connection, $args);
-	$filter_view = $global_connection->new_search_view(array('count' => 1));
-	if($filter_results = $global_connection->search_listings($global_filter, $filter_view))
+	if($filter_results = $global_connection->search_listings($global_filter))
 		return "[filter total=" . $filter_results->total() . "]";
 
 	return null;

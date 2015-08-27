@@ -73,7 +73,12 @@ class PL_Search_View {
 				if(is_scalar($value))
 					$this->limit = 0 + $value;
 				break;
+			default:
+				return false;
+				break;
 		}
+
+		return true;
 	}
 
 	protected function get_default_sort_type(PL_Attribute $attribute) {
@@ -92,6 +97,11 @@ class PL_Search_View {
 				break;
 		}
 		return $direction;
+	}
+
+	public static function combine(PL_Search_View $left, PL_Search_View $right) {
+		assert($left->attributes == $right->attributes);
+		return clone $right;
 	}
 
 	public function query_string() {

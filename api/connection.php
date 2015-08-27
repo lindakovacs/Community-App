@@ -2,8 +2,7 @@
 
 
 require_once('http.php');
-require_once('search_filter.php');
-require_once('search_view.php');
+require_once('search_request.php');
 require_once('search_result.php');
 
 
@@ -53,6 +52,13 @@ class PL_API_Connection extends PL_Attribute_Map {
 		return $result;
 	}
 
+	public function get_listing($id) {
+		if($data = $this->http_connection->GET_LISTING($id))
+			return new PL_Listing($data, $this);
+
+		return null;
+	}
+
 	public function new_private_listing($id = null) {
 		if(!$id)
 			return new PL_Private_Listing(null, $this);
@@ -81,7 +87,7 @@ class PL_API_Connection extends PL_Attribute_Map {
 		return null;
 	}
 
-	public function create_listing(PL_Private_Listing $listing) {
+	public function create_private_listing(PL_Private_Listing $listing) {
 		// debug only
 		if($this->http_connection->API_KEY != 'wvkGrh5nHYCPXVFmC17BeDn2KKxD7XE58rfg5BDksHka')
 			return null;
@@ -90,7 +96,7 @@ class PL_API_Connection extends PL_Attribute_Map {
 		}
 	}
 
-	public function update_listing(PL_Private_Listing $listing) {
+	public function update_private_listing(PL_Private_Listing $listing) {
 		// debug only
 		if($this->http_connection->API_KEY != 'wvkGrh5nHYCPXVFmC17BeDn2KKxD7XE58rfg5BDksHka')
 			return null;
@@ -99,7 +105,7 @@ class PL_API_Connection extends PL_Attribute_Map {
 		}
 	}
 
-	public function delete_listing($id) {
+	public function delete_private_listing($id) {
 		// debug only
 		if($this->http_connection->API_KEY != 'wvkGrh5nHYCPXVFmC17BeDn2KKxD7XE58rfg5BDksHka')
 			return null;
@@ -107,52 +113,14 @@ class PL_API_Connection extends PL_Attribute_Map {
 		return $this->http_connection->DELETE_LISTING($id);
 	}
 
-	public function new_search_filter($args = null) {
-		$filter = new PL_Search_Filter($this);
-		if(is_array($args)) {
-			$filter_options = $filter->get_filter_options_array(true);
-			foreach($args as $field => $value)
-				if($filter_options[$field]) {
-					if(is_array($value) && !($filter->allow_array($field)))
-						continue;
-					$filter->set($field, $value);
-				}
-		}
-		return $filter;
+	public function new_search_request($args = null) {
+		return new PL_Search_Request($this, $args);
 	}
 
-	public function new_search_view($args = null) {
-		$view = new PL_Search_View($this);
-		if(is_array($args)) {
-			$view_options = $view->get_view_options_array(true);
-			foreach($args as $field => $value) {
-				if($view_options[$field])
-					$view->set($field, $value);
-			}
-		}
-		return $view;
-	}
-
-	public function search_listings(PL_Search_Filter $filter = null, PL_Search_View $view = null) {
-		$query = $filter ? $filter->query_string() : '';
-		if($view && ($view_query = $view->query_string())) {
-			if($query) $query .= '&';
-			$query .= $view_query;
-		}
-
+	public function search_listings(PL_Search_Request $item = null) {
+		$query = $item ? $item->query_string() : '';
 		if($data = $this->http_connection->SEARCH_LISTINGS($query))
 			return new PL_Search_Result($data, $this);
-		return null;
-	}
-
-	public function read_attribute_values($attribute, PL_Search_Filter $filter = null) {
-		if(is_scalar($attribute))
-			if(($attribute = $this->get_attribute($attribute)) && $attribute->aggregate_name) {
-				$request = 'keys[]=' . $attribute->aggregate_name;
-				if($filter) $filter = $filter->query_string();
-				if($data = $this->http_connection->SEARCH_AGGREGATE($request, $filter))
-					return $data->{$attribute->aggregate_name};
-			}
 		return null;
 	}
 
@@ -180,5 +148,16 @@ class PL_API_Connection extends PL_Attribute_Map {
 			}
 		}
 		return $attributes;
+	}
+
+	public function read_attribute_values($attribute, PL_Search_Filter $filter = null) {
+		if(is_scalar($attribute))
+			if(($attribute = $this->get_attribute($attribute)) && $attribute->aggregate_name) {
+				$request = 'keys[]=' . $attribute->aggregate_name;
+				if($filter) $filter = $filter->query_string();
+				if($data = $this->http_connection->SEARCH_AGGREGATE($request, $filter))
+					return $data->{$attribute->aggregate_name};
+			}
+		return null;
 	}
 }

@@ -37,16 +37,16 @@ class PL_Search_Filter {
 		return null;
 	}
 
-	public function allow_min($name) {
+	protected function allow_min($name) {
 		return ($attribute = $this->attributes->get_attribute($name)) && $attribute->min_name;
 	}
-	public function allow_max($name) {
+	protected function allow_max($name) {
 		return ($attribute = $this->attributes->get_attribute($name)) && $attribute->max_name;
 	}
-	public function allow_array($name) {
+	protected function allow_array($name) {
 		return ($attribute = $this->attributes->get_attribute($name)) && $attribute->array_name;
 	}
-	public function allow_match($name, $match = null) {
+	protected function allow_match($name, $match = null) {
 		return ($attribute = $this->attributes->get_attribute($name)) && $attribute->match_name;
 	}
 

@@ -1,32 +1,52 @@
 <?php
 
 
+require_once('compatibility-plugin.php');
+
+
 add_action('after_setup_theme', 'placester_blueprint_active', 8);
 function placester_blueprint_active() {
 	global $placester_blueprint;
+	global $pl_compatibility_plugin;
 
 	if(!isset($placester_blueprint))
 		$placester_blueprint = false;
 	else {
 		$placester_blueprint['has_plugin_error'] = false;
-		add_theme_support('pls-widget-contact');
+		add_theme_support('pls-widget-contact'); // this is needed for the contact form used by the plugin
+
+		// if we have a blueprint theme, we need the old API
+		if(!isset($pl_compatibility_plugin)) $pl_compatibility_plugin = new PL_Compatibility_Plugin();
 	}
 }
 
 
-function placester_get_api_key() { return false; }
-function placester_get_property_url($id) { return PL_Pages::get_url($id); } // OLDER
+function placester_get_api_key() {
+	global $pl_compatibility_plugin;
+	return $pl_compatibility_plugin ? $pl_compatibility_plugin->get_api_key() : null;
+}
+
+function placester_get_property_url($id) { return false; } // OLDER
 function placester_post_slug() { return true; }
 
 
 class PL_Listing_Helper {
-	public static function get_listing_in_loop () { return false; }
+	public static function get_listing_in_loop () {
+		global $pl_compatibility_plugin;
+		return $pl_compatibility_plugin ? $pl_compatibility_plugin->get_post_listing() : null;
+	}
+
 	public static function basic_aggregates($keys) { return array(); }
 	public static function types_for_options($return_only = false, $allow_globals = true, $type_key = 'property_type') { return array(); }
 	public static function locations_for_options($return_only = false) { return array(); }
 	public static function polygon_locations($return_only = false) { return array(); }
 	public static function counts_for_locations($params = array()) { return array(); }
-	public static function results($args, $global_filters = true) { return array("listings" => array()); }
+
+	public static function results($args, $global_filters = true) {
+		global $pl_compatibility_plugin;
+		return $pl_compatibility_plugin ? $pl_compatibility_plugin->get_search_listings($args, $global_filters) : array("listings" => array());
+	}
+
 	public static function details($args) { return array("listings" => array()); }
 	public static function many_details ($args) { return self::details($args); } // OLDER
 }
@@ -38,16 +58,16 @@ class PL_Permalink_Search {
 
 
 class PL_Pages {
-	public static function get_url ($id = false, $listing = array()) { return false; }
+	public static function get_url ($id = false, $listing = array()) { return placester_get_property_url($id); }
 }
 
 class PL_Page_Helper {
-	public static function get_url($id) { return PL_Pages::get_url($id); } // OLDER
+	public static function get_url($id) { return placester_get_property_url($id); } // OLDER
 }
 
 
 class PL_Dragonfly {
-	public static function image($image, $args) { return false; }
+	public static function resize($image, $args = array()) { return false; }
 }
 
 
@@ -80,7 +100,16 @@ class PL_Helper_User {
 }
 
 class PL_Custom_Attribute_Helper {
-	public static function get_translations() { return array(); }
+	public static function get_translations() {
+		global $pl_compatibility_plugin;
+		$attributes = $pl_compatibility_plugin ? $pl_compatibility_plugin->get_connection()->get_custom_attributes() : array();
+
+		$dictionary = array();
+		foreach($attributes as $attribute)
+			$dictionary[$attribute->name] = $attribute->display_name;
+
+		return $dictionary;
+	}
 }
 
 class PL_Compliance {
