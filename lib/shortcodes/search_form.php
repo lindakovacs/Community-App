@@ -63,7 +63,6 @@ If the text displayed in the list is to be different from the value for that ite
 In the following example a search field is created for the custom attribute \'roofing\'. If the user entered a value of \'shingle\' the results would contain listings that had the word \'shingle\' in the roof attribute, for example \'cedar shingle\', \'Composite Shingles\', etc:<br />
 <code>[custom attribute=\'roofing\' strict_match=\'false\']</code><br />
 <code>css</code> - (optional) Use this if you wish to set one or more css class names to the element.'),
-		'favorite_search_toggle'	=> array('help' => 'Links to save and/or subscribe to the search.  (Only available when used with [search_listings])')
 	);
 
 	protected $template = array(
@@ -132,10 +131,6 @@ In the following example a search field is created for the custom attribute \'ro
 				$field .= self::form_item($attr['group'], $attr['attribute'].'_match', array('type' => 'hidden', 'value' => 'like'));
 			}
 			return self::wrap( 'search_form_sub', $field );
-		}
-		elseif ($tag == 'favorite_search_toggle') {
-			$attr = wp_parse_args($attr);
-			return PL_User_Saved_Search::placester_search_link_toggle($attr);
 		}
 		else {
 			return $m[0];
