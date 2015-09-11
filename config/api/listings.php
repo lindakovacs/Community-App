@@ -475,7 +475,7 @@ if(!$PL_API_LISTINGS) {
 					'dng_rm' => array('type' => 'checkbox', 'group' => 'Listing Amenities', 'label' => 'Dining Room'),
 					'brkfst_nk' => array('type' => 'checkbox', 'group' => 'Listing Amenities', 'label' => 'Breakfast Nook'),
 					'dshwsher' => array('type' => 'checkbox', 'group' => 'Listing Amenities', 'label' => 'Dishwasher'),
-					'refrig' => array('type' => 'checkbox', 'group' => 'Listing Amenities', 'label' => 'Refigerator'),
+					'refrig' => array('type' => 'checkbox', 'group' => 'Listing Amenities', 'label' => 'Refrigerator'),
 					'stve_ovn' => array('type' => 'checkbox', 'group' => 'Listing Amenities', 'label' => 'Stove/Oven'),
 					'stnstl_app' => array('type' => 'checkbox', 'group' => 'Listing Amenities', 'label' => 'Stainless Steel Appliances'),
 					'attic' => array('type' => 'checkbox', 'group' => 'Listing Amenities', 'label' => 'Attic'),
