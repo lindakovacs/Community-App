@@ -72,6 +72,10 @@ class PL_Compliance {
 			if (isset($provider['office_phone_on'][$config]) && !empty($provider['office_phone_on'][$config]) && $office_phone)
 				$response['office_phone'] = $office_phone;
 
+			if($config == 'inline_search' && !empty($provider['small_logo'])) {
+				$response['img'] = $provider['small_logo'];
+			}
+
 			return $response;
 		}
 		return false;
