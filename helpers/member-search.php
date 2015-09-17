@@ -424,8 +424,9 @@ class PL_User_Saved_Search {
 						<?php echo self::placester_search_link_toggle($args); ?>
 					</div>
 				</li>
-			<?php }
-		}
+			<?php } ?>
+			</ul>
+		<?php }
 		else { ?>
 			<p>You haven't saved any favorite searches.</p>
 		<?php }
