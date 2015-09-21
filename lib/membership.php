@@ -468,15 +468,24 @@ class PL_Membership {
 		if ( !is_user_logged_in() ) {
 			ob_start();
 			?>
-			<div style='display:none;'>
+
+			<?php if($USE_GRAVITY = false) : ?>
+
+				<div class="am_login" style="display:none;">
+					<div id="pl_login_form" name="pl_login_form" class="pl_login_reg_form"><h3>Login:</h3>
+						<?php gravity_form( 2, false, false, false, '', false ); ?>
+					</div>
+				</div>
+
+			<?php else : ?>
+
+				<div style='display:none;'>
 				<form name="pl_login_form" id="pl_login_form" action="<?php echo home_url(); ?>/wp-user.php" method="post" class="pl_login_reg_form">
 
 					<?php pls_do_atomic( 'login_form_before_title' ); ?>
 
 					<div id="pl_login_form_inner_wrapper">
 						<h2>Login</h2>
-						<!-- redirect-uri="<?php //echo $_SERVER["HTTP_REFERER"]; ?>" -->
-						<!-- <fb:registration fields="name,location,email" width="260"></fb:registration> -->
 
 						<?php pls_do_atomic( 'login_form_before_email' ); ?>
 
@@ -510,7 +519,10 @@ class PL_Membership {
 					</div>
 
 				</form>
-			</div>
+				</div>
+
+			<?php endif; ?>
+
 			<?php
 			$result = ob_get_clean();
 		}
