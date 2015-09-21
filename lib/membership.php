@@ -382,11 +382,20 @@ class PL_Membership {
 		if ( !is_user_logged_in() ) {
 			ob_start();
 			?>
-			<div style="display:none;">
+
+			<?php if($USE_GRAVITY = false) : ?>
+
+				<div class="am_register" style="display:none;">
+					<div id="pl_lead_register_form" name="pl_lead_register_form" class="pl_login_reg_form pl_lead_register_form"><h3>Register:</h3>
+						<?php gravity_form( 3, false, false, false, '', false ); ?>
+					</div>
+				</div>
+
+			<?php else : ?>
+
+				<div style="display:none;">
 				<form method="post" action="#<?php echo $role; ?>" id="pl_lead_register_form" name="pl_lead_register_form" class="pl_login_reg_form pl_lead_register_form" autocomplete="off">
-
 					<div style="display:none" class="success">You have been successfully signed up. This page will refresh momentarily.</div>
-
 					<div id="pl_lead_register_form_inner_wrapper">
 
 						<?php pls_do_atomic( 'register_form_before_title' ); ?>
@@ -426,9 +435,11 @@ class PL_Membership {
 						<?php pls_do_atomic( 'register_form_after_submit' ); ?>
 
 					</div>
-
 				</form>
-			</div>
+				</div>
+
+			<?php endif; ?>
+
 			<?php
 			$result = ob_get_clean();
 		}
