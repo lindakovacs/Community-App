@@ -94,17 +94,19 @@ class PL_Shortcodes
 	public static $prop_details_enabled_key = 'pls_prop_details_enabled';
 
 	public static function init() {
-		//pulls in all the macro shortcodes, static list defined above
+		// pulls in all the macro shortcodes, static list defined above
 		foreach (self::$codes as $shortcode) {
 			add_shortcode($shortcode, array(__CLASS__, $shortcode . '_shortcode_handler'));			
 		}
 
 		// For any shortcodes that use subcodes, register them to a single handler that bears the shortcode's name
+		/* no, these can't be used as standalones, outside of their proper context
 		foreach (self::$subcodes as $code => $subs) {
-		  foreach ($subs as $sub) {
-			add_shortcode($sub, array(__CLASS__, $code . '_sub_shortcode_handler'));
-		  }	
+			foreach ($subs as $sub) {
+				add_shortcode($sub, array(__CLASS__, $code . '_sub_shortcode_handler'));
+			}
 		}
+		*/
 
 		// register several helpful shortcodes for filters, for metadata, locaiton and common
 		add_shortcode('pl_filter', array(__CLASS__, 'pl_filter_shortcode_handler'));

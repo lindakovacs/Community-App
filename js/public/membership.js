@@ -49,6 +49,12 @@ jQuery(document).ready(function($) {
 			$('div#pl_add_remove_lead_favorites,.pl_add_remove_lead_favorites').show();    	
 		}
 
+		// These allow Login/Register links to be manually added to WP nav menus
+		$('li.pl_register_lead_link > a').addClass('pl_register_lead_link');
+		$('li.pl_register_lead_link').removeClass('pl_register_lead_link');
+		$('li.pl_login_link > a').addClass('pl_login_link');
+		$('li.pl_login_link').removeClass('pl_login_link');
+
 		// Register Form Fancybox
 		stash_fancy('.pl_register_lead_link');
 		$('.pl_register_lead_link').fancybox({
