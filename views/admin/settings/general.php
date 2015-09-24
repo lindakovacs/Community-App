@@ -115,7 +115,7 @@
 		<ul>
 			<li>
 				<input id="block_address" type="checkbox" name="block_address" <?php echo $block_address ? 'checked="checked"' : '' ?>>
-				<label for="block_address">Use <b>Block Addresses</b> rather than exact addresses. Using block addresses will switch over all the addresses in your website to the nearest block or a close-by address, rather than exact address.</label>
+				<label for="block_address">Use <b>Block Addresses</b> rather than exact addresses. Using block addresses will suppress the display of exact street addresses for all properties on your website.</label>
 			</li>
 			<li>
 				<input id="demo_data" type="checkbox" name="demo_data" <?php echo $demo_data_flag ? 'checked="checked"' : '' ?>>
