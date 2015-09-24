@@ -7,7 +7,7 @@ class PL_Css_Helper {
 	public static function init () {		
 		// add_action( 'admin_init', array( __CLASS__, 'admin' ));
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin' ) );
-		add_action( 'customize_controls_enqueue_scripts', array( __CLASS__, 'customizer' ) );
+//		add_action( 'customize_controls_enqueue_scripts', array( __CLASS__, 'customizer' ) );
 	}
 
 	public static function admin ($hook) {

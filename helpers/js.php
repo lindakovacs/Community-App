@@ -8,7 +8,7 @@ class PL_Js_Helper {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin') );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'frontend') );
 		add_action( 'admin_head', array(__CLASS__, 'admin_menu_url') );
-		add_action( 'customize_controls_enqueue_scripts', array(__CLASS__, 'customizer') );
+//		add_action( 'customize_controls_enqueue_scripts', array(__CLASS__, 'customizer') );
 	}
 
 	public static function admin ($hook) {
