@@ -344,7 +344,7 @@ abstract class PL_SC_Base {
 				$name .= '[]';
 				$multiple = 'multiple';
 			case 'select':
-				$options = self::_option_explode($attr['options']);
+				$options = self::_option_explode($attr['options'], in_array($item, array('price', 'min_price', 'max_price')));
 				$value = is_array($request_value) ? $request_value : self::_value_explode($value);
 				?>
 				<select id="<?php echo $id ?>" <?php echo $class ?> <?php echo $multiple ?> name="<?php echo $name ?>">
@@ -393,28 +393,52 @@ abstract class PL_SC_Base {
 		return ob_get_clean();
 	}
 
-	private static function _option_explode($option) {
-		if(!is_scalar($option)) return array();
+	private static function _array_explode($string) {
+		$result = array();
 
-		$options = array();
-		$pairs = array_map('trim', explode(',', $option));
-		foreach ($pairs as $pair) {
-			$parts = array_map('trim', explode('|', $pair, 2));
-			if (empty($parts[1])) $parts[1] = $parts[0];
-			$options[$parts[0]] = $parts[1];
+		if(is_scalar($string)) {
+			$tokens = preg_split("/^ +|( *[,|] *)| +$/", $string, 0, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+			$value = array(); $pointer = 0; $quoted = false;
+
+			foreach($tokens as $token) {
+				if(is_null($value[$pointer]) || $value[$pointer] === '') {
+					if($token[0] == "'" || $token[0] == '"')
+						$quoted = $token[0];
+				}
+
+				if(!$quoted && strpos($token, ',') !== false) {
+					$result[$value[0]] = $value[1];
+					$value = array(); $pointer = 0;
+				}
+
+				else if(!$quoted && strpos($token, '|') !== false) {
+					$value[++$pointer] = '';
+				}
+
+				else {
+					$value[$pointer] .= $token;
+					if($quoted && substr($token, -1) == $quoted) {
+						$value[$pointer] = trim($value[$pointer], "'" . '"');
+						$quoted = false;
+					}
+				}
+			}
+			$result[$value[0]] = $value[1];
 		}
-		return $options;
+
+		return $result;
+	}
+
+	private static function _option_explode($option, $prices = false) {
+		$result = self::_array_explode($option);
+		foreach ($result as $key => &$value) {
+			if(is_null($value))
+				$value = ($prices ? PLS_Format::number($key, array('abbreviate' => false)) : $key);
+		}
+		return $result;
 	}
 
 	private static function _value_explode($value) {
-		if(!is_scalar($value)) return array();
-
-		$values = array();
-		$pairs = array_map('trim', explode(',', $value));
-		foreach ($pairs as $pair) {
-			$parts = array_map('trim', explode('|', $pair, 2));
-			$values[] = $parts[0];
-		}
-		return $values;
+		return array_keys(self::_array_explode($value));
 	}
 }
