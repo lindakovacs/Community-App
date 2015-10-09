@@ -1259,13 +1259,16 @@ To add some text to your listings:<br />
 
 		if( ! empty( $atts ) ) {
 
-			if( ! empty( $atts['hide_sort_by'] ) && $atts['hide_sort_by'] == 'true' ) {
-				$css .= '.sort_wrapper .sort_item:first-child { display: none; } ';
+			if( $atts['hide_sort_by'] == 'true' && $atts['hide_sort_direction'] == 'true') {
+				$css .= '.sort_wrapper { display: none !important; } ';
 			}
-			if( ! empty( $atts['hide_sort_direction'] ) && $atts['hide_sort_direction'] == 'true' ) {
-				$css .= '.sort_wrapper .sort_item:last-child { display: none; } ';
+			if( $atts['hide_sort_by'] == 'true' ) {
+				$css .= '.sort_wrapper .sort_item:first-child { display: none !important; } ';
 			}
-			if( ! empty( $atts['hide_num_results'] ) && $atts['hide_num_results'] == 'true' ) {
+			if( $atts['hide_sort_direction'] == 'true' ) {
+				$css .= '.sort_wrapper .sort_item:last-child { display: none !important; } ';
+			}
+			if( $atts['hide_num_results'] == 'true' ) {
 				$css .= '#placester_listings_list_length { display: none; } ';
 			}
 		}

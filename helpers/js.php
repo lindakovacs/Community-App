@@ -8,7 +8,7 @@ class PL_Js_Helper {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin') );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'frontend') );
 		add_action( 'admin_head', array(__CLASS__, 'admin_menu_url') );
-		add_action( 'customize_controls_enqueue_scripts', array(__CLASS__, 'customizer') );
+//		add_action( 'customize_controls_enqueue_scripts', array(__CLASS__, 'customizer') );
 	}
 
 	public static function admin ($hook) {
@@ -164,7 +164,7 @@ class PL_Js_Helper {
 	}
 
 	public static function frontend () {
-		self::register_enqueue_if_not('general', trailingslashit(PL_JS_PUB_URL) . 'general.js', array('jquery'));
+		//self::register_enqueue_if_not('general', trailingslashit(PL_JS_PUB_URL) . 'general.js', array('jquery'));
 		// listings
 		self::register_enqueue_if_not('datatables', trailingslashit(PL_JS_LIB_URL) . 'datatables/jquery.dataTables.js', array('jquery'));
 		// favorites/contact form

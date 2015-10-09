@@ -51,7 +51,7 @@ class PL_Listing_Helper {
 				}
 			}
 		}
-		
+
 		// fetch single inactive listing if specifically requested
 		if (!empty($args['listing_ids']) && count($args['listing_ids']) == 1 && !isset($args['include_disabled'])) {
 			$args['include_disabled'] = 1;
@@ -66,26 +66,28 @@ class PL_Listing_Helper {
 			$args['purchase_types'] = array($args['purchase_types']);
 		}
 
-		/* REMOVE */
-		// if ($global_filters) {
-		// 	error_log("\n[[[AFTER:]]]\n" . var_export($args, true));
-		// }
-
-		// Respect block address setting if it's already set, otherwise, defer to the plugin setting...
-		if (empty($args['address_mode'])) {
-			$args['address_mode'] = ( PL_Option_Helper::get_block_address() ? 'polygon' : 'exact' );
-		}
+		// Avoid the data server's address_mode functionality
+		$address_mode = $args['address_mode'] ?: (PL_Option_Helper::get_block_address() ? 'polygon' : 'exact');
+		unset($args['address_mode']);
 
 		// Call the API with the given args...
 		$listings = PL_Listing::get($args);
+
 		// Make sure it contains listings, then process accordingly...
 		if (!empty($listings['listings'])) {
 			foreach ($listings['listings'] as $key => $listing) {
-				$listings['listings'][$key]['cur_data']['url'] = PL_Pages::get_url($listing['id'], $listing);
-				// add unit number to address: if unit has a space assume it contains a unit descriptor. handle case where it has # already
-				// TODO: consider moving to mls import
-				$listings['listings'][$key]['location']['address'] = $listing['location']['address'] . (empty($listing['location']['unit']) || strpos($listing['location']['address'], $listing['location']['unit'].' ')===0 ? '' : (strpos($listing['location']['unit'],' ')===false && substr($listing['location']['unit'], 0, 1)!='#' ? ' #' : ' ') . $listing['location']['unit']);
-				$listings['listings'][$key]['location']['full_address'] = $listings['listings'][$key]['location']['address'] . ' ' . $listing['location']['locality'] . ' ' . $listing['location']['region'];
+
+				// if the user wants "block" addresses, remove the street number (trying to catch known variations)
+				if($address_mode == 'polygon') {
+					$listing['location']['address'] = self::obscure_address($listing['location']['address']);
+				}
+				else if($listing['location']['unit']) {
+					$listing['location']['address'] = self::append_address_unit($listing['location']['address'], $listing['location']['unit']);
+				}
+
+				$listing['cur_data']['url'] = PL_Pages::get_url($listing['id'], $listing);
+				$listing['location']['full_address'] = $listing['location']['address'] . ' ' . $listing['location']['locality'] . ' ' . $listing['location']['region'];
+				$listings['listings'][$key] = $listing;
 			}
 		}
 
@@ -95,6 +97,17 @@ class PL_Listing_Helper {
 		}
 
 		return $listings;
+	}
+
+	public static function obscure_address($address) {
+		return preg_replace('{^([0-9]|# ?)([0-9A-Za-z]| ?([\#\&\-\/\,\.]|and) ?)* ([A-DF-MO-RT-Za-df-mo-rt-z] )?}', '', $address);
+	}
+
+	public static function append_address_unit($address, $unit) {
+		if(strpos($address, $unit . ' ') !== 0)
+			$address .= (strpos($unit, ' ') === false && substr($unit, 0, 1) != '#' ? ' #' : ' ') . $unit;
+
+		return $address;
 	}
 
 	public static function details ($args) {

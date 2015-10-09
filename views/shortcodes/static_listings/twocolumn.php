@@ -191,6 +191,7 @@ $template = array(
 	display: none !important;
 }
 .pl-tpl-stl-twocolumn .dataTables_length {
+	display: none !important;
 	float: right !important;
 	margin: -2.35em 1em 0 0 !important;
 	border: 0 !important;
