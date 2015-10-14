@@ -347,7 +347,7 @@ if(!$PL_API_LISTINGS) {
 		),
 		'create' => array(
 			'request' => array(
-				'url' => 'https://api.placester.com/v2/listings',
+				'url' => "$PL_API_SERVER/v2/listings",
 				'type' => 'POST'
 			),
 			'args' => array(
@@ -475,7 +475,7 @@ if(!$PL_API_LISTINGS) {
 					'dng_rm' => array('type' => 'checkbox', 'group' => 'Listing Amenities', 'label' => 'Dining Room'),
 					'brkfst_nk' => array('type' => 'checkbox', 'group' => 'Listing Amenities', 'label' => 'Breakfast Nook'),
 					'dshwsher' => array('type' => 'checkbox', 'group' => 'Listing Amenities', 'label' => 'Dishwasher'),
-					'refrig' => array('type' => 'checkbox', 'group' => 'Listing Amenities', 'label' => 'Refrigerator'),
+					'refrig' => array('type' => 'checkbox', 'group' => 'Listing Amenities', 'label' => 'refrigerator'),
 					'stve_ovn' => array('type' => 'checkbox', 'group' => 'Listing Amenities', 'label' => 'Stove/Oven'),
 					'stnstl_app' => array('type' => 'checkbox', 'group' => 'Listing Amenities', 'label' => 'Stainless Steel Appliances'),
 					'attic' => array('type' => 'checkbox', 'group' => 'Listing Amenities', 'label' => 'Attic'),
@@ -515,7 +515,7 @@ if(!$PL_API_LISTINGS) {
 		),
 		'temp_image' => array(
 			'request' => array(
-				'url' => 'https://api.placester.com/v2/listings/media/temp/image',
+				'url' => "$PL_API_SERVER/v2/listings/media/temp/image",
 				'type' => 'POST'
 			),
 			'args' => array(
@@ -525,7 +525,7 @@ if(!$PL_API_LISTINGS) {
 		),
 		'update' => array(
 			'request' => array(
-				'url' => 'https://api.placester.com/v2/listings',
+				'url' => "$PL_API_SERVER/v2/listings",
 				'type' => 'PUT'
 			),
 			'args' => array(),
@@ -533,7 +533,7 @@ if(!$PL_API_LISTINGS) {
 		),
 		'delete' => array(
 			'request' => array(
-				'url' => 'https://api.placester.com/v2/listings',
+				'url' => "$PL_API_SERVER/v2/listings",
 				'type' => 'DELETE'
 			),
 			'args' => array(
@@ -543,7 +543,7 @@ if(!$PL_API_LISTINGS) {
 		),
 		'get.locations' => array(
 			'request' => array(
-				'url' => 'https://api.placester.com/v2/listings/locations/',
+				'url' => "$PL_API_SERVER/v2/listings/locations/",
 				'type' => 'GET'
 			),
 			'args' => array(
@@ -562,7 +562,7 @@ if(!$PL_API_LISTINGS) {
 		),
 		'get.aggregate' => array(
 			'request' => array(
-				'url' => 'https://api.placester.com/v2.1/listings/aggregate/',
+				'url' => "$PL_API_SERVER/v2.1/listings/aggregate/",
 				'type' => 'GET'
 			),
 			'args' => array(
