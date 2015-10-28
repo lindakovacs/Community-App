@@ -17,6 +17,10 @@ class PL_API_Connection extends PL_Attribute_Map {
 		$this->custom_attributes = $this->read_custom_attributes();
 	}
 
+	public function get_api_key() {
+		return $this->$http_connection->API_KEY;
+	}
+
 	public function get_custom_attributes() {
 		return $this->custom_attributes;
 	}
@@ -151,13 +155,33 @@ class PL_API_Connection extends PL_Attribute_Map {
 	}
 
 	public function read_attribute_values($attribute, PL_Search_Filter $filter = null) {
-		if(is_scalar($attribute))
-			if(($attribute = $this->get_attribute($attribute)) && $attribute->aggregate_name) {
-				$request = 'keys[]=' . $attribute->aggregate_name;
-				if($filter) $filter = $filter->query_string();
-				if($data = $this->http_connection->SEARCH_AGGREGATE($request, $filter))
-					return $data->{$attribute->aggregate_name};
-			}
-		return null;
+		$keys = array();
+
+		// accepts an attribute name...
+		if(is_scalar($attribute) && ($object = $this->get_attribute($attribute)) && $object->aggregate_name)
+			$keys[$object->name] = $object->aggregate_name;
+
+		// ... or an array of names
+		else if(is_array($attribute))
+			foreach($attribute as $element)
+				if(is_scalar($element) && ($object = $this->get_attribute($element)) && $object->aggregate_name)
+					$keys[$object->name] = $object->aggregate_name;
+
+		if(empty($keys))
+			return null;
+
+		$request = 'keys[]=' . implode('&keys[]=', $keys);
+		if($filter) $filter = $filter->query_string();
+		$response = $this->http_connection->SEARCH_AGGREGATE($request, $filter);
+
+		foreach($keys as $name => $aggregate_name) {
+			natcasesort($response->{$aggregate_name});
+
+			$keys[$name] = array_values($response->{$aggregate_name});
+			while(trim($keys[$name][0]) === '')
+				array_shift($keys[$name]);
+		}
+
+		return is_array($attribute) ? $keys : $keys[$attribute];
 	}
 }

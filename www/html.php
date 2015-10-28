@@ -4,20 +4,32 @@
 class HTML_Element {
 	protected $element;
 	protected $attributes;
+	protected $contents;
 
 	public $id;
 	public $class;
 	public $style;
 
 	// abstract
-	protected function __construct($element) { $this->element = $element; $this->attributes = array(); }
+	protected function __construct($element) {
+		$this->element = $element;
+		$this->attributes = array();
+		$this->contents = null;
+	}
 
-	public function __to_string() { return $this->html_string(); }
+	public function __toString() { return $this->html_string(); }
 	public function html_string() {
 		$html = '<' . $this->element;
 		if($attributes = $this->html_attributes())
 			$html .= $attributes;
-		$html .= ">";
+		$html .= '>';
+
+		if($contents = $this->html_contents())
+			$html .= $contents;
+
+		if($contents || !is_null($this->contents))
+			$html .= "</$this->element>";
+
 		return $html;
 	}
 
@@ -48,51 +60,102 @@ class HTML_Element {
 
 		return $html;
 	}
-}
 
-class HTML_Compound_Element extends HTML_Element {
-	public function html_string() {
-		$html = parent::html_string();
-		$html .= $this->html_contents();
-		$html .= "</$this->element>";
-		return $html;
+	protected function html_content($content) {
+		if(is_object($content)) {
+			if(method_exists($content, 'html_string')) {
+				return $content->html_string(); }
+			else if(method_exists($content, '__toString')) {
+				return $content->__toString(); }
+		}
+
+		else if(is_scalar($content)) {
+			return $content; }
+
+		return "";
 	}
 
-	protected function html_contents() { return ""; }
+	protected function html_contents() {
+		$html = "";
+
+		if(is_array($this->contents) && !empty($this->contents)) {
+			foreach($this->contents as $content)
+				$html .= $this->html_content($content);
+			return $html;
+		}
+
+		return $this->html_content($this->contents);
+	}
 }
 
-class HTML_Input extends HTML_Element {
-	public $value;
 
-	protected function __construct($type, $name, $value) {
+class HTML_Div extends HTML_Element {
+	public function __construct($id = null) {
+		parent::__construct('div');
+		$this->id = $id;
+		$this->contents = array();
+	}
+
+	public function add_content($content) { $this->contents[] = $content; }
+}
+
+class HTML_Span extends HTML_Element {
+	public function __construct($id = null) {
+		parent::__construct('span');
+		$this->id = $id;
+		$this->contents = array();
+	}
+
+	public function add_content($content) { $this->contents[] = $content; }
+}
+
+
+class HTML_Form extends HTML_Element {
+	public $method;
+	public $target;
+
+	public function __construct($name, $action) {
+		parent::__construct('form');
+		$this->attributes['name'] = $name;
+		$this->attributes['action'] = $action;
+		$this->contents = array();
+	}
+
+	public function add_content($content) { $this->contents[] = $content; }
+}
+
+
+class HTML_Input extends HTML_Element {
+	protected function __construct($type, $name) {
 		parent::__construct('input');
 		$this->attributes['type'] = $type;
 		$this->attributes['name'] = $name;
-		$this->value = $value;
 	}
 }
 
+class HTML_Label extends HTML_Element {
+	public function __construct($for, $text) {
+		parent::__construct('label');
+		$this->attributes['for'] = $for;
+		$this->contents = is_null($text) ? "" : $text;
+	}
+}
+
+
 class HTML_Text_Input extends HTML_Input {
+	public $list;
+	public $value;
+
 	public function __construct($name, $value = null) {
-		parent::__construct('text', $name, $value);
+		parent::__construct('text', $name);
+		$this->value = $value;
 	}
 }
 
 class HTML_Hidden_Input extends HTML_Input {
 	public function __construct($name, $value) {
 		parent::__construct('hidden', $name, $value);
-	}
-}
-
-class HTML_Button_Input extends HTML_Input {
-	public function __construct($name, $value) {
-		parent::__construct('button', $name, $value);
-	}
-}
-
-class HTML_Submit_Input extends HTML_Input {
-	public function __construct($name, $value) {
-		parent::__construct('submit', $name, $value);
+		$this->attributes['value'] = $value;
 	}
 }
 
@@ -100,7 +163,8 @@ class HTML_Checkbox_Input extends HTML_Input {
 	public $checked;
 
 	public function __construct($name, $value, $checked = false) {
-		parent::__construct('checkbox', $name, $value);
+		parent::__construct('checkbox', $name);
+		$this->attributes['value'] = $value;
 		$this->checked = $checked;
 	}
 }
@@ -109,107 +173,98 @@ class HTML_Radio_Input extends HTML_Input {
 	public $checked;
 
 	public function __construct($name, $value, $checked = false) {
-		parent::__construct('radio', $name, $value);
+		parent::__construct('radio', $name);
+		$this->attributes['value'] = $value;
 		$this->checked = $checked;
 	}
 }
 
-class HTML_TextArea extends HTML_Compound_Element {
-	protected $text;
 
-	public function __construct($name, $text = null) {
-		parent::__construct('textarea');
-		$this->attributes['name'] = $name;
-		$this->text = $text;
+class HTML_Button extends HTML_Element {
+	public $name;
+	public $value;
+
+	public function __construct($label = "") {
+		parent::__construct('button');
+		$this->attributes['type'] = 'button';
+		$this->contents = $label;
 	}
-
-	public function set_text($text) { $this->text = $text; }
-	public function get_text() { return $this->text; }
-
-	protected function html_contents() { return $this->text; }
 }
 
-class HTML_Select extends HTML_Compound_Element {
-	protected $options;
-	public $multiple;
+class HTML_Submit_Button extends HTML_Button {
+	public function __construct($label = "Submit") {
+		parent::__construct($label);
+		$this->attributes['type'] = 'submit';
+	}
+}
+
+class HTML_Reset_Button extends HTML_Button {
+	public function __construct($label = "Reset") {
+		parent::__construct($label);
+		$this->attributes['type'] = 'reset';
+	}
+}
+
+
+class HTML_TextArea extends HTML_Element {
+	public function __construct($name, $text = "") {
+		parent::__construct('textarea');
+		$this->attributes['name'] = $name;
+		$this->contents = $text;
+	}
+}
+
+
+class HTML_Select extends HTML_Element {
 	public $size;
 
 	public function __construct($name, $multiple = false) {
 		parent::__construct('select');
 		$this->attributes['name'] = $name;
-		$this->options = array();
-		$this->multiple = $multiple;
+		$this->attributes['multiple'] = $multiple;
+		$this->contents = array();
 	}
 
-	public function add_option(HTML_Option $option) { $this->options[] = $option; }
-	public function get_options() { return $this->options; }
-	public function clear_options() { $this->options = array(); }
-
-	protected function html_contents() {
-		$html = "";
-		foreach($this->options as $option)
-			$html .= $option->html_string();
-
-		return $html;
-	}
+	public function add_content($content) { $this->contents[] = $content; }
 }
 
-class HTML_Option extends HTML_Compound_Element {
-	protected $text;
+class HTML_Option extends HTML_Element {
 	public $selected;
 
 	public function __construct($value, $text, $selected = false) {
 		parent::__construct('option');
 		$this->attributes['value'] = $value;
 		$this->selected = $selected;
-		$this->text = $text;
+		$this->contents = $text;
 	}
-
-	protected function html_contents() { return $this->text; }
 }
 
-class HTML_FieldSet extends HTML_Compound_Element {
+class HTML_Datalist extends HTML_Element {
+	public function __construct($id) {
+		parent::__construct('datalist');
+		$this->id = $id;
+		$this->contents = array();
+	}
+
+	public function add_content($content) { $this->contents[] = $content; }
+}
+
+
+class HTML_FieldSet extends HTML_Element {
 	protected $legend;
-	protected $fields;
 
 	public function __construct($legend) {
 		parent::__construct('fieldset');
-		$this->legend = is_a($legend, 'HTML_Legend') ? $legend : new HTML_Legend($legend);
+		$this->legend = (is_a($legend, 'HTML_Legend') ? $legend : new HTML_Legend($legend));
+		$this->contents = array($this->legend);
 	}
 
-	public function add_field(HTML_Element $field) { $this->fields[] = $field; }
-	public function get_fields() { return $this->fields; }
-	public function clear_fields() { $this->fields = array(); }
-
-	protected function html_contents() {
-		$html = $this->legend ? $this->legend->html_string() : "";
-		foreach($this->fields as $field)
-			$html .= $field->html_string();
-
-		return $html;
-	}
+	public function add_content($content) { $this->contents[] = $content; }
 }
 
-class HTML_Label extends HTML_Compound_Element {
-	protected $text;
-
-	public function __construct($for, $text) {
-		parent::__construct('label');
-		$this->attributes['for'] = $for;
-		$this->text = $text;
-	}
-
-	protected function html_contents() { return $this->text; }
-}
-
-class HTML_Legend extends HTML_Compound_Element {
-	protected $text;
-
+class HTML_Legend extends HTML_Element {
 	public function __construct($text) {
 		parent::__construct('legend');
-		$this->text = $text;
+		$this->contents = is_null($text) ? "" : $text;
 	}
-
-	protected function html_contents() { return $this->text; }
 }
-

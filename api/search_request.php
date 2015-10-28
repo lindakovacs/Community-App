@@ -7,10 +7,12 @@ require_once('search_view.php');
 
 
 class PL_Search_Request extends PL_Search_Filter {
+	protected $connection; // a duplicate pointer to parent member attributes -- to clarify its actual type
 	protected $view;
 
 	public function __construct(PL_API_Connection $connection, $args = null) {
 		parent::__construct($connection);
+		$this->connection = $connection;
 		$this->view = new PL_Search_View($connection);
 
 		if(is_array($args)) {
@@ -51,7 +53,7 @@ class PL_Search_Request extends PL_Search_Filter {
 		$filter_options = $this->get_filter_options_array(true);
 		if($filter_options[$option]) {
 			if(($attribute = $this->attributes->get_attribute($option)) && $attribute->type == PL_TEXT_VALUE)
-				return $this->attributes->read_attribute_values($attribute->name, $filter);
+				return $this->connection->read_attribute_values($attribute->name, $filter);
 			return array();
 		}
 
@@ -65,7 +67,7 @@ class PL_Search_Request extends PL_Search_Filter {
 
 		$filter_options = $this->get_filter_options_array(true);
 		if($filter_options[$option])
-			return $this->get_filter_option_values($option);
+			return $this->get_filter_option_values($option, $filter);
 
 		return null;
 	}

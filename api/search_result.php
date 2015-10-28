@@ -22,6 +22,11 @@ class PL_Search_Result implements Countable, ArrayAccess, Iterator {
 			return $this->listing_data->count;
 		return 0;
 	}
+	public function limit() {
+		if($this->listing_data && $this->listing_data->listings && $this->listing_data->limit)
+			return $this->listing_data->limit;
+		return 0;
+	}
 	public function total() {
 		if($this->listing_data && $this->listing_data->listings && $this->listing_data->total)
 			return $this->listing_data->total;

@@ -1,6 +1,9 @@
 <?php
 
 
+require_once('membership/membership.php');
+
+
 class PL_Compatibility_Plugin {
 	static $singleton;
 
@@ -8,11 +11,18 @@ class PL_Compatibility_Plugin {
 	protected $connection;
 
 	protected $global_filter;
+	protected $current_listing;
+	protected $custom_attributes;
 
 
 	public function __construct() {
-		if(!self::$singleton)
+		if(!self::$singleton) {
 			self::$singleton = $this;
+
+			// only if we need the compatibility api
+			PL_Membership::init();
+			wp_enqueue_script('membership');
+		}
 	}
 
 	public function get_api_key() {
@@ -24,9 +34,10 @@ class PL_Compatibility_Plugin {
 
 	public function get_connection() {
 		if(!isset($this->connection)) {
-			$this->connection = $this->get_api_key() ? new PL_API_Connection($this->get_api_key()) : null;
-			$this->connection->enable_attribute(array_keys($this->connection->get_standard_attributes()));
-			$this->connection->enable_attribute(array_keys($this->connection->get_custom_attributes()));
+			$this->connection = PL_WP_API_Connection::get_connection();
+//			$this->connection = $this->get_api_key() ? new PL_API_Connection($this->get_api_key()) : null;
+//			$this->connection->enable_attribute(array_keys($this->connection->get_standard_attributes()));
+//			$this->connection->enable_attribute(array_keys($this->connection->get_custom_attributes()));
 		}
 		return $this->connection;
 	}
@@ -38,17 +49,6 @@ class PL_Compatibility_Plugin {
 		return $this->global_filter;
 	}
 
-	public function get_post_listing() {
-		if(is_singular('property')) {
-			global $pl_wp_site;
-			global $wp_query;
-
-			$listings = $pl_wp_site->get_query_results($wp_query);
-			return $this->convert_listing($listings[0]);
-		}
-		return null;
-	}
-
 	public function get_search_listings($query_string, $use_global_filter) {
 		$search_request = $this->convert_request_params($query_string);
 		if($use_global_filter)
@@ -58,12 +58,52 @@ class PL_Compatibility_Plugin {
 		return $this->convert_search_result($search_result);
 	}
 
+	public function get_current_listing() {
+		if(!isset($this->current_listing) && is_singular('property')) {
+			global $pl_wp_site;
+			global $wp_query;
+
+			$listings = $pl_wp_site->get_query_results($wp_query);
+			$this->current_listing = $this->convert_listing($listings[0]);
+		}
+		return $this->current_listing;
+	}
+
+	public function get_custom_attributes() {
+		if(!isset($this->custom_attributes)) {
+			$this->custom_attributes = array();
+			foreach($this->get_connection()->get_custom_attributes() as $attribute)
+				$this->custom_attributes[$attribute->name] = $attribute->display_name;
+		}
+		return $this->custom_attributes;
+	}
+
+	public function get_attribute_values($attribute, $use_global_filter, $as_menu = false) {
+		$filter = $use_global_filter ? $this->get_global_filter() : null;
+		$result = $this->get_connection()->read_attribute_values($attribute, $filter);
+
+		if(!$result)
+			return array();
+
+		if(is_scalar($attribute) && $as_menu)
+			$result = array_merge(array('' => 'Any'), array_combine($result, $result));
+
+		return $result;
+	}
+
 
 	protected function convert_listing(PL_Listing $listing) {
 		$json = $listing ? $listing->json_string() : null;
 		$data = json_decode($json, true); // associative array format
 
 		$data['cur_data']['url'] = home_url('property/' . $listing->pdx_id);
+		$data['location']['full_address'] = $data['location']['address'] . ' ' . $data['location']['locality'] . ' ' . $data['location']['region'];
+
+		if($unit = $data['location']['unit'])
+			if(strpos($data['location']['address'], $unit . ' ') !== 0) {
+				$prefix = (strpos($unit, ' ') === false && substr($unit, 0, 1) != '#') ? ' #' : ' ';
+				$data['location']['address'] = $data['location']['address'] . $prefix . $unit;
+			}
 
 		return $data;
 	}
@@ -73,7 +113,9 @@ class PL_Compatibility_Plugin {
 		$result_array['total'] = $result->total();
 		$result_array['offset'] = $result->offset();
 		$result_array['count'] = $result->count();
+		$result_array['limit'] = $result->limit();
 
+		$result_array['listings'] = array();
 		foreach($result as $listing)
 			$result_array['listings'][] = $this->convert_listing($listing);
 
