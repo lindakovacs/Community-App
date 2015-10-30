@@ -68,7 +68,7 @@ class PL_Listing_Helper {
 
 		// Avoid the data server's address_mode functionality
 		$address_mode = $args['address_mode'] ?: (PL_Option_Helper::get_block_address() ? 'polygon' : 'exact');
-		unset($args['address_mode']);
+		$args['address_mode'] = 'exact'; // this overrides the server-side account setting
 
 		// Call the API with the given args...
 		$listings = PL_Listing::get($args);
