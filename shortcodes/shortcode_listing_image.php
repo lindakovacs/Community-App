@@ -9,8 +9,8 @@ Author URI: https://www.placester.com/
  */
 
 
-require_once(BUILDER . 'api/listing_image.php');
-require_once(BUILDER . 'www/image.php');
+require_once(BUILDER_DIR . 'api/listing_image.php');
+require_once(BUILDER_DIR . 'www/image.php');
 
 
 class PL_Shortcode_Listing_Image extends PL_Shortcode_Handler {

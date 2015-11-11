@@ -9,7 +9,7 @@ Author URI: https://www.placester.com/
  */
 
 
-require_once(BUILDER . 'api/listing.php');
+require_once(BUILDER_DIR . 'api/listing.php');
 require_once('shortcode_listing_image.php');
 
 

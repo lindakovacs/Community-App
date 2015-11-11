@@ -9,7 +9,7 @@ Author URI: https://www.placester.com/
  */
 
 
-require_once(BUILDER . 'api/search_result.php');
+require_once(BUILDER_DIR . 'api/search_result.php');
 require_once('shortcode_listing.php');
 
 
@@ -30,6 +30,14 @@ class PL_Shortcode_Search_Result extends PL_Shortcode_Handler {
 	static public function register_shortcodes(PL_Shortcode_Dispatcher $dispatcher) {
 		$dispatcher->register_shortcode('listing', __CLASS__, 'listing_shortcode');
 		$dispatcher->register_shortcode('foreach:listing', __CLASS__, 'foreach_listing_shortcode');
+
+		$dispatcher->register_shortcode('search:total', __CLASS__, 'search_total_shortcode');
+		$dispatcher->register_shortcode('search:limit', __CLASS__, 'search_limit_shortcode');
+		$dispatcher->register_shortcode('search:count', __CLASS__, 'search_count_shortcode');
+
+		$dispatcher->register_shortcode('search:page', __CLASS__, 'search_page_shortcode');
+		$dispatcher->register_shortcode('search:first', __CLASS__, 'search_first_shortcode');
+		$dispatcher->register_shortcode('search:last', __CLASS__, 'search_last_shortcode');
 	}
 
 	public function __construct(PL_Search_Result $current_result) {

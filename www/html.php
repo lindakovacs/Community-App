@@ -1,7 +1,12 @@
 <?php
 
 
-class HTML_Element {
+interface HTML {
+	public function __toString();
+	public function html_string();
+}
+
+class HTML_Element implements HTML {
 	protected $element;
 	protected $attributes;
 	protected $contents;
@@ -17,6 +22,10 @@ class HTML_Element {
 		$this->contents = null;
 	}
 
+	// read-only access to protected attributes
+	public function __get($name) { return $this->attributes[$name]; }
+
+	// render html
 	public function __toString() { return $this->html_string(); }
 	public function html_string() {
 		$html = '<' . $this->element;
@@ -219,6 +228,9 @@ class HTML_Select extends HTML_Element {
 	public $size;
 
 	public function __construct($name, $multiple = false) {
+		if($multiple && substr($name, -2) != '[]')
+			$name .= '[]';
+
 		parent::__construct('select');
 		$this->attributes['name'] = $name;
 		$this->attributes['multiple'] = $multiple;

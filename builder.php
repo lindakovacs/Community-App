@@ -10,19 +10,18 @@ Author URI: https://www.placester.com/
  */
 
 
-define('BUILDER', __DIR__ . '/');
+define('BUILDER_DIR', __DIR__ . '/');
+define('BUILDER_FILE', __FILE__);
 
-require_once(BUILDER . 'wp/wp_site.php');
+require_once(BUILDER_DIR . 'wp/wp_site.php');
 
 $pl_wp_site = new PL_WP_Site();
-register_activation_hook(__FILE__, array('PL_WP_Site', 'wp_activate_plugin'));
-register_deactivation_hook(__FILE__, array('PL_WP_Site', 'wp_deactivate_plugin'));
 
 
 //---
 
 
-require_once(BUILDER . 'transitional/compatibility-api.php');
+require_once(BUILDER_DIR . 'transitional/compatibility-api.php');
 
 if(defined(PL_TRANSITIONAL) && PL_TRANSITIONAL) :
 	$pl_compatibility_plugin = new PL_Compatibility_Plugin();

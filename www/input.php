@@ -4,217 +4,226 @@
 require_once('html.php');
 
 
-interface PL_Search_Element {
-	public function set_value($value);
-	public function get_value();
+class PL_POST_Element implements HTML {
+	protected static $incoming_data; // incoming post data overrides element values supplied in constructors
+	protected static $outgoing_data; // filtered incoming post data, or defaults, for defined search elements
+	protected $html;
+
+	public function __toString() { return $this->html ? $this->html->html_string() : ''; }
+	public function html_string() { return $this->html ? $this->html->html_string() : ''; }
 }
 
 
-class PL_Text_Input extends HTML_Text_Input implements PL_Search_Element {
-	protected $container;
+class PL_Text_Input extends PL_POST_Element {
+	protected $name;
 	protected $label;
+	protected $input;
 
 	// HTML5 auto-completion
 	protected $datalist;
 
-	public function __construct($name, $label, $value = "") {
-		parent::__construct($name, $value);
-		$this->label = new HTML_Label($name, $label);
+	public function __construct($name, $label, $value = null) {
+		if(self::$incoming_data) $value = self::$incoming_data[$name];
 
-		$this->container = new HTML_Div();
-		$this->container->add_content($this->label);
-		$this->container->add_content($this);
+		if(!$value && !is_numeric($value) || !is_scalar($value))
+			$value = null;
+
+		self::$outgoing_data[$name] = $value;
+
+		$this->name = $name;
+		$this->label = new HTML_Label($name, $label);
+		$this->input = new HTML_Text_Input($name, $value);
+
+		$this->html = new HTML_Div();
+		$this->html->add_content($this->label);
+		$this->html->add_content($this->input);
 	}
 
 	public function add_option($text) {
 		if(!$this->datalist) {
-			$list = $this->attributes['name'] . '-datalist';
-			$this->attributes['list'] = $list;
-			$this->datalist = new HTML_Datalist($list);
-			$this->container->add_content($this->datalist);
+			$this->input->list = $this->name . '-datalist';
+			$this->datalist = new HTML_Datalist($this->input->list);
+			$this->html->add_content($this->datalist);
 		}
 
 		$this->datalist->add_content(new HTML_Option($text, $text));
 	}
-
-	public function get_value() { return $this->value; }
-	public function set_value($value) {
-		if(is_array($value)) $value = current($value);
-		$this->value = $value;
-	}
-
-	public function html_string() {
-		static $recursion = false;
-		if($recursion)
-			return parent::html_string();
-
-		$recursion = true;
-		$html = $this->container->html_string();
-		$recursion = false;
-
-		return $html;
-	}
 }
 
-class PL_Radio_Input extends HTML_Radio_Input implements PL_Search_Element {
-	protected $container;
+class PL_Checkbox_Input extends PL_POST_Element {
 	protected $label;
+	protected $checkbox;
 
 	public function __construct($name, $value, $label, $checked = false) {
-		parent::__construct($name, $value, $checked);
+		if(!$value && !is_numeric($value))
+			$value = false;
+		else if(!is_scalar($value))
+			$value = true;
+
+		if(self::$incoming_data) {
+			if($value === true && self::$incoming_data[$name] === '_ne_null')
+				$checked = true;
+			else if($value === false && self::$incoming_data[$name] === '_eq_null')
+				$checked = true;
+			else if(is_scalar(self::$incoming_data[$name]) && $value === self::$incoming_data[$name])
+				$checked = true;
+			else if(is_array(self::$incoming_data[$name]) && in_array($value, self::$incoming_data[$name], true))
+				$checked = true;
+			else
+				$checked = false;
+		}
+
+		if($checked) {
+			if(is_bool($value)) {
+				self::$outgoing_data[$name . '_match'] = 'exist';
+				self::$outgoing_data[$name] = ($value ? 1 : 0);
+			}
+			else
+				self::$outgoing_data[$name] = $value;
+		}
+
+		if($value === true)
+			$value = '_ne_null';
+		else if($value === false)
+			$value = '_eq_null';
+
 		$this->label = new HTML_Label($name, $label);
+		$this->checkbox = new HTML_Checkbox_Input($name, $value, $checked);
 
-		$this->container = new HTML_Div();
-		$this->container->add_content($this);
-		$this->container->add_content($this->label);
-	}
-
-	public function get_value() {
-		return $this->attributes['checked'] ? $this->attributes['value'] : null;
-	}
-
-	public function set_value($value) {
-		if(is_array($value)) $value = current($value);
-		$this->attributes['checked'] = ($this->value === $value);
-	}
-
-	public function html_string() {
-		static $recursion = false;
-		if($recursion)
-			return parent::html_string();
-
-		$recursion = true;
-		$html = $this->container->html_string();
-		$recursion = false;
-
-		return $html;
+		$this->html = new HTML_Div();
+		$this->html->add_content($this->checkbox);
+		$this->html->add_content($this->label);
 	}
 }
 
-class PL_Checkbox_Input extends HTML_Checkbox_Input implements PL_Search_Element {
-	protected $container;
+class PL_Select extends PL_POST_Element {
+	protected $name;
 	protected $label;
+	protected $select;
 
-	public function __construct($name, $value, $label, $checked = false) {
-		parent::__construct($name, $value, $checked);
-		$this->label = new HTML_Label($name, $label);
-
-		$this->container = new HTML_Div();
-		$this->container->add_content($this);
-		$this->container->add_content($this->label);
-	}
-
-	public function get_value() {
-		return $this->attributes['checked'] ? $this->attributes['value'] : null;
-	}
-
-	public function set_value($value) {
-		if(is_scalar($value)) $value = array($value);
-		$this->attributes['checked'] = in_array($this->value, $value, true);
-	}
-
-	public function html_string() {
-		static $recursion = false;
-		if($recursion)
-			return parent::html_string();
-
-		$recursion = true;
-		$html = $this->container->html_string();
-		$recursion = false;
-
-		return $html;
-	}
-}
-
-class PL_Select extends HTML_Select implements PL_Search_Element {
-	protected $container;
-	protected $label;
+	protected $multiple;
+	protected $selection;
 
 	public function __construct($name, $label, $multiple = false) {
-		parent::__construct($name, $multiple);
+		$this->name = $name;
+		if($this->multiple = $multiple)
+			$name = $name . '[]';
+
 		$this->label = new HTML_Label($name, $label);
+		$this->select = new HTML_Select($name, $multiple);
 
-		$this->container = new HTML_Div();
-		$this->container->add_content($this->label);
-		$this->container->add_content($this);
+		$this->html = new HTML_Div();
+		$this->html->add_content($this->label);
+		$this->html->add_content($this->select);
 	}
 
 	public function add_option($value, $text, $selected = false) {
-		$this->add_content(new HTML_Option($value, $text, $selected));
-	}
-
-	public function set_value($value) {}
-	public function get_value() {}
-
-	public function html_string() {
-		static $recursion = false;
-		if($recursion)
-			return parent::html_string();
-
-		$recursion = true;
-		$html = $this->container->html_string();
-		$recursion = false;
-
-		return $html;
-	}
-}
-
-class PL_Radio_Select extends HTML_FieldSet implements PL_Search_Element {
-	protected $name;
-
-	public function __construct($name, $label) {
-		parent::__construct($label);
-		$this->name = $name;
-	}
-
-	public function add_option($value, $text, $selected = false) {
-		$this->add_content(new PL_Radio_Input($this->name, $value, $text, $selected));
-	}
-
-	public function get_value() {
-		$value = null;
-		foreach($this->contents as $child) if(is_a($child, 'PL_Radio_Input')) {
-			if(is_null($value))
-				$value = $child->get_value(); // find the first checked radio
+		if(!$value && !is_numeric($value))
+			if(!$this->multiple)
+				$value = '';
 			else
-				$child->set_value(null); // uncheck the rest
-		}
-		return $value;
-	}
+				return;
+		else if(!is_scalar($value))
+			return;
 
-	public function set_value($value) {
-		if(is_array($value)) $value = current($value);
-		foreach($this->contents as $child) if(is_a($child, 'PL_Radio_Input')) {
-			$child->set_value($value);
+		if($this->multiple || !$this->selection) {
+			if(self::$incoming_data) {
+				if(is_null(self::$incoming_data[$this->name]) && $value === '')
+					$selected = true;
+				else if(is_scalar(self::$incoming_data[$this->name]) && $value === self::$incoming_data[$this->name])
+					$selected = true;
+				else if(is_array(self::$incoming_data[$this->name]) && in_array($value, self::$incoming_data[$this->name], true))
+					$selected = true;
+				else
+					$selected = false;
+			}
 		}
+		else
+			$selected = false;
+
+		if($selected) {
+			$this->selection = true;
+			if($value !== '')
+				if(!$this->multiple)
+					self::$outgoing_data[$this->name] = $value;
+				else
+					self::$outgoing_data[$this->name][] = $value;
+		}
+
+		$this->select->add_content(new HTML_Option($value, $text, $selected));
 	}
 }
 
-class PL_Checkbox_Select extends HTML_FieldSet implements PL_Search_Element {
+class PL_Radio_Select extends PL_POST_Element {
 	protected $name;
+	protected $selection;
 
 	public function __construct($name, $label) {
-		parent::__construct($label);
+		$this->html = new HTML_FieldSet($label);
 		$this->name = $name;
 	}
 
 	public function add_option($value, $text, $selected = false) {
-		$this->add_content(new PL_Checkbox_Input($this->name, $value, $text, $selected));
+		if(!$value && !is_numeric($value))
+			$value = '';
+		else if(!is_scalar($value))
+			return;
+
+		if(!$this->selection) {
+			if(self::$incoming_data) {
+				if(is_null(self::$incoming_data[$this->name]) && $value === '')
+					$selected = true;
+				else if(is_scalar(self::$incoming_data[$this->name]) && $value === self::$incoming_data[$this->name])
+					$selected = true;
+				else if(is_array(self::$incoming_data[$this->name]) && in_array($value, self::$incoming_data[$this->name], true))
+					$selected = true;
+				else
+					$selected = false;
+			}
+		}
+		else
+			$selected = false;
+
+		if($selected) {
+			$this->selection = true;
+			if($value !== '')
+				self::$outgoing_data[$this->name] = $value;
+		}
+
+		$this->html->add_content($radio = new HTML_Div());
+		$radio->add_content(new HTML_Radio_Input($this->name, $value, $selected));
+		$radio->add_content(new HTML_Label($this->name, $text));
+	}
+}
+
+class PL_Checkbox_Select extends PL_POST_Element {
+	protected $name;
+
+	public function __construct($name, $label) {
+		$this->html = new HTML_FieldSet($label);
+		$this->name = $name;
 	}
 
-	public function get_value() {
-		$value = array();
-		foreach($this->contents as $child) if(is_a($child, 'PL_Checkbox_Input')) {
-			$val = $child->get_value();
-			if(!is_null($val)) $value[] = $val;
-		}
-		return count($value) > 1 ? $value : current($value);
-	}
+	public function add_option($value, $text, $selected = false) {
+		if(!$value && !is_numeric($value) || !is_scalar($value))
+			return;
 
-	public function set_value($value) {
-		if(!is_array($value)) $value = array($value);
-		foreach($this->contents as $child) if(is_a($child, 'PL_Checkbox_Input')) {
-			$child->set_value($value);
+		if(self::$incoming_data) {
+			if(is_scalar(self::$incoming_data[$this->name]) && $value === self::$incoming_data[$this->name])
+				$selected = true;
+			else if(is_array(self::$incoming_data[$this->name]) && in_array($value, self::$incoming_data[$this->name], true))
+				$selected = true;
+			else
+				$selected = false;
 		}
+
+		if($selected) {
+			$this->selection = true;
+			self::$outgoing_data[$this->name][] = $value;
+		}
+
+		$this->html->add_content($checkbox = new HTML_Div());
+		$checkbox->add_content(new HTML_Checkbox_Input($this->name . '[]', $value, $selected));
+		$checkbox->add_content(new HTML_Label($this->name, $text));
 	}
 }

@@ -31,6 +31,8 @@ class PL_Search_Request extends PL_Search_Filter {
 		$filter->empty = $this->empty;
 		$filter->error = $this->error;
 		$filter->closed = $this->closed;
+
+		return $filter;
 	}
 
 	public function set_filter(PL_Search_Filter $filter) {

@@ -1,43 +1,43 @@
 <?php
 
 
-require_once(BUILDER . 'api/connection.php');
+require_once(BUILDER_DIR . 'api/search_context.php');
 require_once('input.php');
 
 
-class PL_Page_Context extends PL_Search_Request {
-	public function __construct(PL_API_Connection $connection, PL_Search_Filter $filter = null) {
-		parent::__construct($connection);
-		$this->set_filter($filter);
-	}
+class PL_Search_Form extends PL_POST_Element {
+	protected $context; // a connection with external filters limiting menu and auto-suggest choices
 
-	public function get_connection() { return $this->connection; }
-}
-
-class PL_Search_Form extends PL_Search_Request {
-	protected $context; // may have an external filter limiting menu and auto-suggest choices
-	protected $elements;
 	protected $form;
+	protected $elements;
 
-	public function __construct(PL_Page_Context $context, $template = null, $postdata = null) {
-		parent::__construct($context->connection);
+	protected $request;
+	protected $request_data;
+
+	public function __construct(PL_Search_Context $context, $template = null, $post_data = null) {
+		$this->context = $context;
+
+		self::$incoming_data = $post_data; // element constructors access this
+		self::$outgoing_data = array();
+
+		$this->html = $this->form = new HTML_Form('pl_search_form', get_permalink());
+		$this->form->method = 'POST';
 		$this->elements = array();
-		$this->form = new HTML_Form('pl_search_form', 'http://awesome.placeter.net');
 
 		$group = new HTML_FieldSet('Location');
-		$group->add_content($this->elements['locality'] = $this->get_search_filter_menu('locality'));
+		$group->add_content($this->elements['locality'] = $this->get_search_filter_entry('locality', array('datalist' => true)));
 		$group->add_content($this->elements['region'] = $this->get_search_filter_menu('region'));
 		$group->add_content($this->elements['postal'] = $this->get_search_filter_menu('postal'));
 		$this->form->add_content($group);
 
 		$group = new HTML_FieldSet('Listing Type');
 		$group->add_content($this->elements['purchase_type'] = $this->get_search_filter_menu('purchase_type'));
-		$group->add_content($this->elements['property_type'] = $this->get_search_filter_menu('property_type'));
-		$group->add_content($this->elements['zoning_type'] = $this->get_search_filter_menu('zoning_type'));
+		$group->add_content($this->elements['property_type'] = $this->get_search_filter_menu('property_type', array('type' => 'checkbox')));
+		$group->add_content($this->elements['zoning_type'] = $this->get_search_filter_menu('zoning_type', array('type' => 'radio')));
 		$this->form->add_content($group);
 
 		$group = new HTML_FieldSet('Price Range');
-		$group->add_content($this->elements['min_price'] = $this->get_search_filter_menu('min_price'));
+		$group->add_content($this->elements['min_price'] = $this->get_search_filter_menu('min_price', array('options' => array('1.0', '2.0', '3.0', '4.0'))));
 		$group->add_content($this->elements['max_price'] = $this->get_search_filter_menu('max_price'));
 		$this->form->add_content($group);
 
@@ -46,9 +46,20 @@ class PL_Search_Form extends PL_Search_Request {
 		$group->add_content($this->elements['min_baths'] = $this->get_search_filter_menu('min_baths'));
 		$this->form->add_content($group);
 
-		if($postdata) {
+		$this->form->add_content(new HTML_Submit_Button());
 
-		}
+		$this->request_data = self::$outgoing_data;
+		self::$incoming_data = self::$outgoing_data = null;
+	}
+
+	public function get_search_data() {
+		return $this->request_data;
+	}
+
+	public function get_search_request() {
+		if(!$this->request)
+			$this->request = new PL_Search_Request($this->context->get_connection(), $this->get_search_data());
+		return $this->request;
 	}
 
 	public function get_search_filter_checkbox($filter_option, $checkbox_config = null) {
@@ -60,7 +71,7 @@ class PL_Search_Form extends PL_Search_Request {
 		if(is_array($entry_config))
 			extract($entry_config, EXTR_IF_EXISTS);
 
-		$filter_options = $this->connection->get_filter_attributes();
+		$filter_options = $this->context->get_connection()->get_filter_attributes();
 		if(!($attribute = $filter_options[$filter_option]))
 			return null;
 
@@ -74,7 +85,7 @@ class PL_Search_Form extends PL_Search_Request {
 
 		if(!is_array($datalist)) {
 			if($datalist)
-				$datalist = $this->connection->read_attribute_values($attribute->name, $this->context);
+				$datalist = $this->context->get_filter_option_values($attribute->name);
 			else
 				$datalist = array();
 		}
@@ -86,16 +97,12 @@ class PL_Search_Form extends PL_Search_Request {
 		return $element;
 	}
 
-	private static function is_selected($option, $selected) {
-		return false;
-	}
-
 	public function get_search_filter_menu($filter_option, $menu_config = null) {
 		$type = 'select'; $label = true; $options = true; $selected = null; $display_values = array();
 		if(is_array($menu_config))
 			extract($menu_config, EXTR_IF_EXISTS);
 
-		$filter_options = $this->connection->get_filter_attributes();
+		$filter_options = $this->context->get_connection()->get_filter_attributes();
 		if(!($attribute = $filter_options[$filter_option]))
 			return null;
 
@@ -107,27 +114,25 @@ class PL_Search_Form extends PL_Search_Request {
 				$label = 'Max ' . $label;
 		}
 
-		if(!is_array($options)) {
-			if($options)
-				$options = $this->connection->read_attribute_values($attribute->name, $this->filter);
-			else
-				$options = array();
-		}
+		if(!is_array($options) && $options)
+			$options = $this->context->get_filter_option_values($attribute->name);
 
-		$default_values = array_combine($options, $options);
-		$display_values = array_replace($default_values, $display_values);
+		if($options)
+			$display_values = array_replace(array_combine($options, $options), $display_values);
+		else
+			$display_values = $options = array();
 
 		switch($type) {
 			case 'select':
 				$menu = new PL_Select($filter_option, $label, false);
-				$menu->add_option('', 'Any', self::is_selected('', $selected));
+				$menu->add_option('', 'Any', true);
 				break;
 			case 'multiple':
 				$menu = new PL_Select($filter_option, $label, true);
 				break;
 			case 'radio':
 				$menu = new PL_Radio_Select($filter_option, $label);
-				$menu->add_option('', 'Any', self::is_selected('', $selected));
+				$menu->add_option('', 'Any', true);
 				break;
 			case 'checkbox':
 				$menu = new PL_Checkbox_Select($filter_option, $label);
@@ -137,10 +142,8 @@ class PL_Search_Form extends PL_Search_Request {
 		}
 
 		foreach($options as $option)
-			$menu->add_option($option, $display_values[$option], self::is_selected($option, $selected));
+			$menu->add_option($option, $display_values[$option], false);
 
 		return $menu;
 	}
-
-	public function html_string() { return $this->form->html_string(); }
 }

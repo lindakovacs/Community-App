@@ -1,7 +1,7 @@
 <?php
 
 
-require_once(BUILDER . 'api/connection.php');
+require_once(BUILDER_DIR . 'api/connection.php');
 
 
 class PL_Shortcode_Handler {
@@ -103,53 +103,36 @@ class PL_Shortcode_Dispatcher {
 }
 
 
-class PL_Shortcode_Context {
+class PL_Shortcode_System {
 	static protected $dispatcher;
-	protected $handler;
 
-	public function __construct(PL_Shortcode_Handler $handler) {
-		if(self::$dispatcher) {
-			self::$dispatcher->attach_handler(get_class($handler), $handler);
-			$this->handler = $handler;
-		}
-	}
-
-	public function __destruct() {
-		if(self::$dispatcher)
-			self::$dispatcher->detach_handler(get_class($this->handler), $this->handler);
-	}
-
-	public function __get($property) {
-		switch($property) {
-			case 'dispatcher':
-				return self::$dispatcher;
-			case 'handler':
-				return $this->handler;
-		}
-
-		return null;
-	}
-}
-
-
-class PL_Shortcode_System extends PL_Shortcode_Context {
-	static public function initialize() {
-		return self::$dispatcher = new PL_Shortcode_Dispatcher();
+	public function __construct() {
+		if(!self::$dispatcher)
+			self::$dispatcher = new PL_Shortcode_Dispatcher();
 	}
 
 	static public function register_handler($class) {
 		self::$dispatcher->register_handler($class);
 	}
 
-	public function __construct() {}
-	public function __destruct() {}
+	public function attach_handler(PL_Shortcode_Handler $handler) {
+		self::$dispatcher->attach_handler(get_class($handler), $handler);
+	}
 
-	public function __get($property) {
-		switch($property) {
-			case 'dispatcher':
-				return self::$dispatcher;
-		}
+	public function detach_handler(PL_Shortcode_Handler $handler) {
+		self::$dispatcher->detach_handler(get_class($handler), $handler);
+	}
+}
 
-		return null;
+
+class PL_Shortcode_Context extends PL_Shortcode_System {
+	protected $handler;
+
+	public function __construct(PL_Shortcode_Handler $handler) {
+		$this->attach_handler($this->handler = $handler);
+	}
+
+	public function __destruct() {
+		$this->detach_handler($this->handler);
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 
 
-require_once(BUILDER . 'api/connection.php');
+require_once(BUILDER_DIR . 'api/connection.php');
 
 
 class PL_API_Config {
