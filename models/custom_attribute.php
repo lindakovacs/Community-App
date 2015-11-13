@@ -14,23 +14,25 @@ class PL_Custom_Attributes {
 		$config = PL_Config::PL_API_CUST_ATTR('get');
 		$request = array_merge(array( "api_key" => PL_Option_Helper::api_key()), PL_Validate::request($args, $config['args']));
 		$response = PL_HTTP::send_request($config['request']['url'], $request);
-		// error_log(var_export($response, true));
+
+		$attributes = array();
 		if ($response) {
-			foreach ($response as $attribute => $value) {
-		 		$response[$attribute] = PL_Validate::attributes($value, $config['returns']);
+			global $PL_API_LISTINGS; // config/api/listings.php
+			$metadata = $PL_API_LISTINGS['get']['args']['metadata'];
+
+			foreach ($response as $attribute) {
+				if(is_array($attribute) && !$metadata[$attribute['key']]) // skip attributes that have already been explicitly defined
+					$attributes[] = PL_Validate::attributes($attribute, $config['returns']);
 		 	}
-		}
-		else {
-			$response = array();
 		}
 
 		// Memoize response if args array is empty...
 		if (empty($args)) {
 			// error_log("Memoizing custom_attributes...");
-			self::$get_memo = $response;
+			self::$get_memo = $attributes;
 		}
 		
-		return $response;
+		return $attributes;
 	}
 
 //end class
