@@ -9,6 +9,7 @@ require_once('display_attribute.php');
 class PL_Display_Listing extends PL_Listing {
 	protected $display;
 
+	public function __get($name) { return $this->get_display_value($name); }
 	public function get_display_value($name) {
 		if(isset($this->display[$name]))
 			return $this->display[$name];
@@ -22,7 +23,7 @@ class PL_Display_Listing extends PL_Listing {
 			if(is_a($attribute, 'PL_Display_Attribute') && $attribute->format)
 				$value = $attribute->format->format($value);
 
-			else switch($this->type) { // fallback formats
+			else switch($attribute->type) { // fallback formats
 				case PL_BOOLEAN:
 					static $default_boolean_format;
 					if(!$default_boolean_format)
