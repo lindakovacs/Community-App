@@ -31,13 +31,13 @@ class PL_Shortcode_Search_Result extends PL_Shortcode_Handler {
 		$dispatcher->register_shortcode('listing', __CLASS__, 'listing_shortcode');
 		$dispatcher->register_shortcode('foreach:listing', __CLASS__, 'foreach_listing_shortcode');
 
-		$dispatcher->register_shortcode('search:total', __CLASS__, 'search_total_shortcode');
-		$dispatcher->register_shortcode('search:limit', __CLASS__, 'search_limit_shortcode');
-		$dispatcher->register_shortcode('search:count', __CLASS__, 'search_count_shortcode');
+		$dispatcher->register_shortcode('total', __CLASS__, 'total_shortcode');
+		$dispatcher->register_shortcode('limit', __CLASS__, 'limit_shortcode');
+		$dispatcher->register_shortcode('count', __CLASS__, 'count_shortcode');
 
-		$dispatcher->register_shortcode('search:page', __CLASS__, 'search_page_shortcode');
-		$dispatcher->register_shortcode('search:first', __CLASS__, 'search_first_shortcode');
-		$dispatcher->register_shortcode('search:last', __CLASS__, 'search_last_shortcode');
+		$dispatcher->register_shortcode('page', __CLASS__, 'page_shortcode');
+		$dispatcher->register_shortcode('first', __CLASS__, 'first_shortcode');
+		$dispatcher->register_shortcode('last', __CLASS__, 'last_shortcode');
 	}
 
 	public function __construct(PL_Search_Result $current_result) {
@@ -95,5 +95,19 @@ class PL_Shortcode_Search_Result extends PL_Shortcode_Handler {
 
 		$this->listing_context = null;
 		return $output;
+	}
+
+	public function total_shortcode($args, $content, $shortcode) { return $this->current_result->total(); }
+	public function limit_shortcode($args, $content, $shortcode) { return $this->current_result->limit(); }
+	public function count_shortcode($args, $content, $shortcode) { return $this->current_result->count(); }
+
+	public function page_shortcode($args, $content, $shortcode) {
+		return $this->current_result->count() ? intval($this->current_result->offset() / $this->current_result->limit()) + 1 : 0;
+	}
+	public function first_shortcode($args, $content, $shortcode) {
+		return $this->current_result->count() ? $this->current_result->offset() + 1 : 0;
+	}
+	public function last_shortcode($args, $content, $shortcode) {
+		return $this->current_result->count() ? $this->current_result->offset() + $this->current_result->count() : 0;
 	}
 }

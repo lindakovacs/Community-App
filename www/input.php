@@ -28,7 +28,7 @@ class PL_Text_Input extends PL_POST_Element {
 		if(!$value && !is_numeric($value) || !is_scalar($value))
 			$value = null;
 
-		self::$outgoing_data[$name] = $value;
+		if(!is_null($value)) self::$outgoing_data[$name] = $value;
 
 		$this->name = $name;
 		$this->label = new HTML_Label($name, $label);

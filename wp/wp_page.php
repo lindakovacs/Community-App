@@ -18,30 +18,54 @@ class PL_WP_Page extends PL_Page_Context {
 
 		if($_SERVER['REQUEST_METHOD'] === 'POST') {
 			$this->form = new PL_Search_Form($this, null, $_REQUEST);
-			$search_id = $this->get_search_id($post, $this->form->get_search_data());
+			set_query_var('pdx_search_id', $this->get_search_id($post, $this->form->get_search_data()));
+			set_query_var('pdx_search_pg', null);
 
-			set_query_var('pdx_search_id', $search_id);
 			wp_redirect($this->wp_post_type_link(null, $post), 302);
 			exit();
 		}
 
-		if($search_id = get_query_var('pdx_search_id'))
-			if($search_data = $this->get_search_data($post, $search_id))
-				$this->form = new PL_Search_Form($this, null, $search_data);
+		else if(($search_id = get_query_var('pdx_search_id')) && is_array($search_data = $this->get_search_data($post, $search_id))) {
+			$this->form = new PL_Search_Form($this, null, $search_data);
+			if($search_id != ($new_search_id = $this->get_search_id($post, $this->form->get_search_data()))) {
+				set_query_var('pdx_search_id', $new_search_id);
+				set_query_var('pdx_search_pg', null);
 
-			else {
-				set_query_var('pdx_search_id', '');
 				wp_redirect($this->wp_post_type_link(null, $post), 302);
 				exit();
 			}
+		}
 
-		else
+		else {
 			$this->form = new PL_Search_Form($this, null, null);
+			if($search_id) {
+				set_query_var('pdx_search_id', null);
+				set_query_var('pdx_search_pg', null);
+
+				wp_redirect($this->wp_post_type_link(null, $post), 302);
+				exit();
+			}
+		}
+
+		$search_offset = $this->get_search_offset($search_pg = get_query_var('pdx_search_pg'));
+		if($search_offset == 0 && $search_pg !== '' && $search_pg !== null) {
+			set_query_var('pdx_search_pg', null);
+
+			wp_redirect($this->wp_post_type_link(null, $post), 302);
+			exit();
+		}
 
 		$this->search_request = $this->form->get_search_request();
-		$this->search_request->set('offset', 12 * (get_query_var('page', 1) - 1));
-
+		$this->search_request->set('offset', $search_offset);
 		$this->search_result = $this->search_listings($this->search_request);
+
+		if($search_pg && $search_offset >= ($search_total = $this->search_result->total())) {
+			set_query_var('pdx_search_pg', $this->get_search_pg($search_total - 1));
+
+			wp_redirect($this->wp_post_type_link(null, $post), 302);
+			exit();
+		}
+
 		$this->shortcode_context = new PL_Shortcode_Context(new PL_Shortcode_Search_Result($this->search_result));
 	}
 
@@ -56,54 +80,27 @@ class PL_WP_Page extends PL_Page_Context {
 		return $string_data ? unserialize($string_data) : null;
 	}
 
-	public function the_page_content() {
-		$this->wp_filtering = true;
-		$content = $this->get_the_page_content();
-		$content = apply_filters( 'the_content', $content );
-		$content = str_replace( ']]>', ']]&gt;', $content );
-		$this->wp_filtering = false;
-		echo $content;
+	public function get_search_pg($search_offset) {
+		$pg = intval($search_offset / 12);
+		return $pg ? '/' . ++$pg : null;
 	}
 
-	public function get_the_page_content() {
-		return get_the_content();
+	public function get_search_offset($search_pg) {
+		$pg = intval(ltrim($search_pg, '/'));
+		return $pg ? 12 * --$pg : 0;
 	}
 
 	public function form_content() {
-		return $this->form->html_string();
+		return $this->form ? $this->form->html_string() : '';
 	}
 
-	public function message_content() {
-		$content = '';
-		$content .= '<br><br>';
-		$content .= '<pre>' . $this->search_request->query_string() . '</pre>';
-		$content .= '<br><br>';
-		$content .= 'Showing ' . ($this->search_result->offset() + 1);
-		$content .= ' - ' . ($this->search_result->offset() + $this->search_result->count());
-		$content .= ' of ' . $this->search_result->total();
-		$content .= '<br><br>';
-		return $content;
-	}
-
-	public function listing_content() {
-		$content = '';
-		$content .= '<ul>';
-		$content .= '[foreach:listing index=0]';
-		$content .= '<li>[data attribute=address], [data attribute=locality], [data attribute=region]';
-		$content .= '<br>[data attribute=beds] beds, [data attribute=baths] baths, [data attribute=price]';
-		$content .= '[/foreach:listing]';
-		$content .= '</ul>';
-		return do_shortcode($content);
+	public function query_string() {
+		return $this->search_request ? $this->search_request->query_string() : '';
 	}
 
 	public function wp_the_content($content) {
-		if($this->wp_filtering) return $content;
-
-		$content = '';
-		$content .= $this->get_the_page_content();
-		$content .= $this->form_content();
-		$content .= $this->message_content();
-		$content .= $this->listing_content();
+		$content = str_replace('[form]', $this->form_content(), $content);
+		$content = str_replace('[debug]', $this->query_string(), $content);
 		return $content;
 	}
 
@@ -111,6 +108,8 @@ class PL_WP_Page extends PL_Page_Context {
 		$permalink = $post->post_name;
 		if($pdx_search_id = get_query_var('pdx_search_id'))
 			$permalink .= $pdx_search_id;
+		if($pdx_search_pg = get_query_var('pdx_search_pg'))
+			$permalink .= $pdx_search_pg;
 
 		return home_url($permalink . '/');
 	}

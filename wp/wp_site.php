@@ -114,6 +114,7 @@ class PL_WP_Site {
 
 		global $wp;
 		$wp->add_query_var('pdx_search_id');
+		$wp->add_query_var('pdx_search_pg');
 	}
 
 	public static function wp_activate_plugin() {
@@ -143,6 +144,7 @@ class PL_WP_Site {
 		foreach($page_rules as $regex => $rewrite) {
 			$regex = str_replace('(.?.+?)', 'property-search(/[0-9a-z]{8})?', $regex);
 			$rewrite = str_replace('pagename=', 'pdx_page=property-search&pdx_search_id=', $rewrite);
+			$rewrite = str_replace('&page=', '&pdx_search_pg=', $rewrite);
 			$pdx_rules[$regex] = $rewrite;
 		}
 
