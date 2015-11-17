@@ -18,7 +18,7 @@ class PL_API_Connection extends PL_Attribute_Map {
 	}
 
 	public function get_api_key() {
-		return $this->$http_connection->API_KEY;
+		return $this->http_connection->API_KEY;
 	}
 
 	public function get_custom_attributes() {

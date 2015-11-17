@@ -12,7 +12,8 @@ class PL_Listing_Image {
 		$this->dirty = false;
 	}
 
-	public function __get($name) {
+	public function __get($name) { $this->get_value($name); }
+	public function get_value($name) {
 		switch($name) {
 			case 'id':
 			case 'url':
@@ -26,7 +27,8 @@ class PL_Listing_Image {
 		return null;
 	}
 
-	public function __set($name, $value) {
+	public function __set($name, $value) { $this->set_value($name, $value); }
+	public function set_value($name, $value) {
 		switch($name) {
 			case 'caption':
 			case 'order':

@@ -34,7 +34,7 @@ class PL_Shortcode_Listing extends PL_Shortcode_Handler {
 	public function data_shortcode($args) {
 		extract(shortcode_atts(array('attribute' => null), $args));
 		if($attribute)
-			return $this->current_listing->{$attribute};
+			return $this->current_listing->get_value($attribute);
 
 		return "";
 	}
@@ -42,7 +42,7 @@ class PL_Shortcode_Listing extends PL_Shortcode_Handler {
 	public function if_data_shortcode($args, $content) {
 		extract(shortcode_atts(array('attribute' => null, 'value' => null), $args));
 		if($attribute)
-			if(is_null($value) ? $this->current_listing->{$attribute} : $this->current_listing->{$attribute} == $value)
+			if(is_null($value) ? $this->current_listing->get_value($attribute) : $this->current_listing->get_value($attribute) == $value)
 				return do_shortcode($content);
 
 		return "";

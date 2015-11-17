@@ -34,12 +34,13 @@ class PL_Listing {
 		$this->listing = json_decode($other->json_string());
 	}
 
-	public function __get($name) {
+	public function __get($name) { return $this->get_value($name); }
+	public function get_value($name) {
 		if($name == 'images') return $this->get_images();
 		if($name == 'total_images') return $this->images->count();
 
 		if(($attribute = $this->attributes->get_attribute($name)) && $attribute->access_name)
-			return $this->get_value($this->listing, $attribute->access_name);
+			return $this->get_mapped_field($this->listing, $attribute->access_name);
 
 		return null;
 	}
@@ -49,20 +50,20 @@ class PL_Listing {
 		return $this->listing_images;
 	}
 
-	protected function get_value(stdClass $object, $attribute) {
-		return eval('return $object->' . $attribute . ';');
+	protected function get_mapped_field(stdClass $object, $field) {
+		return eval('return $object->' . $field . ';');
 	}
 
-	protected function set_value(stdClass $object, $attribute, $value) {
-		$levels = explode('->', $attribute);
-		while($attribute = array_shift($levels)) {
+	protected function set_mapped_field(stdClass $object, $field, $value) {
+		$levels = explode('->', $field);
+		while($field = array_shift($levels)) {
 
 			// directly assign a property (or auto-create an array)
 			if(count($levels) == 0)
-				return eval('return $object->' . $attribute . ' = $value;');
+				return eval('return $object->' . $field . ' = $value;');
 
 			// walk down through the structure, create a new object if necessary)
-			$object = $this->get_value($object, $attribute) ?: $this->set_value($object, $attribute, new stdClass());
+			$object = $this->get_mapped_field($object, $field) ?: $this->set_mapped_field($object, $field, new stdClass());
 		}
 	}
 
@@ -73,9 +74,10 @@ class PL_Listing {
 
 
 class PL_Private_Listing extends PL_Listing {
-	public function __set($name, $value) {
+	public function __set($name, $value) { $this->set_value($name, $value); }
+	public function set_value($name, $value) {
 		if(($attribute = $this->attributes->get_attribute($name)) && $attribute->access_name)
-			return $this->set_value($this->listing, $attribute->access_name, $value);
+			return $this->set_mapped_field($this->listing, $attribute->access_name, $value);
 
 		return null;
 	}

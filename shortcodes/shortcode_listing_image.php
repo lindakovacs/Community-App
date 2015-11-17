@@ -30,7 +30,7 @@ class PL_Shortcode_Listing_Image extends PL_Shortcode_Handler {
 	public function data_shortcode($args) {
 		extract(shortcode_atts(array('attribute' => null), $args));
 		if(in_array($attribute, array('id', 'url', 'caption')))
-			return $this->current_image->{$attribute};
+			return $this->current_image->get_value($attribute);
 
 		return new PL_Shortcode_Yield();
 	}
