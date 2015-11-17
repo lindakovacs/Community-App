@@ -2,7 +2,7 @@
 
 
 require_once(BUILDER_DIR . 'api/listing.php');
-require_once('format.php');
+require_once('display_attribute.php');
 
 
 class PL_Listing_Display extends PL_Listing {
