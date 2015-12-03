@@ -39,8 +39,11 @@ class PL_Search_Result implements Countable, ArrayAccess, Iterator {
 	}
 
 	public function get_listing($index = null) {
-		if(is_scalar($index) && $this->valid($index))
-			$this->listing_index = $index;
+		if(is_scalar($index))
+			if($this->offsetExists($index))
+				$this->listing_index = $index;
+			else
+				$this->listing_index = $this->count();
 
 		$listing = $this->current();
 		$this->next();

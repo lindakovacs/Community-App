@@ -12,7 +12,7 @@ class PL_Listing_Image {
 		$this->dirty = false;
 	}
 
-	public function __get($name) { $this->get_value($name); }
+	public function __get($name) { return $this->get_value($name); }
 	public function get_value($name) {
 		switch($name) {
 			case 'id':

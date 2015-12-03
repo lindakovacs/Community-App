@@ -10,34 +10,26 @@ Author URI: https://www.placester.com/
 
 
 require_once(BUILDER_DIR . 'api/search_result.php');
+require_once('shortcodes.php');
 require_once('shortcode_listing.php');
 
-
-class PL_Shortcode_Listing_Block extends PL_Shortcode_Handler {
-	static public function register_shortcodes(PL_Shortcode_Dispatcher $dispatcher) {
-	}
-}
-
-class PL_Shortcode_Listing_Loop extends PL_Shortcode_Handler {
-	static public function register_shortcodes(PL_Shortcode_Dispatcher $dispatcher) {
-	}
-}
 
 class PL_Shortcode_Search_Result extends PL_Shortcode_Handler {
 	protected $current_result;
 	protected $listing_context;
 
 	static public function register_shortcodes(PL_Shortcode_Dispatcher $dispatcher) {
-		$dispatcher->register_shortcode('listing', __CLASS__, 'listing_shortcode');
-		$dispatcher->register_shortcode('foreach:listing', __CLASS__, 'foreach_listing_shortcode');
+		$dispatcher->register_shortcode(__CLASS__, PL_SC_PREFIX . 'listing', 'listing_shortcode');
+		$dispatcher->register_shortcode(__CLASS__, PL_SC_PREFIX . 'foreach:listing', 'foreach_listing_shortcode');
 
-		$dispatcher->register_shortcode('total', __CLASS__, 'total_shortcode');
-		$dispatcher->register_shortcode('limit', __CLASS__, 'limit_shortcode');
-		$dispatcher->register_shortcode('count', __CLASS__, 'count_shortcode');
+		$dispatcher->register_shortcode(__CLASS__, PL_SC_PREFIX . 'total', 'total_shortcode');
+		$dispatcher->register_shortcode(__CLASS__, PL_SC_PREFIX . 'limit', 'limit_shortcode');
+		$dispatcher->register_shortcode(__CLASS__, PL_SC_PREFIX . 'offset', 'offset_shortcode');
+		$dispatcher->register_shortcode(__CLASS__, PL_SC_PREFIX . 'count', 'count_shortcode');
 
-		$dispatcher->register_shortcode('page', __CLASS__, 'page_shortcode');
-		$dispatcher->register_shortcode('first', __CLASS__, 'first_shortcode');
-		$dispatcher->register_shortcode('last', __CLASS__, 'last_shortcode');
+		$dispatcher->register_shortcode(__CLASS__, PL_SC_PREFIX . 'page', 'page_shortcode');
+		$dispatcher->register_shortcode(__CLASS__, PL_SC_PREFIX . 'first', 'first_shortcode');
+		$dispatcher->register_shortcode(__CLASS__, PL_SC_PREFIX . 'last', 'last_shortcode');
 	}
 
 	public function __construct(PL_Search_Result $current_result) {
@@ -61,9 +53,7 @@ class PL_Shortcode_Search_Result extends PL_Shortcode_Handler {
 		}
 
 		if($this->listing_context && $content) {
-			$disable_connection_shortcodes = new PL_Shortcode_Context(new PL_Shortcode_Listing_Block);
 			$output = do_shortcode($content);
-			$disable_connection_shortcodes = null;
 			$this->listing_context = null;
 		}
 
@@ -74,8 +64,10 @@ class PL_Shortcode_Search_Result extends PL_Shortcode_Handler {
 		extract(shortcode_atts(array('index' => null, 'count' => null), $args));
 		$output = "";
 
-		if(!is_numeric($index))
+		if(!is_numeric($index)) {
+			$this->current_result->rewind();
 			$index = null;
+		}
 
 		if(!is_numeric($count))
 			$count = $this->current_result->count();
@@ -85,9 +77,7 @@ class PL_Shortcode_Search_Result extends PL_Shortcode_Handler {
 			while($current_listing && $count-- > 0) {
 				if($content) {
 					$this->listing_context = new PL_Shortcode_Context(new PL_Shortcode_Listing($current_listing));
-					$disable_connection_shortcodes = new PL_Shortcode_Context(new PL_Shortcode_Listing_Block);
 					$output .= do_shortcode($content);
-					$disable_connection_shortcodes = null;
 				}
 				$current_listing = $this->current_result->get_listing();
 			}
@@ -99,6 +89,7 @@ class PL_Shortcode_Search_Result extends PL_Shortcode_Handler {
 
 	public function total_shortcode($args, $content, $shortcode) { return $this->current_result->total(); }
 	public function limit_shortcode($args, $content, $shortcode) { return $this->current_result->limit(); }
+	public function offset_shortcode($args, $content, $shortcode) { return $this->current_result->offset(); }
 	public function count_shortcode($args, $content, $shortcode) { return $this->current_result->count(); }
 
 	public function page_shortcode($args, $content, $shortcode) {

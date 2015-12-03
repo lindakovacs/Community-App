@@ -98,6 +98,16 @@ class HTML_Element implements HTML {
 }
 
 
+class HTML_Anchor extends HTML_Element {
+	public function __construct($href = null) {
+		parent::__construct('a');
+		$this->attributes['href'] = $href;
+	}
+
+	public function add_content($content) { $this->contents[] = $content; }
+}
+
+
 class HTML_Div extends HTML_Element {
 	public function __construct($id = null) {
 		parent::__construct('div');
@@ -116,6 +126,18 @@ class HTML_Span extends HTML_Element {
 	}
 
 	public function add_content($content) { $this->contents[] = $content; }
+}
+
+
+class HTML_Image extends HTML_Element {
+	public function __construct($src, $attributes = null) {
+		parent::__construct('img');
+		$this->attributes['src'] = $src;
+
+		if($attributes) foreach($attributes as $name => $value) {
+			$this->$name = $value;
+		}
+	}
 }
 
 

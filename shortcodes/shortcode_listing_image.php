@@ -9,18 +9,17 @@ Author URI: https://www.placester.com/
  */
 
 
+require_once(BUILDER_DIR . 'www/html.php');
 require_once(BUILDER_DIR . 'api/listing_image.php');
-require_once(BUILDER_DIR . 'www/image.php');
+require_once('shortcodes.php');
 
 
 class PL_Shortcode_Listing_Image extends PL_Shortcode_Handler {
 	protected $current_image;
 
 	static public function register_shortcodes(PL_Shortcode_Dispatcher $dispatcher) {
-		$dispatcher->register_shortcode('data', __CLASS__, 'data_shortcode');
-
-		// www shortcode
-		$dispatcher->register_shortcode('img', __CLASS__, 'img_shortcode');
+		$dispatcher->register_shortcode(__CLASS__, PL_SC_PREFIX . 'data', 'data_shortcode');
+		$dispatcher->register_shortcode(__CLASS__, PL_SC_PREFIX . 'img', 'img_shortcode');
 	}
 
 	public function __construct(PL_Listing_Image $image) {

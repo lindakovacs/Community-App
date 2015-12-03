@@ -36,16 +36,13 @@ class PL_Listing {
 
 	public function __get($name) { return $this->get_value($name); }
 	public function get_value($name) {
-		if($name == 'images') return $this->get_images();
-		if($name == 'total_images') return $this->images->count();
-
 		if(($attribute = $this->attributes->get_attribute($name)) && $attribute->access_name)
 			return $this->get_mapped_field($this->listing, $attribute->access_name);
 
 		return null;
 	}
 
-	protected function get_images() {
+	public function get_images() {
 		if(!isset($this->listing_images)) $this->listing_images = new PL_Listing_Images($this->listing->images);
 		return $this->listing_images;
 	}
@@ -82,7 +79,7 @@ class PL_Private_Listing extends PL_Listing {
 		return null;
 	}
 
-	protected function get_images() {
+	public function get_images() {
 		if(!isset($this->listing_images)) $this->listing_images = new PL_Listing_Images($this->listing->images, true);
 		return $this->listing_images;
 	}

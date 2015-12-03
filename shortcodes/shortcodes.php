@@ -1,12 +1,12 @@
 <?php
 
 
-require_once(BUILDER_DIR . 'api/connection.php');
+define('PL_SC_PREFIX', '');
 
 
 class PL_Shortcode_Handler {
-	public static function register_shortcodes() {}
-	public static function shortcode_disabled($args, $content, $shortcode) {
+	static public function register_shortcodes() {}
+	public function shortcode_disabled($args, $content, $shortcode) {
 		return "[$shortcode]";
 	}
 }
@@ -18,22 +18,24 @@ class PL_Shortcode_Result {
 class PL_Shortcode_Yield extends PL_Shortcode_Result {
 }
 
-class PL_Shortcode_Error extends PL_Shortcode_Result {
-	public $message;
-	public function __construct($m = 'shortcode error') { $this->message = $m; }
-}
-
 
 class PL_Shortcode_Dispatcher {
-	protected $registered_classes;
+	protected $default_handler;     // implements fall through processing for shortcodes without active handlers
 
-	protected $active_classes;
-	protected $active_handlers;
+	protected $registered_classes;  // all known handler classes providing shortcode functionality
+	protected $descendant_classes;  // known subclasses of registered classes -- so we only have to search once
 
-	protected $shortcode_classes;
-	protected $shortcode_functions;
+	protected $modal_handler;       // a single active handler, blocks normal processing
+	protected $active_classes;      // registered classes that are currently enabled with active handlers
+	protected $active_handlers;     // the active handler objects of those classes (using same numeric index)
+
+	protected $shortcode_classes;   // the registered class(es) that can handle each shortcode tag, for lookup
+	protected $shortcode_functions; // the associated member function(s) for each shortcode tag, for lookup
 
 	public function __construct() {
+		$this->default_handler = new PL_Shortcode_Handler();
+		$this->modal_handler = null;
+
 		$this->registered_classes = array();
 		$this->active_classes = array();
 		$this->active_handlers = array();
@@ -41,98 +43,116 @@ class PL_Shortcode_Dispatcher {
 		$this->shortcode_functions = array();
 	}
 
-	public function register_handler($class) {
-		if(class_exists($class) && method_exists($class, 'register_shortcodes')) {
-			$this->registered_classes[$class] = $class;
-			$class::register_shortcodes($this);
-		}
+	public function register_handler_class($handler_class) {
+		$this->registered_classes[$handler_class] = $handler_class;
+		$handler_class::register_shortcodes($this);
 	}
 
-	public function attach_handler($class, PL_Shortcode_Handler $handler) {
-		if($this->registered_classes[$class]) {
+	public function register_shortcode($handler_class, $shortcode, $function) {
+		if(!$this->shortcode_classes[$shortcode]) {
+			$this->shortcode_classes[$shortcode] = array($handler_class);
+			add_shortcode($shortcode, array($this, 'dispatch_shortcode'));
+		}
+		else if(!in_array($handler_class, $this->shortcode_classes[$shortcode])) {
+			array_unshift($this->shortcode_classes[$shortcode], $handler_class);
+		}
+
+		$this->shortcode_functions[$shortcode][$handler_class] = $function;
+	}
+
+	public function dispatch_shortcode($args, $content, $shortcode) {
+		if($shortcode_classes = $this->shortcode_classes[$shortcode])
+			if($active_classes = array_intersect($this->active_classes, $this->shortcode_classes[$shortcode])) {
+				foreach($active_classes as $key => $class) {
+
+					$handler = $this->active_handlers[$key];
+					if($this->modal_handler && $this->modal_handler !== $handler)
+						continue;
+
+					$function = $this->shortcode_functions[$shortcode][$class];
+					$result = $handler->{$function}($args, $content, $shortcode);
+
+					if(is_a($result, 'PL_Shortcode_Yield'))
+						continue;
+
+					return $result;
+				}
+			}
+
+		return $this->default_handler->shortcode_disabled($args, $content, $shortcode);
+	}
+
+	public function attach_handler(PL_Shortcode_Handler $handler, $modal = false) {
+		if($class = $this->get_handler_class($handler)) {
+			if($modal)
+				$this->modal_handler = $handler;
 			array_unshift($this->active_classes, $class);
 			array_unshift($this->active_handlers, $handler);
 		}
 	}
 
-	public function detach_handler($class, PL_Shortcode_Handler $handler) {
-		foreach(array_keys($this->active_classes, $class) as $index)
-			if($this->active_handlers[$index] === $handler) {
-				unset($this->active_classes[$index]);
-				unset($this->active_handlers[$index]);
-			}
-	}
-
-	public function register_shortcode($shortcode, $class, $function) {
-		if($this->registered_classes[$class]) {
-			$this->shortcode_classes[$shortcode][] = $class;
-			$this->shortcode_functions[$shortcode][$class] = $function;
+	public function detach_handler(PL_Shortcode_Handler $handler) {
+		if(($index = array_search($handler, $this->active_handlers, true)) !== false) {
+			if($handler === $this->modal_handler)
+				$this->modal_handler = null;
+			unset($this->active_classes[$index]);
+			unset($this->active_handlers[$index]);
 		}
 	}
 
-	public function dispatch_shortcode($shortcode, $args, $content) {
-		if($shortcode_classes = $this->shortcode_classes[$shortcode])
-			if($active_classes = array_intersect($this->active_classes, $this->shortcode_classes[$shortcode])) {
-				foreach($active_classes as $key => $class) {
-					$handler = $this->active_handlers[$key];
-					$function = $this->shortcode_functions[$shortcode][$class];
-					$result = $handler->{$function}($args, $content, $shortcode);
-					if(is_a($result, 'PL_Shortcode_Yield'))
-						continue;
-					else if(is_a($result, 'PL_Shortcode_Error'))
-						return "[$shortcode: {$result->message}]";
-					else if(is_a($result, 'PL_Shortcode_Result'))
-						return "[$shortcode: Unexpected result]";
-					else
-						return $result;
-				}
-			}
+	protected function get_handler_class(PL_Shortcode_Handler $handler) {
+		$class = get_class($handler);
+		if($this->registered_classes[$class])
+			return $class;
 
-		return PL_Shortcode_Handler::shortcode_disabled($args, $content, $shortcode);
-	}
+		if($this->descendant_classes[$class])
+			return $this->descendant_classes[$class];
 
-	public function get_registered_shortcodes() {
-		return array_unique(array_keys($this->shortcode_classes));
-	}
-	public function get_active_shortcodes() {
-		$step1 = array_intersect($this->shortcode_classes, $this->active_classes);
-		$step2 = array_keys($step1);
-		$step3 = array_unique($step2);
-		return array_unique(array_keys(array_intersect($this->shortcode_classes, $this->active_classes)));
+		foreach($this->registered_classes as $registered_class)
+			if(is_a($handler, $registered_class))
+				return $this->descendant_classes[$class] = $registered_class;
+
+		return null;
 	}
 }
 
 
-class PL_Shortcode_System {
+class PL_Shortcode_Global {
 	static protected $dispatcher;
 
-	public function __construct() {
+	public function __construct(PL_Shortcode_Dispatcher $dispatcher = null) {
 		if(!self::$dispatcher)
-			self::$dispatcher = new PL_Shortcode_Dispatcher();
-	}
-
-	static public function register_handler($class) {
-		self::$dispatcher->register_handler($class);
-	}
-
-	public function attach_handler(PL_Shortcode_Handler $handler) {
-		self::$dispatcher->attach_handler(get_class($handler), $handler);
-	}
-
-	public function detach_handler(PL_Shortcode_Handler $handler) {
-		self::$dispatcher->detach_handler(get_class($handler), $handler);
+			if($dispatcher)
+				self::$dispatcher = $dispatcher;
+			else
+				self::$dispatcher = new PL_Shortcode_Dispatcher();
 	}
 }
 
 
-class PL_Shortcode_Context extends PL_Shortcode_System {
+class PL_Shortcode_Context extends PL_Shortcode_Global {
 	protected $handler;
 
-	public function __construct(PL_Shortcode_Handler $handler) {
-		$this->attach_handler($this->handler = $handler);
+	public function __construct(PL_Shortcode_Handler $handler, $modal = false) {
+		self::$dispatcher->attach_handler($this->handler = $handler, $modal);
 	}
 
 	public function __destruct() {
-		$this->detach_handler($this->handler);
+		self::$dispatcher->detach_handler($this->handler);
+	}
+}
+
+
+class PL_Shortcode_System extends PL_Shortcode_Global {
+	public function register_handler_class($handler_class) {
+		self::$dispatcher->register_handler_class($handler_class);
+	}
+
+	public function attach_handler(PL_Shortcode_Handler $handler) {
+		self::$dispatcher->attach_handler($handler);
+	}
+
+	public function detach_handler(PL_Shortcode_Handler $handler) {
+		self::$dispatcher->detach_handler($handler);
 	}
 }
