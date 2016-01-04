@@ -127,8 +127,8 @@ Class PL_HTTP extends WP_Http {
 					// error_log($url . "?" . $request_string);
 					// error_log(var_export($response, true));
 
-					if ( (is_array($response) && isset($response['headers']) && isset($response['headers']['status'])) || $force_return) {
-						if ($response['headers']['status'] == 200 && !empty($response['body'])) {
+					if (is_array($response) && isset($response['response']) && isset($response['response']['code'])) {
+						if (($response['response']['code'] == 200 || $force_return) && !empty($response['body'])) {
 							$body = json_decode($response['body'], true);
 							$cache->save($body, PL_Cache::TTL_HOURS);
 							return $body;
