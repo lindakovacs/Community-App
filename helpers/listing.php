@@ -58,7 +58,7 @@ class PL_Listing_Helper {
 		}
 
 		// Respect the ability for this function to return results that do NOT respect global filters..
-		if ($global_filters) { 
+		if ($global_filters && empty($args['listing_ids'])) {
 			$args = PL_Global_Filters::merge_global_filters($args); 
 		}
 		// purchase_types is a special case in the API
