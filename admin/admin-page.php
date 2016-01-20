@@ -34,16 +34,17 @@ if(!class_exists('PL_Admin_Page_v1A')) {
 		static protected $registered_scripts;
 		static protected $registered_styles;
 
-		protected $page_parent;
-		protected $page_name;
-		protected $order;
 
-		protected $page_title;
-		protected $menu_title;
+		public $page_parent;
+		public $page_name;
+		public $order;
 
-		protected $template;
-		protected $scripts;
-		protected $styles;
+		public $page_title;
+		public $menu_title;
+
+		public $template;
+		public $scripts;
+		public $styles;
 
 
 		public function __construct($page_parent, $order, $page_name, $menu_title, $page_title, $template) {
