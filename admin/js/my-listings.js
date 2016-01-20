@@ -86,6 +86,7 @@ jQuery(document).ready(function($) {
                 { sWidth: '100px' },    //sqft
                 { sWidth: '100px' }     //available
             ],
+            "aaSorting": [[0, "desc"]],
             "fnServerParams": function ( aoData ) {
                 aoData.push( { "name": "action", "value" : "datatable_ajax"} );
                 aoData.push( { "name": "sSearch", "value" : $('input#address_search').val() })
