@@ -1,0 +1,537 @@
+$light-black: #696969
+$blue: #0c60a7
+$red: #eb0e0e
+$green: #6E9910
+$gray: #f0f0f0
+$helvetica: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue", Helvetica
+
+@mixin box-sizing
+  box-sizing: border-box
+  -webkit-box-sizing: border-box
+  -moz-box-sizing: border-box
+@mixin no-border-raidus
+  border-radius: 0
+  -webkit-border-radius: 0
+  -moz-border-radius: 0
+
+.left
+  float: left
+
+/*headers on specific pages
+
+.header-wrapper
+  float: left
+  width: 100%
+  a
+    float: left
+    margin: 13px 0 0 10px
+  h2
+    float: left
+    &#settings-page-email-title
+      width: 100%
+      #settings-page-email-in-title
+        color: $blue
+  &#settings-header-wrapper
+    padding-bottom: 20px
+    a.button-secondary
+      margin: 13px 20px 0 0px
+
+#MLS_Integration
+  margin-left: 10px
+  color: #333
+  background-color: #FFEBE8
+  border-color: #C00 #C00 white
+
+// Premium Wizard Sign Up Form
+.prem_form
+  width: 220px
+  float: left
+  margin: 15px 0 10px
+  label
+    float: left
+    width: 100px
+    margin-right: 10px
+    color: $light-black
+  input
+    width: 200px
+
+/*ajax messages
+
+.ajax_message
+  font-size: 14px
+  margin: 15px 0 0 10px
+  color: green
+  font-weight: bold
+  &.red
+    color: $red
+
+.placester_icon
+  background: url('../images/logo_30.png') no-repeat
+
+#placester-admin-menu
+  border-bottom: #ccc 1px solid
+  padding-bottom: 0px
+  margin-bottom: 15px
+
+h3.hndle
+  font-size: 15px
+  font-family: Arial
+  font-weight: normal
+  padding: 7px 10px
+
+/* global modal styling
+
+/* Cleaning up jqueryUI's styles
+
+// jquery-ui 1.10 removed zindex support in WP3.6.1. - needed to prevent CodeMirror and other things using z-index bleed through
+.ui-front
+  z-index: 500
+
+.ui-widget-header
+  border: none !important
+  background: none !important
+
+.ui-dialog-content
+  padding-top: 0px !important
+
+.ui-dialog-title h2
+  margin: 5px 0 !important
+
+.ui-widget-overlay
+  opacity: 0.6 !important
+  -moz-opacity: 0.6 !important
+  filter: alpha(opacity = 0.6)
+
+// jquery-ui 1.10 positions this as absolute instead of fixed which does not work when its appended to the body element
+.ui-widget-overlay.ui-front
+  position: fixed
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%	
+
+/*    end
+
+// Modal Dialog Boxes
+.ui-dialog.ui-widget-content
+  border: 10px solid #343434
+  padding: 0
+  @include no-border-raidus
+  // title bar
+  .ui-dialog-titlebar
+    background-color: #343434 !important
+    padding: 5px 5px 15px 5px
+    h1, h2, h3
+      font-weight: 400
+    @include no-border-raidus
+    span.ui-dialog-title
+      color: #fff
+      font:
+        weight: 400
+        size: 20px
+    // close icon
+    .ui-dialog-titlebar-close
+      top: 40% !important
+      background: transparent url('../../images/icons/close-icon.png') no-repeat !important
+      border: none !important
+      box-shadow: none
+      -webkit-box-shadow: none
+      -moz-box-shadow: none
+      padding: 0
+      .ui-icon
+        display: none
+
+  // main content
+  .ui-dialog-content
+    margin-top: 5px
+    padding: 10px 20px
+    @include box-sizing
+    h1, h2, h3, h4
+      float: left
+      line-height: 22px
+      margin: 10px 0
+      color: $light-black
+      width: 100%
+      font:
+        family: Arial
+        weight: 400
+    h1, h2
+      font:
+        weight: 600
+    h1
+      font-size: 20px
+    h2
+      font-size: 18px
+    h3
+      font-size: 16px
+    h4
+      font-size: 14px
+    p
+      font:
+        family: Arial
+        size: 12px
+      color: $light-black
+      float: left
+      margin: 10px 0
+      width: 100%
+      &.red
+        color: $red
+      &.center
+        text-align: center
+      &.after-note
+        margin: -5px 0 0
+        font:
+          size: 11px
+      &.modal-subtitle
+        margin: -10px 0 0
+
+    a, a:visited
+      color: $blue
+      &:hover
+        color: #000
+    ul
+      width: 100%
+      float: left
+      margin: 5px 0
+      li
+        color: $light-black
+        font:
+          size: 12px
+          family: Arial
+    
+        
+  // footer bar
+  .ui-dialog-buttonpane
+    background: $gray
+    border: 0
+    padding: 10px
+    button
+      margin: 5px
+
+// Modal Form
+.ui-dialog.ui-widget-content
+  .ui-dialog-content
+    input[type="text"], input[type="email"]
+      height: 32px
+      padding: 0 5px
+      border-color: #b0b0b0
+      color: $light-black !important
+      font:
+        weight: 400
+        size: 13px
+        family: Arial
+      
+      &.red
+        border-color: $red !important
+        color: $light-black !important
+      &.green
+        border-color: $green !important
+        color: $light-black !important
+        
+// API Key Modal
+.ui-dialog.ui-widget-content
+  .ui-dialog-content
+    #confirm_email
+      height: 60px
+      .pls_search_form
+        width: 660px
+    #api_key_form
+      height: 50px
+    #api_key_form, #signup_wizard, #confirm_email
+      float: left
+      width: 100%
+      margin: 5px 0
+      #api_key_message
+        position: absolute
+        padding: 0
+        margin-top: -20px
+        text-indent: 200px
+        font:
+          size: 15px
+          family: Arial
+          weight: 400
+      label
+        float: left
+        width: 185px
+        color: $light-black
+        padding-top: 8px
+        font:
+          family: Arial
+          size: 17px
+      input[type="text"]
+        float: left
+        margin: 0 15px
+        width: 410px
+      #api-key-message-icon
+        margin-top: 2px
+        float: left
+        height: 30px
+        width: 30px
+        padding: 0
+        margin: 0
+        &.green
+          background: url(../../images/icons/green-chk.png) no-repeat 0 5px
+
+#api_key_validation, #api_key_success
+  position: absolute
+  padding: 0
+  margin-top: -18px
+  text-indent: 200px
+  font:
+    size: 15px
+    family: Arial
+    weight: 400
+
+// Premium sign up button modal
+#premium_wizard
+  #premium-wizard-message
+    font:
+      size: 14px
+      family: $helvetica
+    line-height: 18px
+  #premium_wizard_start
+    padding: 10px 45px
+    margin: 10px auto
+    display: block
+    position: relative
+
+#signup_wizard
+  #confirm_email
+    float: left
+    margin: 5px 0
+
+// Premium Form - update name/number
+#prem_form_messages
+  ul#error-messages
+    margin: 10px 0 0
+    li
+      list-style-image: url(../../images/icons/error-icon-sm.png)
+      margin-left: 20px
+      float: left
+      width: 100%
+      color: $red
+      
+
+
+/* Plugin specific styles
+
+.ui-dialog
+  .ui-dialog-titlebar
+    font-size: 21px
+    padding: 12px
+    h1, h2, h3, h4
+      font:
+        family: Arial
+      padding: 0px 0px
+      margin: 10px 0
+    h1
+      font-size: 23px
+    h2
+      font-size: 21px
+    h3
+      font-size: 18px
+    h4
+      font-size: 16px
+
+  .ui-dialog-content
+    p
+      line-height: 17px
+      font-size: 13px
+      margin: 15px 0px
+      &.message
+        background-color: #FFFBCC
+        border: 1px solid #E6DB55
+        color: #555
+        line-height: 19px
+        padding: 5px 10px
+        font-size: 12px
+        margin: 3px 0px
+        @include box-sizing
+    a
+      text-decoration: none
+      color: #21759B
+      &:hover
+        color: #D54E21
+    p.large_green_button
+      text-align: center
+      font-weight: 600
+      color: white
+      text-decoration: none
+      padding: 10px 20px
+      background: #86B229
+      background: -moz-linear-gradient(top, #a0cc42 0%, #86b229 50%, #6e9910)
+      background: -webkit-gradient(linear, left top, left bottom, from(#a0cc42), color-stop(0.5, #86b229), to(#6e9910))
+      border-radius: 5px
+      -moz-border-radius: 5px
+      -webkit-border-radius: 5px
+      border: 1px solid #6F961C
+      text-shadow: 0px 2px 1px rgba(0, 0, 0, 0.4), 0px 1px 0px rgba(255, 255, 255, 0.3)
+      font-size: 17px !important
+      span
+        display: block
+        font-size: 11px
+        font-weight: normal
+    .red
+      color: $red
+      padding: 0
+      font:
+        weight: normal
+        size: 15px
+    .green
+      color: $green
+      padding: 0
+      font:
+        weight: normal
+        size: 15px
+    #no-cc-required
+      text-align: center
+      font:
+        family: $helvetica
+        size: 13px
+  .ui-dialog-buttonpane
+    button
+      padding: 10px 15px
+      float: left
+      font-family: Arial
+      font-size: 13px
+      font-weight: normal
+      text-transform: uppercase
+      min-width: 80px
+      text-align: center
+      text-decoration: none
+    .ui-dialog-buttonset
+      width: 100%
+
+
+
+.settings_sub_nav
+  float: left
+  ul
+    float: left
+    li
+      float: left
+      padding: 5px 10px
+      border-right: 1px solid #CCC
+      &.submenu-title
+        font-weight: bold
+        font-size: 12px
+        padding-left: 0px
+      &:last-child, &:first-child
+        border-right: none !important
+      a
+        float: left
+
+.settings_option_wrapper
+  float: left
+  clear: both
+  width: 100%
+
+.ui-dialog
+  .green-btn
+    color: #fff
+    background: #86B229
+    background: -moz-linear-gradient(top, #a0cc42 0%, #86b229 50%, #6e9910)
+    background: -webkit-gradient(linear, left top, left bottom, from(#a0cc42), color-stop(0.5, #86b229), to(#6e9910))
+    border-radius: 5px
+    -moz-border-radius: 5px
+    -webkit-border-radius: 5px
+    border-top: 2px solid #C6E21D
+    border-left: 1px solid #6F961C
+    border-bottom: 1px solid #6F961C
+    border-right: 1px solid #6F961C
+    text-shadow: 1px 1px #6a8d1d
+    box-shadow: 0px -1px 0 #6F961C
+    font:
+      size: 17px
+      family: Arial
+    /*  text-shadow: 0px 2px 1px rgba(0, 0, 0, 0.4), 0px 1px 0px rgba(255, 255, 255, 0.3);
+
+  .gray-btn
+    background: #eeeeee
+    background: -moz-linear-gradient(top, #eeeeee 0%, #cccccc 100%)
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eeeeee), color-stop(100%, #cccccc))
+    background: -webkit-linear-gradient(top, #eeeeee 0%, #cccccc 100%)
+    background: -o-linear-gradient(top, #eeeeee 0%, #cccccc 100%)
+    background: -ms-linear-gradient(top, #eeeeee 0%, #cccccc 100%)
+    background: linear-gradient(to bottom, #eeeeee 0%, #cccccc 100%)
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#cccccc',GradientType=0 )
+    border-radius: 5px
+    -moz-border-radius: 5px
+    -webkit-border-radius: 5px
+    border: 1px solid #909090
+    /*  text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.4), 0px 1px 0px rgba(255, 255, 255, 0.3);
+  .right-btn
+    float: right !important
+
+
+
+
+// Spinner
+.bar1
+  -moz-transform: rotate(0deg) translate(0, -20px)
+  -webkit-transform: rotate(0deg) translate(0, -20px)
+  opacity: 0.12
+
+.bar2
+  -moz-transform: rotate(45deg) translate(0, -20px)
+  -webkit-transform: rotate(45deg) translate(0, -20px)
+  opacity: 0.25
+
+.bar3
+  -moz-transform: rotate(90deg) translate(0, -20px)
+  -webkit-transform: rotate(90deg) translate(0, -20px)
+  opacity: 0.37
+
+.bar4
+  -moz-transform: rotate(135deg) translate(0, -20px)
+  -webkit-transform: rotate(135deg) translate(0, -20px)
+  opacity: 0.50
+
+.bar5
+  -moz-transform: rotate(180deg) translate(0, -20px)
+  -webkit-transform: rotate(180deg) translate(0, -20px)
+  opacity: 0.62
+
+.bar6
+  -moz-transform: rotate(225deg) translate(0, -20px)
+  -webkit-transform: rotate(225deg) translate(0, -20px)
+  opacity: 0.75
+
+.bar7
+  -moz-transform: rotate(270deg) translate(0, -20px)
+  -webkit-transform: rotate(270deg) translate(0, -20px)
+  opacity: 0.87
+
+.bar8
+  -moz-transform: rotate(315deg) translate(0, -20px)
+  -webkit-transform: rotate(315deg) translate(0, -20px)
+  opacity: 1
+
+#loading-spinner
+  position: relative
+  width: 50px
+  height: 50px
+  margin-bottom: 1.5em
+  margin-right: 1.5em
+  -moz-border-radius: 100px
+  float: left
+  -moz-transform: scale(0.5)
+  -webkit-transform: scale(0.5)
+  div
+    width: 6px
+    height: 14px
+    background: #000
+    position: absolute
+    top: 18px
+    left: 21px
+  position: absolute
+  -webkit-animation-name: rotateThis
+  -webkit-animation-duration: 1s
+  -webkit-animation-iteration-count: infinite
+  -webkit-animation-timing-function: linear
+
+@-webkit-keyframes rotateThis
+  from
+    -webkit-transform: scale(0.5) rotate(0deg)
+  to
+    -webkit-transform: scale(0.5) rotate(360deg)

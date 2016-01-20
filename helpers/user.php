@@ -100,13 +100,13 @@ class PL_Helper_User {
 	 */
 
 	public static function new_api_key_view() {
-		$admin_email = get_option('admin_email');
-		PL_Router::load_builder_partial('sign-up.php', array('email' => $admin_email));
-		die();	
+		$email = get_option('admin_email');
+		include PLACESTER_PLUGIN_DIR . 'admin/views/partials/sign-up.php';
+		die();
 	}
 
 	public static function existing_api_key_view() {
-		PL_Router::load_builder_partial('existing-placester.php');
+		include PLACESTER_PLUGIN_DIR . 'admin/views/partials/existing-placester.php';
 		die();
 	}
 

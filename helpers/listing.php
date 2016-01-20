@@ -271,7 +271,16 @@ class PL_Listing_Helper {
 		foreach ($api_response['listings'] as $key => $listing) {
 			$images = $listing['images'];
 			$listings[$key][] = ((is_array($images) && isset($images[0])) ? '<img width=50 height=50 src="' . $images[0]['url'] . '" />' : 'empty');
-			$listings[$key][] = '<a class="address" href="' . ADMIN_MENU_URL . '?page=placester_property_add&id=' . $listing['id'] . '">' . $listing["location"]["address"] . ' ' . $listing["location"]["locality"] . ' ' . $listing["location"]["region"] . '</a><div class="row_actions"><a href="' . ADMIN_MENU_URL . '?page=placester_property_add&id=' . $listing['id'] . '" >Edit</a><span>|</span><a href=' . PL_Pages::get_url($listing['id'], $listing) . '>View</a><span>|</span><a class="red" id="pls_delete_listing" href="#" ref="'.$listing['id'].'">Delete</a></div>';
+
+			$edit_link = admin_url('admin.php?page=placester_property_edit&id=' . $listing['id']);
+			$address = $listing["location"]["address"] . ' ' . $listing["location"]["locality"] . ' ' . $listing["location"]["region"];
+			$listings[$key][] = '<a class="address" href="' . $edit_link . '">' . $address . '</a>' .
+				'<div class="row_actions">' .
+					'<a href="' . $edit_link . '">Edit</a><span>|</span>' .
+					'<a href=' . PL_Pages::get_url($listing['id'], $listing) . '>View</a><span>|</span>' .
+					'<a class="red" id="pls_delete_listing" href="#" ref="'.$listing['id'].'">Delete</a>' .
+				'</div>';
+
 			$listings[$key][] = $listing["location"]["postal"];
 			$listings[$key][] = implode($listing["zoning_types"], ', ') . ' ' . implode($listing["purchase_types"], ', ');
 			$listings[$key][] = $listing["property_type"];

@@ -22,7 +22,7 @@ class PL_Logging {
 	 		add_action('admin_enqueue_scripts', array(__CLASS__, 'record_page'));
 			add_action('admin_head', array(__CLASS__, 'start'));
 			add_action('admin_footer', array(__CLASS__, 'events'));
-			register_activation_hook(PL_PARENT_DIR, 'activation');
+			register_activation_hook(PLACESTER_PLUGIN_DIR, 'activation');
 		}
 	}
 

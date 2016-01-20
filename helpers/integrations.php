@@ -35,19 +35,19 @@ class PL_Integration_Helper {
 	}
 
 	public static function new_integration_view () {
-		PL_Router::load_builder_partial('integration-form.php', array('wizard' => true));
+		$wizard = true;
+		include PLACESTER_PLUGIN_DIR . 'admin/views/partials/integration-form.php';
 		die();
 	}
 
 	public static function idx_prompt_view () {
 		global $wpdb, $i_am_a_placester_theme;
-	
 
+		$page = $pagelink = null;
 		PL_Option_Helper::set_demo_data_flag(true);
 
-		$html = PL_Router::load_builder_partial('idx-prompt.php', null, true);
-		$page = $pagelink = null;
-		
+		ob_start(); include PLACESTER_PLUGIN_DIR . 'admin/views/partials/idx-prompt.php'; $html = ob_get_clean();
+
 		if (!$i_am_a_placester_theme) {
 			$querystr = "
 				SELECT $wpdb->posts.*
@@ -66,24 +66,26 @@ class PL_Integration_Helper {
 			}
 			else {
 				$page_args = array(
-						'post_name' => 'property-search',
-						'post_title' => 'Real Estate Search',
-						'post_content' => "[search_form]\n[search_listings]\n",
-						'post_type' => 'page',
-						'post_status' => 'publish',
+					'post_name' => 'property-search',
+					'post_title' => 'Real Estate Search',
+					'post_content' => "[search_form]\n[search_listings]\n",
+					'post_type' => 'page',
+					'post_status' => 'publish',
 				);
 				$ID = wp_insert_post($page_args);
 				update_post_meta($ID, 'pl_sample', 'property-search');
 				$page = get_post($ID);
 			}
 		}
-		$html .= PL_Router::load_builder_partial('sample-page.php', array('page'=>$page, 'placestertheme'=>$i_am_a_placester_theme), true);
-		if ($page) {
+
+		$placestertheme = $i_am_a_placester_theme;
+		ob_start(); include PLACESTER_PLUGIN_DIR . 'admin/views/partials/sample-page.php'; $html .= ob_get_clean();
+
+		if ($page)
 			$pagelink = get_permalink($page->ID);
-		}
-		
+
 		header( "Content-Type: application/json" );
-		echo json_encode(array('html'=>$html, 'data'=>array('search_page'=>$pagelink, 'listing_page' => admin_url('admin.php?page=placester_property_add'))));
+		echo json_encode(array('html' => $html, 'data' => array('search_page' => $pagelink, 'listing_page' => admin_url('admin.php?page=placester_property_add'))));
 		die();
 	}
 

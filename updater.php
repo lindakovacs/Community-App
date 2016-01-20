@@ -37,7 +37,7 @@ class PL_Updater {
 	
 	public static function admin_notices() {
 		if ($notices = get_option(self::$opt)) {
-			$plugin = get_plugin_data(trailingslashit(PL_PARENT_DIR).'placester.php');
+			$plugin = get_plugin_data(trailingslashit(PLACESTER_PLUGIN_DIR).'placester.php');
 			echo '<div class="updated"><p><em>'.$plugin['Name'].'</em> plugin:</p>';
 			foreach ($notices as $notice) {
 				echo "<p>$notice</p>";
