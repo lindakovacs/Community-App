@@ -21,9 +21,10 @@ include_once('lib/posts.php');
 include_once('lib/menus.php');
 
 
-//if ( !defined('HOSTED_PLUGIN_KEY') ) {
-//	add_submenu_page( 'placester', '', 'Theme Gallery', 'edit_pages', 'placester_theme_gallery', array('PL_Router','theme_gallery') );
-//}
+if(!defined('HOSTED_PLUGIN_KEY')) {
+	$pl_admin_page = new PL_Admin_Page('placester', 9000, 'placester_gallery', 'Theme Gallery', 'Theme Gallery', PL_CUSTOMIZER_DIR . 'admin/views/theme-gallery.php');
+	$pl_admin_page->require_style('placester-gallery', PL_CUSTOMIZER_CSS_URL . 'theme-gallery.css');
+}
 
 /*
 public static function customize_scripts() {
@@ -42,14 +43,6 @@ public static function customize_scripts() {
 		PL_Router::load_builder_partial('theme-switch.php');
 		PL_Router::load_builder_partial('dummy-data-confirmation.php');
 		self::enqueue_script('theme-switch', trailingslashit(PL_CUSTOMIZER_JS_URL) . 'theme-switch.js', array('jquery-ui-core', 'jquery-ui-dialog'));
-	}
-}
-
-public static function theme_gallery () {
-	if (isset($_GET['theme_url'])) {
-		self::router('install-theme.php', array(), PL_CUSTOMIZER_DIR . 'admin/views/');
-	} else {
-		self::router('theme-gallery.php', array(), PL_CUSTOMIZER_DIR . 'admin/views/');
 	}
 }
 */

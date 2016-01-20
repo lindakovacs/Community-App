@@ -26,7 +26,7 @@
 	<tbody id="the-list" class="list:themes">
 		<tr>
 			<?php foreach ($themes as $theme => $meta): ?>
-				<td class="available-theme top left">
+				<td class="available-theme top left" style="width: 350px;">
 					<h3><?php echo $theme; ?></h3>
 					<a id="theme_info_link" target="_blank" href="<?php echo $meta['info_link']; ?>" class="">Take a tour</a>
 					<span>&nbsp;|&nbsp;</span>
