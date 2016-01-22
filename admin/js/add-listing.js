@@ -71,7 +71,7 @@ jQuery(document).ready(function($) {
         submit: function (e, data) {
         	$.each(data.files, function (index, file) {
         		var id = file.name.replace(/( )|(\.)|(\))|(\()/g,'');
-                $('#fileupload-holder-message').append('<div id="image_container_remove"><li class="image_container"><div class="image_upload_bg"><div class="wpspinner" id="'+id+'"></div><a id="remove_image">Loading...</a></div></li></div>');
+                $('#fileupload-holder-message').append('<div id="image_container_remove"><li class="image_container"><div class="image_upload_bg"><div class="plspinner" id="'+id+'"></div><a id="remove_image">Loading...</a></div></li></div>');
             });	
         },
         done: function (e, data) {

@@ -9,7 +9,7 @@ $title = empty($title) ? 'Preview' : $title;
 	<div class="inside">
 		<div id='preview-wrapper'>
 			<div class="preview_load_spinner" style="display:none;">
-				<img src="<?php echo PLACESTER_PLUGIN_URL . 'images/preview_load_spin.gif'; ?>" alt="Widget options are Loading..." />
+				<img src="<?php echo PL_SHORTCODES_CSS_URL . 'spinner.gif'; ?>" alt="Widget options are Loading..." />
 			</div>
 			<div id='preview_meta_widget'><?php echo $iframe;?></div>
 			<div id="pl-review-wrapper">

@@ -206,7 +206,7 @@ div#delete_response_message.green {
 
 .widefat thead tr th span {
     padding-left: 15px; 
-    background: url('../../images/datatable/sorting.png') no-repeat 0 0;
+    background: url('sorting.png') no-repeat 0 0;
     float:left;
     height: 16px;
     -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";

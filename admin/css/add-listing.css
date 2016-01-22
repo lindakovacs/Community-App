@@ -60,8 +60,8 @@ section.form_group,section.form_group h3 {
 	width: 100px;
 	height: 100px;
 }
-.wpspinner {
-	background-image: url('../../images/datatable/wpspin_light.gif');
+.plspinner {
+	background-image: url('spinner.gif');
 	background-repeat:no-repeat;
 	width: 16px;
 	height: 16px;

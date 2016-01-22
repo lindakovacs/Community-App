@@ -204,7 +204,7 @@ border-top:1px solid #c6e31d; border-bottom:1px solid #537607;
 	opacity: 0.9;
 }
 
-#logo a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -0px -498px; margin:0px 0px 0px 3px;
+#logo a {height:50px; width:50px; background:url('onboard_icons.png') -0px -498px; margin:0px 0px 0px 3px;
 -webkit-transition-duration: 1.6s;
 -moz-transition-duration: 1.6s;
 -o-transition-duration: 1.6s;
@@ -223,48 +223,48 @@ overflow:hidden;
 -o-transform:rotate(720deg);
 }
 
-#theme a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -0px -0px;}
-#theme a:hover {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -0px;}
-#theme.active a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -0px;}
+#theme a {height:50px; width:50px; background:url('onboard_icons.png') -0px -0px;}
+#theme a:hover {height:50px; width:50px; background:url('onboard_icons.png') -50px -0px;}
+#theme.active a {height:50px; width:50px; background:url('onboard_icons.png') -50px -0px;}
 
-#title a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -0px -50px;}
-#title a:hover {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -50px;}
-#title.active a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -50px;}
+#title a {height:50px; width:50px; background:url('onboard_icons.png') -0px -50px;}
+#title a:hover {height:50px; width:50px; background:url('onboard_icons.png') -50px -50px;}
+#title.active a {height:50px; width:50px; background:url('onboard_icons.png') -50px -50px;}
 
-#colors a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -0px -100px;}
-#colors a:hover {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -100px;}
-#colors.active a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -100px;}
+#colors a {height:50px; width:50px; background:url('onboard_icons.png') -0px -100px;}
+#colors a:hover {height:50px; width:50px; background:url('onboard_icons.png') -50px -100px;}
+#colors.active a {height:50px; width:50px; background:url('onboard_icons.png') -50px -100px;}
 
-#brand a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -0px -150px;}
-#brand a:hover {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -150px;}
-#brand.active a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -150px;}
+#brand a {height:50px; width:50px; background:url('onboard_icons.png') -0px -150px;}
+#brand a:hover {height:50px; width:50px; background:url('onboard_icons.png') -50px -150px;}
+#brand.active a {height:50px; width:50px; background:url('onboard_icons.png') -50px -150px;}
 
-#mls a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -0px -200px;}
-#mls a:hover {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -200px;}
-#mls.active a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -200px;}
+#mls a {height:50px; width:50px; background:url('onboard_icons.png') -0px -200px;}
+#mls a:hover {height:50px; width:50px; background:url('onboard_icons.png') -50px -200px;}
+#mls.active a {height:50px; width:50px; background:url('onboard_icons.png') -50px -200px;}
 
-#listing a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -0px -250px;}
-#listing a:hover {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -250px;}
-#listing.active a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -250px;}
+#listing a {height:50px; width:50px; background:url('onboard_icons.png') -0px -250px;}
+#listing a:hover {height:50px; width:50px; background:url('onboard_icons.png') -50px -250px;}
+#listing.active a {height:50px; width:50px; background:url('onboard_icons.png') -50px -250px;}
 
-#post a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -0px -300px;}
-#post a:hover {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -300px;}
-#post.active a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -300px;}
+#post a {height:50px; width:50px; background:url('onboard_icons.png') -0px -300px;}
+#post a:hover {height:50px; width:50px; background:url('onboard_icons.png') -50px -300px;}
+#post.active a {height:50px; width:50px; background:url('onboard_icons.png') -50px -300px;}
 
-#invite a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -0px -350px;}
-#invite a:hover {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -350px;}
-#invite.active a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -350px;}
+#invite a {height:50px; width:50px; background:url('onboard_icons.png') -0px -350px;}
+#invite a:hover {height:50px; width:50px; background:url('onboard_icons.png') -50px -350px;}
+#invite.active a {height:50px; width:50px; background:url('onboard_icons.png') -50px -350px;}
 
-#analytics a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -0px -400px;}
-#analytics a:hover {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -400px;}
-#analytics.active a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -400px;}
+#analytics a {height:50px; width:50px; background:url('onboard_icons.png') -0px -400px;}
+#analytics a:hover {height:50px; width:50px; background:url('onboard_icons.png') -50px -400px;}
+#analytics.active a {height:50px; width:50px; background:url('onboard_icons.png') -50px -400px;}
 
-#social a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -0px -450px;}
-#social a:hover {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -450px;}
-#social.active a {height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -50px -450px;}
+#social a {height:50px; width:50px; background:url('onboard_icons.png') -0px -450px;}
+#social a:hover {height:50px; width:50px; background:url('onboard_icons.png') -50px -450px;}
+#social.active a {height:50px; width:50px; background:url('onboard_icons.png') -50px -450px;}
 
 #confirm { opacity: 0.3; }
-#confirm a { height:50px; width:50px; background:url(../images/icons/onboard_icons.png) -47px -500px; }
+#confirm a { height:50px; width:50px; background:url('onboard_icons.png') -47px -500px; }
 
 section#pane {
 	display: none;	
@@ -467,16 +467,16 @@ select.cl {
 
 #fb-32, #tw-32, #ld-32, #gl-32, #fb-32-active, #tw-32-active, #ld-32-active, #gl-32-active {height:32px; width:32px; display:block;}
 
-#fb-32-active {background:url(../images/icons/onboard_icons.png) -59px -558px;}
+#fb-32-active {background:url('onboard_icons.png') -59px -558px;}
 
-#fb-32 {background:url(../images/icons/onboard_icons.png) -59px -814px;}
-#tw-32 {background:url(../images/icons/onboard_icons.png) -59px -846px;}
-#ld-32 {background:url(../images/icons/onboard_icons.png) -59px -878px;}
-#gl-32 {background:url(../images/icons/onboard_icons.png) -59px -910px;}
+#fb-32 {background:url('onboard_icons.png') -59px -814px;}
+#tw-32 {background:url('onboard_icons.png') -59px -846px;}
+#ld-32 {background:url('onboard_icons.png') -59px -878px;}
+#gl-32 {background:url('onboard_icons.png') -59px -910px;}
 
-#tw-32:hover {background:url(../images/icons/onboard_icons.png) -59px -718px;}
-#ld-32:hover {background:url(../images/icons/onboard_icons.png) -59px -750px;}
-#gl-32:hover {background:url(../images/icons/onboard_icons.png) -59px -782px;}
+#tw-32:hover {background:url('onboard_icons.png') -59px -718px;}
+#ld-32:hover {background:url('onboard_icons.png') -59px -750px;}
+#gl-32:hover {background:url('onboard_icons.png') -59px -782px;}
 
 p.inp-cmt {
 	color:#909090;
@@ -565,13 +565,13 @@ div#pagination #center a:hover {
 div.featureicon {
  height:24px; 
  width:24px; 
- background:url(../images/icons/onboard_icons.png) -15px -714px;
+ background:url('onboard_icons.png') -15px -714px;
  float:left;
  margin:2px 8px 10px 0px;
 }
 
 div.featureicon:hover {
- background:url(../images/icons/onboard_icons.png) -15px -690px;	
+ background:url('onboard_icons.png') -15px -690px;	
 }
 
 div.button-container {
@@ -628,7 +628,7 @@ a.ico-responsive {
 	height: 24px;
 	width: 24px;
 	display: block;
-	background: url(../images/icons/onboard_icons.png) -15px -743px;		
+	background: url('onboard_icons.png') -15px -743px;		
 }
 
 a.toggle-display {
@@ -686,7 +686,7 @@ a.wizard-next {
 	display: none;
 	height: 27px;
 	width: 27px;
-	background: url(../images/icons/onboard_icons.png) -13px -656px;
+	background: url('onboard_icons.png') -13px -656px;
 	position: absolute;
 	right: -11px;
 	top: -11px;

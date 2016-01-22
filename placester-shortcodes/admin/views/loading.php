@@ -10,7 +10,7 @@ $location = !empty($location) ? $location : '';
 	});
 	</script>
 	<div class="preview_load_spinner">
-		<img src="<?php echo PLACESTER_PLUGIN_URL . 'images/preview_load_spin.gif'; ?>" alt="Admin page loading..." />
+		<img src="<?php echo PL_SHORTCODES_CSS_URL . 'spinner.gif'; ?>" alt="Admin page loading..." />
 	</div>
 </div>
 <?php

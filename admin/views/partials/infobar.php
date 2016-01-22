@@ -1,13 +1,11 @@
 <style id="pl_infobar" type="text/css">
   #infobar {
+	position: fixed;
 	overflow: hidden;
-	/*position: absolute;*/
 	top: 0px;
 	z-index: 100001;
 	width: 100%;
 	background: #9E1616;
-	position: fixed;
-	/*behavior: url(//dhiodphkum9p1.cloudfront.net/assets/misc/PIE-9b1859b5f8f5e290b0b121fddfecef36.htc);*/
 	-moz-box-shadow: #000 0 1px 3px;
 	-webkit-box-shadow: black 0 1px 3px;
 	-o-box-shadow: #000 0 1px 3px;
@@ -30,7 +28,7 @@
 
   #infobar .close {
 	float: right;
-	background: url(<?php echo PL_IMG_URL; ?>icons/x_white_icon.png) no-repeat;
+	background: url('<?php echo PL_ADMIN_CSS_URL; ?>white-x.png') no-repeat;
 	height: 17px;
 	width: 14px;
 	cursor: pointer;

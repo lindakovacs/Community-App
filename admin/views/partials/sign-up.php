@@ -10,7 +10,7 @@
  -->
 <div id="activate-plugin-dialog" class="">
     <p class="subtitle">To complete plugin activation, please confirm your email address.</p>
-	<img id="loading_gif" src="<?php echo PLACESTER_PLUGIN_URL . 'images/preview_load_spin.gif'; ?>"/>
+	<img id="loading_gif" src="<?php echo PL_ADMIN_CSS_URL . 'spinner.gif'; ?>"/>
     <input id="email" type="email" name="email" value="<?php echo $email; ?>" />
     <div id="api_key_validation"></div>
     <a href="https://placester.com/support/why-do-i-need-to-create-an-account/" target="pl_help" class="learn-more">Learn More</a>
