@@ -166,12 +166,9 @@ class PL_Listing_Helper {
 		$columns = array(
 			'total_images',
 			'location.address',
-			'location.locality',
-			'location.region',
 			'location.postal',
-			'zoning_types',
-			'purchase_types',
-			'property_type',
+			'compound_type', // the data API doesn't actually support this
+			'cur_data.prop_type',
 			'cur_data.beds',
 			'cur_data.baths',
 			'cur_data.price',
@@ -270,7 +267,7 @@ class PL_Listing_Helper {
 		$listings = array();
 		foreach ($api_response['listings'] as $key => $listing) {
 			$images = $listing['images'];
-			$listings[$key][] = ((is_array($images) && isset($images[0])) ? '<img width=50 height=50 src="' . $images[0]['url'] . '" />' : 'empty');
+			$listings[$key][] = ((is_array($images) && isset($images[0])) ? '<img width=50 height=50 src="' . $images[0]['url'] . '" />' : '');
 
 			$edit_link = admin_url('admin.php?page=placester_property_edit&id=' . $listing['id']);
 			$address = $listing["location"]["address"] . ' ' . $listing["location"]["locality"] . ' ' . $listing["location"]["region"];
@@ -282,13 +279,16 @@ class PL_Listing_Helper {
 				'</div>';
 
 			$listings[$key][] = $listing["location"]["postal"];
-			$listings[$key][] = implode($listing["zoning_types"], ', ') . ' ' . implode($listing["purchase_types"], ', ');
+
+			global $PL_API_LISTINGS;
+			$listings[$key][] = $PL_API_LISTINGS['create']['args']['compound_type']['options'][$listing['compound_type']];
+
 			$listings[$key][] = $listing["property_type"];
-			$listings[$key][] = $listing["cur_data"]["beds"];
-			$listings[$key][] = $listing["cur_data"]["baths"];
-			$listings[$key][] = $listing["cur_data"]["price"];
-			$listings[$key][] = $listing["cur_data"]["sqft"];
-			$listings[$key][] = $listing["cur_data"]["avail_on"] ? date_format(date_create($listing["cur_data"]["avail_on"]), "jS F, Y g:i A.") : 'n/a';
+			$listings[$key][] = $listing["cur_data"]["beds"] === false ? '' : $listing["cur_data"]["beds"];
+			$listings[$key][] = $listing["cur_data"]["baths"] === false ? '' : $listing["cur_data"]["baths"];
+			$listings[$key][] = is_null($listing["cur_data"]["price"]) ? '' : $listing["cur_data"]["price"];
+			$listings[$key][] = is_null($listing["cur_data"]["sqft"]) ? '' : $listing["cur_data"]["sqft"];
+			$listings[$key][] = $listing["cur_data"]["avail_on"] ? date_format(date_create($listing["cur_data"]["avail_on"]), "jS F, Y g:i A.") : '';
 		}
 
 		// Required for datatables.js to function properly.

@@ -103,10 +103,10 @@ jQuery(document).ready(function($) {
 
     // hide/show action links in rows
     $('tr.odd, tr.even').live('mouseover', function(event) {
-        $(this).find(".row_actions").show();
+        $(this).find(".row_actions").css('visibility', 'visible');
     });
     $('tr.odd, tr.even').live('mouseout', function(event) {
-        $(this).find(".row_actions").hide();
+        $(this).find(".row_actions").css('visibility', 'hidden');
     });
 
 

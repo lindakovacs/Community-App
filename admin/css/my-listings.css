@@ -121,7 +121,7 @@
 
 
 .row_actions {
-  display: none;
+  visibility: hidden;
 }
 .row_actions a, .row_actions span {
   padding-right: 10px;

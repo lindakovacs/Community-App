@@ -45,7 +45,7 @@ PL_Form::generate_form(PL_Config::PL_API_LISTINGS('get', 'args'), array('method'
     <thead>
       <tr>
         <th><span></span></th>
-        <th><span>Street</span></th>
+        <th><span>Address</span></th>
         <th><span>Zip</span></th>
         <th><span>Listing Type</span></th>
         <th><span>Property Type</span></th>
