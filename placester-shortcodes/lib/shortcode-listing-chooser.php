@@ -1,10 +1,10 @@
-<?php 
+<?php
+
 PL_Shortcode_Listing_Chooser::register();
 class PL_Shortcode_Listing_Chooser {
 	public static function register () {
-		add_action('wp_ajax_list_options', array(__CLASS__, 'get_listings' ));
+		add_action('wp_ajax_listing_chooser_options', array(__CLASS__, 'get_listings' ));
 	}
-
 
 	public static function init ( $params = array() ) {
 		extract( $params );

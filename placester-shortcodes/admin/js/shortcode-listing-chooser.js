@@ -54,11 +54,9 @@ jQuery(document).ready(function($) {
                 { sWidth: '100px' },    //add
             ], 
             "fnServerParams": function ( aoData ) {
-                aoData.push( { "name": "action", "value" : "list_options"} );
-                // aoData.push( { "name": "sSearch", "value" : $('input#address_search').val() })
+                aoData.push( { "name": "action", "value" : "listing_chooser_options"} );
                 aoData = options_filters(aoData);
-                // console.log(aoData);
-            } 
+            }
 		});
 		featured_datatable = $('#datatable_featured_listings').dataTable({
             "bFilter" : false,

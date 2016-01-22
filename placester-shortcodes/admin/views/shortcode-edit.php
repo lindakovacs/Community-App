@@ -110,10 +110,6 @@ else {
 $nonce_action = 'update-' . $post_type . '_' . $post_ID;
 
 
-// for selecting featured listings
-require_once('partials/shortcode-listing-chooser.php');
-
-
 function placester_shortcode_create_box($values, $pl_shortcodes_attr, $pl_featured_meta_value) {
 	include 'partials/shortcode-create-box.php';
 }

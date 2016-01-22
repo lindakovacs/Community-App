@@ -8,10 +8,13 @@ Version: 1.0.0
 Author URI: https://www.placester.com/
 */
 
-include_once('lib/shortcode-cpt.php');
-include_once('lib/component_entities.php');
-include_once('lib/shortcodes.php');
-include_once('lib/listing-customizer.php');
+require_once('lib/shortcode-cpt.php');
+require_once('lib/component_entities.php');
+require_once('lib/shortcodes.php');
+require_once('lib/listing-customizer.php');
+
+// for selecting featured listings
+require_once('lib/shortcode-listing-chooser.php');
 
 
 // the shortcode admin pages may need to send a browser redirect after content is generated
