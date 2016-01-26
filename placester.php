@@ -32,8 +32,6 @@ define('PL_PLUGIN_VERSION','1.3.4');
 define( 'PLACESTER_PLUGIN_DIR', plugin_dir_path(__FILE__) );
 define( 'PLACESTER_PLUGIN_URL', trailingslashit(plugins_url()) . 'placester/' );
 
-define( 'PL_IMG_URL', trailingslashit(PLACESTER_PLUGIN_URL) . 'images/' );
-
 
 // API Server
 global $PL_API_SERVER;
@@ -123,39 +121,32 @@ include_once('placester-tools/placester-tools.php');
 include_once('placester-customizer/placester-customizer.php');
 
 
-// Register hook to load blueprint from plugin if the active theme has yet to do so...
-add_action( 'after_setup_theme', 'load_blueprint_from_plugin', 18 );
-function load_blueprint_from_plugin () {
-	if (!class_exists('Placester_Blueprint')) {
-		// Load script that contains main blueprint class, and instantiate an object...
-		require_once('blueprint/blueprint.php');
-		new Placester_Blueprint('2.5', 'plugin');
-		add_action('init', 'plugin_blueprint_settings');
-	}
-}
-
-// This takes care of what a theme's functions.php file normally handles...
-function plugin_blueprint_settings () {
-	remove_theme_support('pls-default-css');
-	remove_theme_support('pls-default-style');
-	remove_theme_support('pls-default-960');
-	remove_theme_support('pls-default-normalize');
-	remove_theme_support('pls-js');
-	remove_theme_support('pls-routing-util-templates');
-
-	// for property detail page lead capture
-	add_theme_support( 'pls-js', array(
-			'jquery-ui'    => array('script' => true, 'style' => true),
-			'datatable'    => array('script' => true, 'style' => true),
-			'lead-capture' => array('script' => true, 'style' => false)
-		)
-	);
-}
-
-
 register_activation_hook(__FILE__, 'placester_activate');
 function placester_activate () {
 	PL_WordPress_Helper::report_url();
+}
+
+
+add_action( 'after_setup_theme', 'check_for_blueprint', 18 );
+function check_for_blueprint () {
+	if (!class_exists('Placester_Blueprint')) {
+		function pls_get_option($arg1 = null, $arg2 = null, $arg3 = null) { return null; }
+		function pls_has_plugin_error($arg1 = null) { return false; }
+		function pls_do_atomic($arg1 = null, $arg2 = null) { return false; }
+		function pls_apply_atomic($arg1 = null, $arg2 = null) { return $arg2; }
+
+		// load the search sub-system and define its scripts
+		include_once('placester-search/compatibility.php');
+		include_once('placester-search/caching.php');
+		include_once('placester-search/util.php');
+		include_once('placester-search/listings.php');
+		include_once('placester-search/partials.php');
+		include_once('placester-search/formatting.php');
+		include_once('placester-search/image-util.php');
+		include_once('placester-search/internationalization.php');
+
+		define('PLS_JS_URL', PLACESTER_PLUGIN_URL . 'placester-search/js/');
+	}
 }
 
 add_action('wp_head', 'placester_info_bar');
@@ -170,6 +161,26 @@ function placester_info_bar_enqueue() {
 	if(PL_Option_Helper::get_demo_data_flag() && current_user_can('manage_options')) {
 		wp_enqueue_style('placester-global');
 		wp_enqueue_script('placester-infobar', PLACESTER_PLUGIN_URL . 'admin/js/infobar.js', array('jquery'), PL_PLUGIN_VERSION);
+	}
+
+	if (!class_exists('Placester_Blueprint')) {
+		ob_start();
+		?>
+		<script type="text/javascript">//<![CDATA[
+			var info = {"ajaxurl": "<?php echo admin_url( 'admin-ajax.php' ); ?>"};
+			//]]>
+		</script>
+		<?php
+		echo ob_get_clean();
+
+		wp_register_style('jquery-ui', PL_ADMIN_JS_URL . 'jquery-ui/css/smoothness/jquery-ui-1.8.17.custom.css');
+		wp_register_style('jquery-datatables', PLACESTER_PLUGIN_URL . 'admin/js/datatables/jquery.dataTables.css', array('jquery-ui'));
+		wp_register_script('jquery-datatables', PLACESTER_PLUGIN_URL . 'admin/js/datatables/jquery.dataTables.js', array('jquery'), PL_PLUGIN_VERSION, true);
+
+		wp_register_script('jquery-address', PLS_JS_URL . 'libs/jquery.address.js', array('jquery'), PL_PLUGIN_VERSION, true);
+		wp_enqueue_script('placester-listings', PLS_JS_URL . 'scripts/listings.js', array('jquery', 'jquery-address', 'jquery-datatables'), PL_PLUGIN_VERSION, true);
+
+		// lead-capture
 	}
 }
 
