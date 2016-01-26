@@ -146,6 +146,7 @@ function check_for_blueprint () {
 		include_once('placester-search/internationalization.php');
 
 		define('PLS_JS_URL', PLACESTER_PLUGIN_URL . 'placester-search/js/');
+		define('PLS_IMG_URL', PLACESTER_PLUGIN_URL . 'placester-search/images/');
 	}
 }
 
