@@ -121,7 +121,7 @@ class PLS_Partials_Get_Listings_Ajax {
 
         ob_start();
         ?>
-            <script type="text/javascript" src="<?php echo PLACESTER_PLUGIN_URL . 'placester-maps/js/listing-list.js'; ?>"></script>
+            <script type="text/javascript" src="<?php echo PLACESTER_PLUGIN_URL . 'placester-search/js/listing-list.js'; ?>"></script>
             
             <!-- Sort Dropdown -->
             <?php if ($show_sort): ?>
