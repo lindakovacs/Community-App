@@ -145,6 +145,13 @@ function check_for_blueprint () {
 		include_once('placester-search/image-util.php');
 		include_once('placester-search/internationalization.php');
 
+		include_once('placester-search/maps/maps-util.php');
+		include_once('placester-search/maps/lifestyle.php');
+		include_once('placester-search/maps/lifestyle_polygon.php');
+		include_once('placester-search/maps/listings.php');
+		include_once('placester-search/maps/polygon.php');
+		include_once('placester-search/maps/neighborhood.php');
+
 		define('PLS_JS_URL', PLACESTER_PLUGIN_URL . 'placester-search/js/');
 		define('PLS_IMG_URL', PLACESTER_PLUGIN_URL . 'placester-search/images/');
 	}
