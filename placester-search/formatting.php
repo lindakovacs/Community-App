@@ -784,7 +784,7 @@ class PLS_Format
 
 	public static function get_lat_lng_of_address($address)
 	{
-		$url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' . $address . '&sensor=false';
+		$url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' . $address;
 		$url = str_replace(',', '', $url);
 		$url = str_replace(' ', '+', $url);
 		$result = wp_remote_get($url);

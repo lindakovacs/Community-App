@@ -1486,13 +1486,13 @@ To add some text to your listings:<br />
 		}
 
 		if (!empty($js_files['filters'])) {
-			wp_enqueue_script('pl-filters.js', trailingslashit(PLS_JS_URL) . 'scripts/filters.js', array('jquery'));
+			wp_enqueue_script('pl-filters.js', PLACESTER_PLUGIN_URL . 'placester-search/js/filters.js', array('jquery'));
 		}
 		if (!empty($js_files['lifestyle'])) {
-			wp_enqueue_script('pl-lifestyle.js', trailingslashit(PLS_JS_URL) . 'scripts/lifestyle.js', array('jquery'));
+			wp_enqueue_script('pl-lifestyle.js', PLACESTER_PLUGIN_URL . 'placester-maps/js/lifestyle.js', array('jquery'));
 		}
 		if (!empty($js_files['lifestyle_polygon'])) {
-			wp_enqueue_script('pl-lifestyle_polygon.js', trailingslashit(PLS_JS_URL) . 'scripts/lifestyle_polygon.js', array('jquery'));
+			wp_enqueue_script('pl-lifestyle_polygon.js', PLACESTER_PLUGIN_URL . 'placester-maps/js/lifestyle_polygon.js', array('jquery'));
 		}
 	}
 }

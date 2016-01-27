@@ -12,8 +12,7 @@ $PL_TP_GOOGLE_PLACES = array(
 			'language' => '',
 			'name' => '',
 			'rankby' => '',
-			'types' => '',
-			'sensor' => 'false'
+			'types' => ''
 			),
 		'returns' => array()
 	)

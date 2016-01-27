@@ -134,23 +134,25 @@ function check_for_blueprint () {
 		function pls_has_plugin_error($arg1 = null) { return false; }
 		function pls_do_atomic($arg1 = null, $arg2 = null) { return false; }
 		function pls_apply_atomic($arg1 = null, $arg2 = null) { return $arg2; }
+		function pls_get_textdomain() { return get_template(); }
 
 		// load the search sub-system and define its scripts
 		include_once('placester-search/compatibility.php');
 		include_once('placester-search/caching.php');
 		include_once('placester-search/util.php');
+		include_once('placester-search/html.php');
 		include_once('placester-search/listings.php');
 		include_once('placester-search/partials.php');
 		include_once('placester-search/formatting.php');
 		include_once('placester-search/image-util.php');
 		include_once('placester-search/internationalization.php');
 
-		include_once('placester-search/maps/maps-util.php');
-		include_once('placester-search/maps/lifestyle.php');
-		include_once('placester-search/maps/lifestyle_polygon.php');
-		include_once('placester-search/maps/listings.php');
-		include_once('placester-search/maps/polygon.php');
-		include_once('placester-search/maps/neighborhood.php');
+		include_once('placester-maps/maps-util.php');
+		include_once('placester-maps/lifestyle.php');
+		include_once('placester-maps/lifestyle_polygon.php');
+		include_once('placester-maps/listings.php');
+		include_once('placester-maps/polygon.php');
+		include_once('placester-maps/neighborhood.php');
 
 		define('PLS_JS_URL', PLACESTER_PLUGIN_URL . 'placester-search/js/');
 		define('PLS_IMG_URL', PLACESTER_PLUGIN_URL . 'placester-search/images/');
@@ -185,8 +187,8 @@ function placester_info_bar_enqueue() {
 		wp_register_style('jquery-datatables', PLACESTER_PLUGIN_URL . 'admin/js/datatables/jquery.dataTables.css', array('jquery-ui'));
 		wp_register_script('jquery-datatables', PLACESTER_PLUGIN_URL . 'admin/js/datatables/jquery.dataTables.js', array('jquery'), PL_PLUGIN_VERSION, true);
 
-		wp_register_script('jquery-address', PLS_JS_URL . 'libs/jquery.address.js', array('jquery'), PL_PLUGIN_VERSION, true);
-		wp_enqueue_script('placester-listings', PLS_JS_URL . 'scripts/listings.js', array('jquery', 'jquery-address', 'jquery-datatables'), PL_PLUGIN_VERSION, true);
+		wp_register_script('jquery-address', PLACESTER_PLUGIN_URL . 'placester-search/js/jquery.address.js', array('jquery'), PL_PLUGIN_VERSION, true);
+		wp_enqueue_script('placester-listings', PLACESTER_PLUGIN_URL . 'placester-search/js/listings.js', array('jquery', 'jquery-address', 'jquery-datatables'), PL_PLUGIN_VERSION, true);
 
 		// lead-capture
 	}
