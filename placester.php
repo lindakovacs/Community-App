@@ -82,13 +82,6 @@ include_once('lib/global-filters.php');
 include_once('lib/permalink-search.php');
 
 
-// analytics
-include_once('lib/mixpanel.php');
-include_once('config/analytics.php');
-include_once('lib/analytics.php');
-include_once('helpers/logging.php'); // this needs to be separated
-
-
 // third party tools
 include_once('lib/dragonfly-resize.php');
 
@@ -137,15 +130,16 @@ function check_for_blueprint () {
 		function pls_get_textdomain() { return get_template(); }
 
 		// load the search sub-system and define its scripts
-		include_once('placester-search/compatibility.php');
-		include_once('placester-search/caching.php');
-		include_once('placester-search/util.php');
-		include_once('placester-search/html.php');
+		include_once('placester-blueprint/compatibility.php');
+		include_once('placester-blueprint/caching.php');
+		include_once('placester-blueprint/util.php');
+		include_once('placester-blueprint/html.php');
+		include_once('placester-blueprint/formatting.php');
+		include_once('placester-blueprint/image-util.php');
+		include_once('placester-blueprint/internationalization.php');
+
 		include_once('placester-search/listings.php');
 		include_once('placester-search/partials.php');
-		include_once('placester-search/formatting.php');
-		include_once('placester-search/image-util.php');
-		include_once('placester-search/internationalization.php');
 
 		include_once('placester-maps/maps-util.php');
 		include_once('placester-maps/lifestyle.php');
@@ -196,5 +190,13 @@ function placester_info_bar_enqueue() {
 
 // PL_COMPATIBILITY_MODE -- preserve the interface expected by certain previous versions of blueprint
 function placester_post_slug() {
-  return true;
+	return true;
 }
+
+// PL_COMPATIBILITY_MODE -- preserve the interface expected by certain previous versions of blueprint
+class PL_Analytics {
+	public static function log_snippet_js() {
+		return null;
+	}
+}
+

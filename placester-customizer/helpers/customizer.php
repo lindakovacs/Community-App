@@ -132,8 +132,6 @@ class PL_Customizer_Helper
 	  ?>
 	    <!-- Spinner for Theme Preview overlay -->
 	    <img id="preview_load_spinner" src="<?php echo PL_IMG_URL . 'preview_load_spin.gif'; ?>" alt="Theme Preview is Loading..." />
-	  
-	    <?php echo PL_Logging::mixpanel_inline_js(); ?>
 
 		<?php if ( self::is_onboarding() ): ?>
 		    <!-- Tooltip box -->
