@@ -77,18 +77,9 @@ include_once('models/wordpress.php');
 include_once('helpers/wordpress.php');
 
 // search
-include_once('lib/form.php');
 include_once('lib/global-filters.php');
-include_once('lib/permalink-search.php');
-
-
-// third party tools
-include_once('lib/dragonfly-resize.php');
-
-if ((!is_admin() && file_exists(WP_PLUGIN_DIR.'/wordpress-seo/inc/class-sitemaps.php') && strpos($_SERVER["REQUEST_URI"],'sitemap')!==false)
-	|| is_admin()) {
-	include_once('lib/sitemaps.php'); // refers to taxonomies
-}
+include_once('placester-search/placester-search.php');
+include_once('placester-maps/placester-maps.php');
 
 
 // needed on the wp-admin side only (eventually)
@@ -122,35 +113,8 @@ function placester_activate () {
 
 add_action( 'after_setup_theme', 'check_for_blueprint', 18 );
 function check_for_blueprint () {
-	if (!class_exists('Placester_Blueprint')) {
-		function pls_get_option($arg1 = null, $arg2 = null, $arg3 = null) { return null; }
-		function pls_has_plugin_error($arg1 = null) { return false; }
-		function pls_do_atomic($arg1 = null, $arg2 = null) { return false; }
-		function pls_apply_atomic($arg1 = null, $arg2 = null) { return $arg2; }
-		function pls_get_textdomain() { return get_template(); }
-
-		// load the search sub-system and define its scripts
-		include_once('placester-blueprint/compatibility.php');
-		include_once('placester-blueprint/caching.php');
-		include_once('placester-blueprint/util.php');
-		include_once('placester-blueprint/html.php');
-		include_once('placester-blueprint/formatting.php');
-		include_once('placester-blueprint/image-util.php');
-		include_once('placester-blueprint/internationalization.php');
-
-		include_once('placester-search/listings.php');
-		include_once('placester-search/partials.php');
-
-		include_once('placester-maps/maps-util.php');
-		include_once('placester-maps/lifestyle.php');
-		include_once('placester-maps/lifestyle_polygon.php');
-		include_once('placester-maps/listings.php');
-		include_once('placester-maps/polygon.php');
-		include_once('placester-maps/neighborhood.php');
-
-		define('PLS_JS_URL', PLACESTER_PLUGIN_URL . 'placester-search/js/');
-		define('PLS_IMG_URL', PLACESTER_PLUGIN_URL . 'placester-search/images/');
-	}
+	if (!class_exists('Placester_Blueprint'))
+		include_once('lib/smallprint.php');
 }
 
 add_action('wp_head', 'placester_info_bar');
@@ -165,26 +129,6 @@ function placester_info_bar_enqueue() {
 	if(PL_Option_Helper::get_demo_data_flag() && current_user_can('manage_options')) {
 		wp_enqueue_style('placester-global');
 		wp_enqueue_script('placester-infobar', PLACESTER_PLUGIN_URL . 'admin/js/infobar.js', array('jquery'), PL_PLUGIN_VERSION);
-	}
-
-	if (!class_exists('Placester_Blueprint')) {
-		ob_start();
-		?>
-		<script type="text/javascript">//<![CDATA[
-			var info = {"ajaxurl": "<?php echo admin_url( 'admin-ajax.php' ); ?>"};
-			//]]>
-		</script>
-		<?php
-		echo ob_get_clean();
-
-		wp_register_style('jquery-ui', PL_ADMIN_JS_URL . 'jquery-ui/css/smoothness/jquery-ui-1.8.17.custom.css');
-		wp_register_style('jquery-datatables', PLACESTER_PLUGIN_URL . 'admin/js/datatables/jquery.dataTables.css', array('jquery-ui'));
-		wp_register_script('jquery-datatables', PLACESTER_PLUGIN_URL . 'admin/js/datatables/jquery.dataTables.js', array('jquery'), PL_PLUGIN_VERSION, true);
-
-		wp_register_script('jquery-address', PLACESTER_PLUGIN_URL . 'placester-search/js/jquery.address.js', array('jquery'), PL_PLUGIN_VERSION, true);
-		wp_enqueue_script('placester-listings', PLACESTER_PLUGIN_URL . 'placester-search/js/listings.js', array('jquery', 'jquery-address', 'jquery-datatables'), PL_PLUGIN_VERSION, true);
-
-		// lead-capture
 	}
 }
 

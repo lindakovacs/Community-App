@@ -8,6 +8,14 @@ Version: 1.0.0
 Author URI: https://www.placester.com/
 */
 
+
+include_once('lib/dragonfly-resize.php');
+
+if ((!is_admin() && file_exists(WP_PLUGIN_DIR.'/wordpress-seo/inc/class-sitemaps.php') && strpos($_SERVER["REQUEST_URI"],'sitemap')!==false)
+	|| is_admin()) {
+	include_once('lib/sitemaps.php'); // refers to taxonomies
+}
+
 //include_once('placester-tools/lib/social_networks.php');
 
 include_once('config/third-party/google-places.php');
