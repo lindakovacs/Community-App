@@ -113,8 +113,13 @@ function placester_activate () {
 
 add_action( 'after_setup_theme', 'check_for_blueprint', 18 );
 function check_for_blueprint () {
-	if (!class_exists('Placester_Blueprint'))
+	if (!class_exists('Placester_Blueprint')) {
 		include_once('lib/smallprint.php');
+
+		include_once('widgets/agent.php'); register_widget( 'PLS_Widget_Agent' );
+		include_once('widgets/listings.php'); register_widget( 'PLS_Widget_Listings' );
+		include_once('widgets/office.php'); register_widget( 'PLS_Widget_Office' );
+	}
 }
 
 add_action('wp_head', 'placester_info_bar');

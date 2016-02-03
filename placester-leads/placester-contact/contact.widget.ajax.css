@@ -1,0 +1,178 @@
+.contact-form-validator-error {
+  z-index: 999999; }
+  .contact-form-validator-error span {
+    border: 5px solid;
+    border-color: #eed3d7 transparent transparent transparent;
+    bottom: -10px;
+    left: 5px;
+    display: block;
+    height: 0;
+    width: 0;
+    position: absolute; }
+  .contact-form-validator-error p {
+    float: left;
+    margin: 0;
+    padding: 6px;
+    color: #b94a48;
+    background: #f2dede;
+    border: 1px solid #eed3d7;
+    font-size: 12px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px; }
+
+.login-form-validator-error, .register-form-validator-error {
+  z-index: 999999; }
+  .login-form-validator-error span, .register-form-validator-error span {
+    border: 5px solid;
+    border-color: #eed3d7 transparent transparent transparent;
+    bottom: -10px;
+    left: 5px;
+    display: block;
+    height: 0;
+    width: 0;
+    position: absolute; }
+  .login-form-validator-error p, .register-form-validator-error p {
+    float: left;
+    margin: 0;
+    padding: 6px;
+    color: #b94a48;
+    background: #f2dede;
+    border: 1px solid #eed3d7;
+    font-size: 12px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px; }
+
+.pl_login_reg_form .success,
+.pl_lead_register_form .success,
+#edit_profile_form .success {
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 13px;
+  float: left;
+  padding: 7px 10px;
+  display: none;
+  color: #468847;
+  border-color: #d6e9c6;
+  background: #dff0d8; }
+.pl_login_reg_form .error,
+.pl_lead_register_form .error,
+#edit_profile_form .error {
+  color: #de4826;
+  border-color: #de4826; }
+.pl_login_reg_form .invalid,
+.pl_lead_register_form .invalid,
+#edit_profile_form .invalid {
+  box-shadow: 0 0 1px 1px red; }
+
+.pl_login_reg_form,
+.pl_lead_register_form {
+  padding: 20px; }
+  .pl_login_reg_form h2,
+  .pl_lead_register_form h2 {
+    margin: 0 0 0.5em 0; }
+  .pl_login_reg_form label,
+  .pl_lead_register_form label {
+    display: none; }
+  .pl_login_reg_form input[type="text"], .pl_login_reg_form input[type="email"], .pl_login_reg_form input[type="password"],
+  .pl_lead_register_form input[type="text"],
+  .pl_lead_register_form input[type="email"],
+  .pl_lead_register_form input[type="password"] {
+    box-sizing: border-box;
+    min-width: 260px;
+    margin: 0 0 0.5em 0; }
+  .pl_login_reg_form .reg_form_submit, .pl_login_reg_form .login-submit,
+  .pl_lead_register_form .reg_form_submit,
+  .pl_lead_register_form .login-submit {
+    text-align: right; }
+    .pl_login_reg_form .reg_form_submit a, .pl_login_reg_form .login-submit a,
+    .pl_lead_register_form .reg_form_submit a,
+    .pl_lead_register_form .login-submit a {
+      float: left;
+      margin: 0.4em 1em 0 0; }
+
+#edit_profile_form label {
+  display: block;
+  margin: 0 0 0.5em 0; }
+#edit_profile_form input[type="text"], #edit_profile_form input[type="email"], #edit_profile_form input[type="password"] {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 0 0.5em 0; }
+
+.placester_contact_form label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 13px; }
+.placester_contact_form input[type="text"], .placester_contact_form input[type="email"] {
+  width: 200px;
+  margin-bottom: 10px; }
+.placester_contact_form textarea {
+  width: 250px;
+  margin-bottom: 10px; }
+.placester_contact_form .info {
+  width: 200px;
+  margin-bottom: 10px;
+  font-size: 80%; }
+.placester_contact_form .pls-contact-form-loading {
+  float: right;
+  margin: 0;
+  width: 50px;
+  height: 50px; }
+  .placester_contact_form .pls-contact-form-loading #medium-spinner {
+    float: right; }
+.placester_contact_form .success {
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 13px;
+  float: left;
+  padding: 7px 10px;
+  display: none;
+  color: #468847;
+  border-color: #d6e9c6;
+  background: #dff0d8; }
+.placester_contact_form .error {
+  color: #de4826;
+  border-color: #de4826; }
+.placester_contact_form .invalid {
+  box-shadow: 0 0 1px 1px red; }
+
+.ui-widget-overlay {
+  background-image: none !important; }
+
+.ui-dialog {
+  background: #fcfcfc;
+  padding: 4px !important; }
+  .ui-dialog .ui-dialog-titlebar {
+    background: none !important;
+    border: none !important;
+    position: absolute !important;
+    z-index: 1 !important;
+    top: 4px !important;
+    right: 4px !important; }
+  .ui-dialog .ui-dialog-titlebar-close {
+    border-color: transparent !important;
+    background: none !important; }
+    .ui-dialog .ui-dialog-titlebar-close .ui-icon {
+      background-image: url("ui-icons_222222_256x240.png"); }
+  .ui-dialog .ui-dialog-title {
+    visibility: hidden; }
+  .ui-dialog .ui-dialog-buttonpane {
+    display: none; }

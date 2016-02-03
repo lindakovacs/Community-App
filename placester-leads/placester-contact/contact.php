@@ -5,7 +5,7 @@ class Placester_Contact_Widget extends WP_Widget {
   public function __construct() {
     $widget_ops = array(
       'classname' => 'pls-contact-form Placester_Contact_Widget',
-      'description' => 'Works only on the Property Details Page.'
+      'description' => 'A configurable contact form for your Property pages'
     );
     $this->WP_Widget( 'Placester_Contact_Widget', 'Placester: Contact Form', $widget_ops );
   }
@@ -227,7 +227,7 @@ class Placester_Contact_Widget extends WP_Widget {
                   <input type="submit" value="<?php echo $submit_value; ?>" class="<?php echo $button_class; ?>" />
                   
                   <div class="pls-contact-form-loading" style='display:none;'>
-                    <img class="spinner" id="spinner" src="<?php echo trailingslashit( PLS_IMG_URL ); ?>preview_load_spin.gif" width="25" />
+                    <img class="spinner" id="spinner" src="<?php echo PL_LEADS_URL . 'placester-contact/spinner.gif'; ?>" width="25" />
                   </div>
                   
                 </form>
@@ -266,24 +266,16 @@ class Placester_Contact_Widget extends WP_Widget {
   // }
 } // End Class
 
-// add_action('init', 'placester_contact_widget');
-// // Style
-// function placester_contact_widget() {
-//     $myStyleUrl = WP_PLUGIN_URL . '/placester/css/contact.widget.ajax.css';
-//     wp_enqueue_style( 'contactwidgetcss', $myStyleUrl );
-//     $myScriptUrl = WP_PLUGIN_URL . '/placester/js/contact.widget.ajax.js';
-//     wp_enqueue_script( 'contactwidgetjs', $myScriptUrl, array('jquery') );
 
-//     // Get current page protocol
-//     $protocol = isset( $_SERVER['HTTPS'] ) ? 'https://' : 'http://';
+add_action('wp_enqueue_scripts', 'placester_contact_widget_enqueue');
+function placester_contact_widget_enqueue() {
+  wp_enqueue_style('contact-widget', PL_LEADS_URL . 'placester-contact/contact.widget.ajax.css');
 
-//     $params = array(
-//         'ajaxurl' => admin_url( 'admin-ajax.php', $protocol ),
-//     );
-//     wp_localize_script( 'contactwidgetjs', 'contactwidgetjs', $params );
-// }
+  wp_register_script( 'jquery-validator', PL_LEADS_URL . 'placester-contact/validator.js' , array( 'jquery'), NULL, true );
+  wp_enqueue_script( 'contact-widget', PL_LEADS_URL . 'placester-contact/contact.widget.ajax.js' , array( 'jquery', 'jquery-cookies', 'jquery-validator' ), NULL, true );
+}
 
-// Ajax function
+
 add_action( 'wp_ajax_placester_contact', 'ajax_placester_contact' );
 add_action( 'wp_ajax_nopriv_placester_contact', 'ajax_placester_contact' );
 function ajax_placester_contact() {

@@ -38,7 +38,7 @@ class PLS_Widget_Office extends WP_Widget {
 
 			<section id="map-widget">
 
-        <script src="http://maps.googleapis.com/maps/api/js" type="text/javascript"></script>
+        <!--script src="http://maps.googleapis.com/maps/api/js" type="text/javascript"></script-->
 
 				<script type="text/javascript">
 					jQuery(document).ready(function () {

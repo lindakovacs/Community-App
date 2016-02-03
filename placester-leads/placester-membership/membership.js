@@ -43,6 +43,19 @@ jQuery(document).ready(function($) {
 		$('.pl_login_link').trigger('click');
 	});
 
+	function overlay_show(element) {
+		if(typeof element == 'string') { // use as jquery selector
+			element = $(element);
+		}
+
+		if(!element || !element.length)
+			return;
+
+		element.show();
+	}
+
+	function overlay_hide(element) {}
+
 	if (typeof $.fancybox == "function") {
 		// If reg form available or logged in then show add to favorites 
 		if ($('.pl_lead_register_form').length || $('.pl_add_remove_lead_favorites #pl_add_favorite').length) {
