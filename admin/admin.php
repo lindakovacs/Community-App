@@ -43,10 +43,6 @@ class PL_Admin_Page extends PL_Admin_Page_v1A {
 		// and add the bit of dynamic script below
 		add_action('admin_print_scripts', array($this, 'page_print_scripts'));
 
-		// if no API key give the user a sign-up prompt
-		if(!PL_Option_Helper::api_key())
-			wp_enqueue_script('sign-up');
-
 		// enqueue the page-specific scripts
 		parent::page_enqueue_scripts();
 
@@ -76,7 +72,6 @@ PL_Admin_Page::register_style('settings-all', PL_ADMIN_CSS_URL . 'settings.css')
 
 PL_Admin_Page::register_script('jquery-datatables', PL_ADMIN_JS_URL . 'datatables/jquery.dataTables.js', array('jquery'));
 PL_Admin_Page::register_script('placester-global', PL_ADMIN_JS_URL . 'global.js', array('jquery'));
-PL_Admin_Page::register_script('sign-up', PL_ADMIN_JS_URL . 'sign-up.js', array('jquery-ui-core', 'jquery-ui-dialog'));
 
 
 // administration pages
