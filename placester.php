@@ -115,10 +115,8 @@ add_action( 'after_setup_theme', 'check_for_blueprint', 18 );
 function check_for_blueprint () {
 	if (!class_exists('Placester_Blueprint')) {
 		include_once('lib/smallprint.php');
-
-		include_once('widgets/agent.php'); register_widget( 'PLS_Widget_Agent' );
-		include_once('widgets/listings.php'); register_widget( 'PLS_Widget_Listings' );
-		include_once('widgets/office.php'); register_widget( 'PLS_Widget_Office' );
+		include_once('lib/agent-widget.php');
+		include_once('lib/listings-widget.php');
 	}
 }
 

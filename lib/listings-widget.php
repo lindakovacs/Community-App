@@ -12,6 +12,7 @@
  *
  * @since 0.0.1
  */
+register_widget( 'PLS_Widget_Listings' );
 class PLS_Widget_Listings extends WP_Widget {
 
 	/**

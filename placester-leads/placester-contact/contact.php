@@ -1,5 +1,6 @@
 <?php
 
+register_widget( 'Placester_Contact_Widget' );
 class Placester_Contact_Widget extends WP_Widget {
 
   public function __construct() {

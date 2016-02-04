@@ -17,5 +17,7 @@ function placester_add_maps_if_no_blueprint () {
 		include_once('lib/listings.php');
 		include_once('lib/polygon.php');
 		include_once('lib/neighborhood.php');
+
+		include_once('lib/office-widget.php');
 	}
 }

@@ -11,6 +11,7 @@
  *
  * @since 0.0.1
  */
+register_widget( 'PLS_Widget_Agent' );
 class PLS_Widget_Agent extends WP_Widget {
 
 	/**

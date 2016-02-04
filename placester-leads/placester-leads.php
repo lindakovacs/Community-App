@@ -55,7 +55,7 @@ function placester_membership_enqueue() {
 add_action( 'after_setup_theme', 'placester_add_lead_components', 20 );
 function placester_add_lead_components () {
 	if (!class_exists('Placester_Blueprint')) {
-		include_once('placester-contact/contact.php'); register_widget( 'Placester_Contact_Widget' );
+		include_once('placester-contact/contact.php');
 
 		include_once('helpers/lead-capture-frontend.php');
 	}

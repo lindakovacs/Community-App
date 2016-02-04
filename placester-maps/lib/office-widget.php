@@ -1,5 +1,6 @@
 <?php
 
+register_widget( 'PLS_Widget_Office' );
 class PLS_Widget_Office extends WP_Widget {
 
 	function __construct() {
@@ -18,12 +19,12 @@ class PLS_Widget_Office extends WP_Widget {
 	}
 
 	public function widget( $args, $instance ) {
-		// Widget output
-		?>
-		<?php extract($args); ?>
+		extract($args);
 
-    <?php $agent = PLS_Plugin_API::get_user_details(); ?>
-   
+		wp_enqueue_script('google-maps', 'http://maps.googleapis.com/maps/api/js');
+		$agent = PLS_Plugin_API::get_user_details();
+
+		// Widget output ?>
 		<section class="widget pls-map widget-pls-map" itemscope itemtype="http://schema.org/LocalBusiness">
 			<?php $title = empty($instance['title']) ? ' ' : apply_filters('widget_title', $instance['title']); ?>
 			<?php $subtitle = empty($instance['subtitle']) ? ' ' : apply_filters('subtitle', $instance['subtitle']); ?>

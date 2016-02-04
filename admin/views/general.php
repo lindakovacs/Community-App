@@ -13,10 +13,10 @@
 	<?php if (PL_Option_Helper::api_key() && isset($email)): ?>
 		<div class="header-wrapper" id="settings-header-wrapper">
 			<h2 id="settings-page-email-title">This plugin is linked to <span id="settings-page-email-in-title"><?php echo $email ?></span> <span class="check-icon"></span></h2>	
-			<a class="button-secondary" href='https://placester.com/user/login'>Login to Placester.com</a>
-			<a class="button-secondary" href='https://placester.com/user/password/new'>Forgot Password?</a>	
 			<a class="button-secondary" id="new_email" >Create a New Placester Account</a>
-			<a class="button-secondary" id="existing_placester" href="#">Change to an Existing Placester Account</a>	
+			<a class="button-secondary" id="existing_placester" href="#">Change to an Existing Placester Account</a>
+			<a class="button-secondary" href='https://placester.com/user/login'>Login to Placester.com</a>
+			<a class="button-secondary" href='https://placester.com/user/password/new'>Forgot Password?</a>
 		</div>
 		<div class="clear"></div>
 		<form action="">
@@ -77,7 +77,14 @@
 			</div>
 		</form>
 	<?php else: ?>
-		<h2 style="clear: both">This plugin is not set up! Click anywhere to start</h2>
+		<div class="header-wrapper" id="settings-header-wrapper">
+			<h2 id="settings-page-email-title">This plugin is not set up</h2>
+			<a class="button-secondary" id="new_email" >Create a New Placester Account</a>
+			<a class="button-secondary" id="existing_placester" href="#">Use an Existing Placester Account</a>
+			<a class="button-secondary" href='https://placester.com/user/login'>Login to Placester.com</a>
+			<a class="button-secondary" href='https://placester.com/user/password/new'>Forgot Password?</a>
+		</div>
+		<div class="clear"></div>
 		<form action="">
 			<div id="" class="meta-box-sortables ui-sortable">
 				<div id="div" class="postbox ">
@@ -86,7 +93,7 @@
 						<span>Placester.com Account Details</span>
 					</h3>
 					<div class="inside">
-						<div class="not-set-up"><h2>Plugin not Set Up! <a href="#" id="settings_get_started_signup">Get Started.</a></h2></div>
+						<div class="not-set-up"><h3>Plugin not set up! <a href="#" id="settings_get_started_signup">Get started.</a></h3></div>
 					</div>
 					<div class="clear"></div>
 				</div>	
