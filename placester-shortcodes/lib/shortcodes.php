@@ -14,29 +14,29 @@ class PL_Shortcodes
 	public static $codes = array(
 		'search_form', 
 		'search_listings', 
-		'prop_details', 
+//		'prop_details',
 		'search_map', 
 		'listing_slideshow', 
 		'advanced_slideshow',
 		'featured_listings', 
 		'static_listings', 
-		'post_listing', 
-		'pl_neighborhood'
+//		'post_listing',
+		'pl_neighborhood' // Is this used?  We'll find out!
 	);
 
 	// TODO: Construct these lists dynamically by examining the doc hierarchy...
 	public static $defaults = array(
 		'search_form' => array('twentyten', 'twentyeleven'),
 		'search_listings' => array('twentyten', 'twentyeleven'),
-		'prop_details' => array('twentyten', 'twentyeleven'),
+//		'prop_details' => array('twentyten', 'twentyeleven'),
 		'search_map' => array('twentyten', 'twentyeleven'),
 		'listing_slideshow'	=> array('twentyten', 'twentyeleven'),
 		'advanced_slideshow' => array('twentyten', 'twentyeleven'),
 		'featured_listings' => array('twentyten', 'twentyeleven'),
 		'static_listings' => array('twentyten', 'twentyeleven'),
-		'post_listing' => array('twentyten', 'twentyeleven'),
-		'pl_neighborhood' => array('twentyten', 'twentyeleven'),
-		'listings' => array('twentyten', 'twentyeleven') 
+//		'post_listing' => array('twentyten', 'twentyeleven'),
+//		'pl_neighborhood' => array('twentyten', 'twentyeleven'),
+//		'listings' => array('twentyten', 'twentyeleven')
 	);
 
 	public static $subcodes = array(
@@ -176,12 +176,18 @@ class PL_Shortcodes
 	 * [listing_slideshow] handler
 	 */
 	public static function listing_slideshow_shortcode_handler ($atts) {
+		global $wp;
+		@file_put_contents('/var/tmp/shortcode-requests.log', date('Y-m-d H:i:s') . ' listing_slideshow' . '       ' . home_url($wp->request) . "\n", LOCK_EX | FILE_APPEND);
+
 		$content = PL_Component_Entity::listing_slideshow( $atts );
 		
 		return self::wrap( 'listing_slideshow', $content );
 	}
 
 	public static function advanced_slideshow_shortcode_handler ($atts) {
+		global $wp;
+		@file_put_contents('/var/tmp/shortcode-requests.log', date('Y-m-d H:i:s') . ' advanced_slideshow' . '      ' . home_url($wp->request) . "\n", LOCK_EX | FILE_APPEND);
+
 		$content = PL_Component_Entity::listing_slideshow( $atts, false );
 		
 		return self::wrap( 'advanced_slideshow', $content );
@@ -191,6 +197,8 @@ class PL_Shortcodes
 	 * [featured_listings] handler
 	 */
 	public static function featured_listings_shortcode_handler ($atts, $content = '') {
+		global $wp;
+		@file_put_contents('/var/tmp/shortcode-requests.log', date('Y-m-d H:i:s') . ' featured_listings' . '       ' . home_url($wp->request) . "\n", LOCK_EX | FILE_APPEND);
 
 		$content = PL_Component_Entity::featured_listings_entity( $atts );
 		
@@ -201,6 +209,9 @@ class PL_Shortcodes
 	 * [static_listings] handler
 	 */
 	public static function static_listings_shortcode_handler ( $atts, $content = '' ) {
+		global $wp;
+		@file_put_contents('/var/tmp/shortcode-requests.log', date('Y-m-d H:i:s') . ' static_listings' . '         ' . home_url($wp->request) . "\n", LOCK_EX | FILE_APPEND);
+
 		add_filter('pl_filter_wrap_filter', array( __CLASS__, 'pl_filter_wrap_default_filters' ));
 		$filters = '';
 
@@ -219,7 +230,10 @@ class PL_Shortcodes
 	/**
 	 * [search_listings] handler
 	 */
-	public static function search_listings_shortcode_handler( $atts, $content ) {		
+	public static function search_listings_shortcode_handler( $atts, $content ) {
+		global $wp;
+		@file_put_contents('/var/tmp/shortcode-requests.log', date('Y-m-d H:i:s') . ' search_listings' . '         ' . home_url($wp->request) . "\n", LOCK_EX | FILE_APPEND);
+
 		add_filter('pl_filter_wrap_filter', array( __CLASS__, 'pl_filter_wrap_default_filters' ));
 		$filters = '';
 		
@@ -250,6 +264,9 @@ class PL_Shortcodes
 	
 
 	public static function pl_neighborhood_shortcode_handler( $atts ) {
+		global $wp;
+		@file_put_contents('/var/tmp/shortcode-requests.log', date('Y-m-d H:i:s') . ' pl_neighborhood' . '         ' . home_url($wp->request) . "\n", LOCK_EX | FILE_APPEND);
+
 		$content = PL_Component_Entity::pl_neighborhood_entity( $atts );
 	
 		return self::wrap( 'pl_neighborhood', $content );

@@ -186,7 +186,6 @@ class PL_Option_Helper {
 
 		// only try to geocode once, whether successful or not
 		if(isset($geo)) {
-			@file_put_contents('/var/tmp/geocode-requests.log', date('Y-m-d H:i:s') . ' placester/option.php' . '         ' . implode(', ', $geo) . "\n", LOCK_EX | FILE_APPEND);
 			self::set_default_location ($geo);
 			return $geo;
 		}
