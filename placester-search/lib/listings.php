@@ -92,7 +92,9 @@ class PLS_Listing_Helper {
 			// clear compliance disclaimer flag, since we're displaying it
 			if($args['context'] == 'search') PLS_Plugin_API::$listing_data_requested = false;
 
-			PLS_Route::router(array($args['context'] . '-compliance.php'), true, false);
+			$template = PLACESTER_PLUGIN_DIR . 'placester-compliance/templates/' . $args['context'] . '-compliance.php';
+			if(file_exists($template))
+				include($template);
 		}
 		return false;
 	}
