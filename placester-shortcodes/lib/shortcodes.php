@@ -144,16 +144,14 @@ class PL_Shortcodes
 	 * [compliance] handler
 	 */
 	public static function compliance_shortcode_handler( $atts ) {
-		$context = PL_Listing_Helper::get_listing_in_loop() ? 'listings' : 'search';
+		if($listing = PL_Listing_Helper::get_listing_in_loop())
+			$args = array('context' => 'listings', 'provider_id' => $listing['provider_id']);
+		else
+			$args = array('content' => 'search');
 
 		ob_start();
-		PLS_Listing_Helper::get_compliance(array(
-			'context' => $context
-		));
-		$content = ob_get_clean();
-
-		return self::wrap( 'compliance', $content );
-		
+		PLS_Listing_Helper::get_compliance($args);
+		return self::wrap( 'compliance', ob_get_clean());
 	} 
 	
 	/**
