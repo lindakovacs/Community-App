@@ -377,19 +377,17 @@ class PL_Shortcodes
 	 * @param unknown_type $content
 	 */
 	public static function pl_filter_shortcode_handler( $atts, $content = '' ) {
-		$out = '';
-		$av_filters = PL_Shortcode_CPT::get_listing_filters();
-		
-		if( !isset( $atts['filter'] ) || ! isset( $atts['value'] ) ) {
+		if(!$atts['filter'] || !$atts['value']) {
 			return "";
 		}
-		
+
+		$av_filters = PL_Shortcode_CPT::get_listing_filters();
 		extract($atts);
-		
+
 		$filterlogic = $filter . '_match';
 		$av_filter = $filter;
 		$filterstr = $filter;
-		if( isset( $group ) ) {
+		if( $group ) {
 			$filterstr = $group . '[' . $filter . ']';
 			$filterlogic = $group . '[' . $filterlogic . ']';
 			$av_filter = $group . '.' . $av_filter;
