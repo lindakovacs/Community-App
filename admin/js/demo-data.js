@@ -58,7 +58,7 @@ jQuery(document).ready(function($) {
     $('#demo_data_wizard').dialog('open');  
 
     // Load Google Maps API
-    // var googleMapsURL = 'https://maps.googleapis.com/maps/api/js?sensor=false&callback=initializeMap';
+    // var googleMapsURL = 'https://maps.googleapis.com/maps/api/js?callback=initializeMap';
     // $.getScript(googleMapsURL);
   }
 

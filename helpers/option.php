@@ -195,7 +195,7 @@ class PL_Option_Helper {
 	}
 
 	private static function geocode_address ($address) {
-		$url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($address) . '&sensor=false';
+		$url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($address);
 		$result = wp_remote_get($url);
 
 		if (is_array($result) && isset($result['body']) && $result['body']) {

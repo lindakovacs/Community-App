@@ -40,7 +40,7 @@ jQuery(document).ready(function($) {
 		create_existing_dialog();
 	});
 
-	$('#new_email').on('click', function () {
+	$('#new_email, #settings_get_started_signup').on('click', function () {
 		$.post(ajaxurl, {action: 'new_api_key_view'}, function (result) {
   			// Change the dialog's content and display it...
   			$('#existing_placester_dialog').html(result);
