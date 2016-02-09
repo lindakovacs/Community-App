@@ -104,6 +104,9 @@ include_once('placester-tools/placester-tools.php');
 // setup and customization
 include_once('placester-customizer/placester-customizer.php');
 
+// listing image slideshow
+include_once('placester-slideshow/placester-slideshow.php');
+
 
 register_activation_hook(__FILE__, 'placester_activate');
 function placester_activate () {

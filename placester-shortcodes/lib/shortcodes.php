@@ -17,11 +17,11 @@ class PL_Shortcodes
 //		'prop_details',
 		'search_map', 
 		'listing_slideshow', 
-		'advanced_slideshow',
+//		'advanced_slideshow',
 		'featured_listings', 
 		'static_listings', 
 //		'post_listing',
-		'pl_neighborhood' // Is this used?  We'll find out!
+//		'pl_neighborhood' // Is this used?  We'll find out!
 	);
 
 	// TODO: Construct these lists dynamically by examining the doc hierarchy...
@@ -31,7 +31,7 @@ class PL_Shortcodes
 //		'prop_details' => array('twentyten', 'twentyeleven'),
 		'search_map' => array('twentyten', 'twentyeleven'),
 		'listing_slideshow'	=> array('twentyten', 'twentyeleven'),
-		'advanced_slideshow' => array('twentyten', 'twentyeleven'),
+//		'advanced_slideshow' => array('twentyten', 'twentyeleven'),
 		'featured_listings' => array('twentyten', 'twentyeleven'),
 		'static_listings' => array('twentyten', 'twentyeleven'),
 //		'post_listing' => array('twentyten', 'twentyeleven'),
