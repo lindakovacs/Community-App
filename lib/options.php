@@ -1,17 +1,45 @@
 <?php 
 
+
+class PL_Options {
+	
+	public static function get ($option, $default = false) {
+		return get_option($option, $default);
+	}
+
+	public static function set ($option, $value, $autoload = true) {
+		// Translate autoload boolean to expected WP string value...
+		$autoload = ($autoload ? 'yes' : 'no');
+
+		// Initially, try to add the option...
+		$outcome = add_option($option, $value, '', $autoload);
+
+		// If add_option fails, it almost always indicates that an option with the provided key 
+		// already exists, so attempt to update the existing option's value...
+		if ($outcome === false) {
+			$outcome = update_option($option, $value);
+		}
+
+ 		return $outcome;
+	}
+
+	public static function delete ($option) {
+		return delete_option($option);
+	}
+}
+
 // This global wrapper eventually needs to be removed -- need time to alter its consumers...
 function placester_get_api_key() { return PL_Option_Helper::api_key(); }
 
 class PL_Option_Helper {
-	
+
 	public static function api_key () {
-	    $api_key = PL_Options::get('placester_api_key');
+		$api_key = PL_Options::get('placester_api_key');
 		if (strlen($api_key) <= 0) {
 			$api_key = false;
 		}
-		
-	    return $api_key;	    
+
+		return $api_key;
 	}
 
 	public static function set_api_key ($new_api_key) {
@@ -22,7 +50,7 @@ class PL_Option_Helper {
 		if (empty($new_api_key) ) {
 			$message = "The API key cannot be empty";
 		}
-		elseif (self::api_key() == $new_api_key) { 
+		elseif (self::api_key() == $new_api_key) {
 			$message = "You're already using that Placester API Key";
 		}
 		else {
@@ -36,7 +64,7 @@ class PL_Option_Helper {
 
 					// Nuke the cache...
 					PL_Cache::invalidate();
-				} 
+				}
 				else {
 					$message = "There was an error -- are you sure that's a valid Placester API key?";
 				}
@@ -50,7 +78,7 @@ class PL_Option_Helper {
 		if (self::get_google_places_key() == $new_places_key) {
 			$result = false;
 			$message = "You're already using that Google Places API Key";
-		} 
+		}
 		else {
 			$result = PL_Options::set('placester_places_api_key', $new_places_key);
 			$message = ($result ? "You've successfully updated your Google Places API Key" : "There was an error -- please try again");
@@ -80,16 +108,16 @@ class PL_Option_Helper {
 	}
 
 	public static function get_polygons () {
-		return PL_Options::get('pls_polygons', array());	
+		return PL_Options::get('pls_polygons', array());
 	}
 
 	public static function set_global_filters ($args) {
 		extract(wp_parse_args($args, array('filters' => array())));
-		return PL_Options::set('pls_global_search_filters', $filters);		
+		return PL_Options::set('pls_global_search_filters', $filters);
 	}
 
 	public static function get_global_filters () {
-		return PL_Options::get('pls_global_search_filters');		
+		return PL_Options::get('pls_global_search_filters');
 	}
 
 	public static function set_community_pages ($enable_pages = false) {
@@ -215,7 +243,7 @@ class PL_Option_Helper {
 	}
 
 	public static function get_translations () {
-		$result = PL_Options::get('pls_amenity_dictionary');	
+		$result = PL_Options::get('pls_amenity_dictionary');
 		return $result;
 	}
 
