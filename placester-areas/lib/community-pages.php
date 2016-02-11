@@ -1,6 +1,6 @@
 <?php
 // this is either deprecated or developmental -- let's see if anyone squawks when it goes away
-// if(!get_option('pls_enable_community_pages', false))
+if(!get_option('pls_enable_community_pages', false))
 	return;
 
 PL_Community_Pages::init();
