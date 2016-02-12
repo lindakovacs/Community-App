@@ -138,4 +138,3 @@ class PL_Analytics {
 		return null;
 	}
 }
-

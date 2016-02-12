@@ -8,9 +8,7 @@ Version: 1.0.0
 Author URI: https://www.placester.com/
 */
 
-// this is either deprecated or developmental -- let's see if anyone squawks when it goes away
-// include_once('lib/community-pages.php');
-
+include_once('lib/community-pages.php');
 include_once('helpers/taxonomy.php');
 
 include_once('lib/tax-meta-class/tax-meta-class.php');

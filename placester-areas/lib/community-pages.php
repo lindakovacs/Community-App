@@ -1,6 +1,6 @@
 <?php
-// this is either deprecated or developmental -- let's see if anyone squawks when it goes away
-// if(!get_option('pls_enable_community_pages', false))
+
+if(!get_option('pls_enable_community_pages', false))
 	return;
 
 PL_Community_Pages::init();
@@ -158,7 +158,6 @@ class PL_Community_Pages {
 				'search_items' => __('Search Communities', 'pls'),
 				'not_found' =>  __('No Community found', 'pls'),
 				'not_found_in_trash' => __('No Community found in Trash', 'pls')),
-			'menu_icon' => trailingslashit(PL_IMG_URL) . 'featured.png',
 			'public' => true,
 			'publicly_queryable' => true,
 			'show_ui' => true,
