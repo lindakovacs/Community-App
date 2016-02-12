@@ -248,7 +248,7 @@
 	         	<div class="lg-cl">
 	              <label>Country</label>
 	              <select id="listing_country" name="location[country]" class="cl">
-	                <?php foreach ( PL_Listing_Helper::supported_countries() as $code => $text ): ?>
+	                <?php foreach ( PL_Listing::supported_countries() as $code => $text ): ?>
 	                  <option value="<?php echo $code; ?>" <?php selected( "US", $code ); ?>><?php echo $text; ?></option>
 	                <?php endforeach; ?>
 	              </select>       
