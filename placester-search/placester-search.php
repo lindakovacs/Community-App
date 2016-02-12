@@ -18,6 +18,9 @@ function placester_add_search_components () {
 		include_once('lib/listings.php');
 		include_once('lib/partials.php');
 
+		include_once('widgets/listings.php');
+//		include_once('widgets/quick-search.php');
+
 		define('PLS_JS_URL', PLACESTER_PLUGIN_URL . 'placester-search/js/');
 		define('PLS_IMG_URL', PLACESTER_PLUGIN_URL . 'placester-search/images/');
 	}

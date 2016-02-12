@@ -50,22 +50,16 @@ include_once('lib/caching.php');
 
 // v2/v2.1 data interface
 include_once('api/config.php');
-include_once('api/validation.php');
 include_once('api/user.php');
-include_once('admin/helpers/user.php');
-
 include_once('api/listing.php');
-include_once('helpers/listing.php'); // polygon functionality needs to be moved, handled via a wp filter
-
-include_once('api/integration.php');
-include_once('admin/helpers/integrations.php');
-
 include_once('api/custom_attribute.php');
 
+include_once('api/integration.php');
 include_once('api/wordpress.php');
-include_once('admin/helpers/wordpress.php');
+
 
 // search
+include_once('helpers/listing.php'); // polygon functionality needs to be moved, handled via a wp filter
 include_once('lib/global-filters.php');
 include_once('placester-search/placester-search.php');
 include_once('placester-maps/placester-maps.php');
@@ -73,6 +67,9 @@ include_once('placester-maps/placester-maps.php');
 
 // needed on the wp-admin side only (eventually)
 include_once('admin/admin.php');
+include_once('admin/helpers/user.php');
+include_once('admin/helpers/integrations.php');
+include_once('admin/helpers/wordpress.php');
 
 
 // areas and polygons
@@ -107,8 +104,7 @@ add_action( 'after_setup_theme', 'check_for_blueprint', 18 );
 function check_for_blueprint () {
 	if (!class_exists('Placester_Blueprint')) {
 		include_once('lib/smallprint.php');
-		include_once('lib/agent-widget.php');
-		include_once('lib/listings-widget.php');
+		include_once('placester-agents/widgets/agent.php');
 	}
 }
 

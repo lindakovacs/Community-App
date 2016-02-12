@@ -5,7 +5,6 @@ PL_Listing_Helper::init();
 class PL_Listing_Helper {
 
 	public static function init () {
-		add_action('wp', array(__CLASS__, 'check_listing_exists'));
 		add_action('wp_ajax_datatable_ajax', array(__CLASS__, 'datatable_ajax'));
 		add_action('wp_ajax_add_listing', array(__CLASS__, 'add_listing_ajax'));
 		add_action('wp_ajax_update_listing', array(__CLASS__, 'update_listing_ajax'));
@@ -13,27 +12,10 @@ class PL_Listing_Helper {
 		add_action('wp_ajax_delete_listing', array(__CLASS__, 'delete_listing_ajax'));
 	}
 
-	/*
-	 * If this is a single property listing, and the listing no longer exists, redirect
-	 */
-	public static function check_listing_exists() {
-		if (is_singular(PL_Pages::$property_post_type) && is_null(self::get_listing_in_loop())) {
-			$home = home_url();
-			wp_redirect($home);
-			exit;
-		}
-	}
-	
 	public static function results ($args = array(), $global_filters = true) {
 		// Handle edge-case $args formatting and value...
 		if (!is_array($args)) { $args = wp_parse_args($args); } 
 		elseif (empty($args)) { $args = $_GET; }
-
-		/* REMOVE */
-		// if ($global_filters) {
-		// 	error_log("\n[[[BEFORE:]]]\n" . var_export($args, true));
-		// 	error_log("\n[[[FILTERS:]]]\n" . var_export(PL_Global_Filters::get_global_filters(), true));
-		// }
 
 		// If a list of specific property IDs was passed in, handle acccordingly...
 		if (!empty($args['property_ids'])) { 
@@ -147,7 +129,7 @@ class PL_Listing_Helper {
 			$listing_data = PL_Pages::get_listing_details();
 		}
 
-		return $listing_data;		
+		return $listing_data;
 	}
 
 	public static function custom_attributes ($args = array()) {
