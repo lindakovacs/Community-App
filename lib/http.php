@@ -8,7 +8,7 @@ if( !class_exists( 'WP_Http' ) )
  */
 Class PL_HTTP extends WP_Http {
 
-	private static $timeout = 10;
+	private static $timeout = 60;
 	private static $http = null;
 
 	private static function _get_object () {
@@ -271,7 +271,7 @@ class WP_Http_PL_Curl {
 	public function request ($url, $args = array()) {
 
 		$defaults = array(
-			'method' => 'GET', 'timeout' => 20,
+			'method' => 'GET', 'timeout' => 60,
 			'redirection' => 5, 'httpversion' => '1.0',
 			'blocking' => true,
 			'headers' => array(), 'body' => null, 'cookies' => array()
