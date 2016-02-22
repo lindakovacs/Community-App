@@ -38,7 +38,7 @@ class PL_Search_Listing_CPT extends PL_SC_Base {
 		'sort_by'			=> array( 'type' => 'select', 'label' => 'Default sort by', 'options' => array(), 'default' => 'cur_data.price' ),
 		'sort_type'			=> array( 'type' => 'select', 'label' => 'Default sort direction', 'options' => array('asc'=>'Ascending', 'desc'=>'Descending'), 'default' => 'desc' ),
 		// TODO: sync up with js list			
-		'query_limit'		=> array( 'type' => 'select', 'label' => 'Default number of results', 'options' => array('10'=>'10', '25'=>'25', '25'=>'25', '50'=>'50'), 'default' => '10' ),
+		'query_limit'		=> array( 'type' => 'select', 'label' => 'Default number of results', 'options' => array('12'=>'12', '24'=>'24', '48'=>'48'), 'default' => '12' ),
 	);
 
 	protected $subcodes = array(

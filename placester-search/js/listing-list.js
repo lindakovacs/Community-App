@@ -17,8 +17,8 @@ List.prototype.init = function (params) {
 	this.table_row_selector = params.table_class || '.placester_properties tr';
 	this.context = params.context || false;
 	this.total_results_id = params.total_results_id || '#pls_num_results';
-	this.limit_default = params.limit_default || 10;
-	this.limit_choices = params.limit_choices || [[10, 25, 50], [10, 25, 50]];
+	this.limit_default = params.limit_default || 12;
+	this.limit_choices = params.limit_choices || [[12, 24, 48], [12, 24, 48]];
 	this.settings = params.settings || { 
 		"bFilter": false,
 		"bProcessing": true,
