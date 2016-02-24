@@ -234,16 +234,7 @@ class PL_Global_Filters {
 		
 		// Send response...
 		echo json_encode($response);
-
-		// Report filters to the API if necessary...
-		if ($filters_saved) { self::report_filters(); }
-
 		die();
-	}
-
-	private static function report_filters () {
-		$response = PL_WordPress::set(array_merge(self::get_global_filters(), array('url' => site_url())));
-		return $response;
 	}
 
 	private static function generate_global_filter_key_from_value ($value) {

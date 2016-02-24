@@ -46,6 +46,7 @@ include_once('lib/pages.php'); // area pages need to be moved
 include_once('lib/options.php');
 include_once('lib/http.php');
 include_once('lib/caching.php');
+include_once('lib/listings.php'); // polygon functionality needs to be moved, handled via a wp filter
 
 
 // v2/v2.1 data interface
@@ -53,11 +54,7 @@ include_once('api/config.php');
 include_once('api/user.php');
 include_once('api/listing.php');
 include_once('api/custom_attribute.php');
-
 include_once('api/integration.php');
-include_once('api/wordpress.php');
-
-include_once('lib/listings.php'); // polygon functionality needs to be moved, handled via a wp filter
 
 
 // needed on the wp-admin side only (eventually)
@@ -65,7 +62,6 @@ include_once('admin/admin.php');
 include_once('admin/helpers/users.php');
 include_once('admin/helpers/listings.php');
 include_once('admin/helpers/integrations.php');
-include_once('admin/helpers/wordpress.php');
 
 
 // search
@@ -92,12 +88,6 @@ include_once('placester-customizer/placester-customizer.php');
 
 // listing image slideshow
 include_once('placester-slideshow/placester-slideshow.php');
-
-
-register_activation_hook(__FILE__, 'placester_activate');
-function placester_activate () {
-	PL_WordPress_Helper::report_url();
-}
 
 
 add_action( 'after_setup_theme', 'check_for_blueprint', 18 );
