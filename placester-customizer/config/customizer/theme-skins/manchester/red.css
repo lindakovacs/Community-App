@@ -1,7 +1,0 @@
-/* RED */
-body {background: #dbd5d5;}
-section[class="company-logo"] h1 a, section[class="company-logo"] h1 a:visited {color: #9b3f40;}
-header nav.main-nav ul li a:visited, header nav.main-nav ul li a:link {color: #000;}
-header nav.main-nav ul li.current_page_item a {background: #9b3f40;}
-section[class="contact-info"] {background: #ebebeb;}
-input.b-blue, .button {background: #9b3f40 !important;}

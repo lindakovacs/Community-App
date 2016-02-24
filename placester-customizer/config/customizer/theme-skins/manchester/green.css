@@ -1,7 +1,0 @@
-/* GREEN */
-body {background: #e6e9e1;}
-section[class="company-logo"] h1 a, section[class="company-logo"] h1 a:visited {color: #84a346;}
-header nav.main-nav ul li a:visited, header nav.main-nav ul li a:link {color: #84a346;}
-header nav.main-nav ul li.current_page_item a {background: #84a346;}
-section[class="contact-info"] {background: #ebebeb;}
-input.b-blue, .button {background: #84a346!important;}

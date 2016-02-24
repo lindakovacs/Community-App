@@ -1,8 +1,0 @@
-/* GRAY */
-body {background: #fff;}
-section[class="company-logo"] h1 a, section[class="company-logo"] h1 a:visited {color: #303030;}
-header nav.main-nav ul li a:visited, header nav.main-nav ul li a:link {color: #000;}
-header nav.main-nav ul li.current_page_item a {background: #303030;}
-section[class="contact-info"] {background: #f6f6f6;}
-input.b-blue, .button {background: #303030 !important;}
-.placester_contact, section.pls-agent.widget,  section.pls-listings.widget, section.pls-recent-posts.widget {background: #f8f8f8;}
