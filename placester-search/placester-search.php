@@ -9,6 +9,7 @@ Author URI: https://www.placester.com/
 
 
 include_once('lib/form.php');
+include_once('lib/filters.php');
 include_once('lib/permalink-search.php');
 
 
@@ -47,4 +48,8 @@ function placester_add_search_scripts() {
 		wp_enqueue_script('placester-listings', PLACESTER_PLUGIN_URL . 'placester-search/js/listings.js', array('jquery', 'jquery-address', 'jquery-datatables'), PL_PLUGIN_VERSION, true);
 	}
 }
+
+$pl_admin_page = new PL_Admin_Page('placester_settings', 150, 'placester_filtering', 'Global Filters', 'Global Filters', PLACESTER_PLUGIN_DIR . 'placester-search/admin/filtering.php');
+$pl_admin_page->require_script('filtering', PLACESTER_PLUGIN_URL . 'placester-search/admin/filtering.js');
+$pl_admin_page->require_style('filtering', PLACESTER_PLUGIN_URL . 'placester-search/admin/filtering.css', array('settings-all'));
 

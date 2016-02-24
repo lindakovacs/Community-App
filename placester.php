@@ -57,12 +57,7 @@ include_once('api/custom_attribute.php');
 include_once('api/integration.php');
 include_once('api/wordpress.php');
 
-
-// search
-include_once('lib/filters.php');
 include_once('lib/listings.php'); // polygon functionality needs to be moved, handled via a wp filter
-include_once('placester-search/placester-search.php');
-include_once('placester-maps/placester-maps.php');
 
 
 // needed on the wp-admin side only (eventually)
@@ -72,6 +67,10 @@ include_once('admin/helpers/listings.php');
 include_once('admin/helpers/integrations.php');
 include_once('admin/helpers/wordpress.php');
 
+
+// search
+include_once('placester-search/placester-search.php');
+include_once('placester-maps/placester-maps.php');
 
 // areas and polygons
 include_once('placester-areas/placester-areas.php');

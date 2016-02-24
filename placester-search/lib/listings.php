@@ -46,14 +46,7 @@ class PLS_Listing_Helper {
 			}
 
 			$api_response = PLS_Plugin_API::get_listing_details($args);
-
-//			// Remove listings without images...
-//			foreach ($api_response['listings'] as $key => $listing) {
-//				if (empty($listing['images'])) {
-//					unset($api_response['listings'][$key]);
-//				}
-//			}
-		} 
+		}
 
 		return $api_response;
 	}
