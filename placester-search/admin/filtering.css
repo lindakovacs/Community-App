@@ -22,9 +22,7 @@
 }
 .global_filter_col {
 	float: left;
-}
-.global_filter_col.filter_button {
-	margin-top: 5px;
+	margin-right: 8px;
 }
 .global_filter_col.red, .global_filter_col.green {
 	margin-top: 3px;

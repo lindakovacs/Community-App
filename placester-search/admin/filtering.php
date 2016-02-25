@@ -5,13 +5,16 @@
 		<div id="global_filter_wrapper" class="<?php echo !empty($filters) ? 'filters_active' : '' ?>">
 			<div class="header-wrapper">
 				<h2>Global Listing Search Filters</h2>
+				<div class="clear"></div>
 				<a class="button-secondary" id="remove_global_filters" >Remove All Filters</a>
+				<div class="clear"></div>
 				<?php if (!empty($filters)): ?>
 					<div class="global_filter_active">Global Filters are Active!</div>
 				<?php endif ?>
 				<div id="global_filter_message_remove"></div>
 			</div>
-			<p>Global listing search filters limit all the search results returned to your website. This is helpful if you have listings of many different types or locations created but only want this website to display a subset of them. For example, to only show properties in Boston.</p>
+			<div class="clear"></div>
+			<p><p>Global listing search filters limit all the search results returned to your website. This is helpful if you have listings of many different types or locations created but only want this website to display a subset of them. For example, to only show properties in Boston.</p>
 			<div class="global_filters tagchecklist">
 				<?php if (!empty($filters)): ?>
 					<p class="label">Active Filters:</p>	
