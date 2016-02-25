@@ -1,5 +1,6 @@
 <?php
 
+register_widget( 'PLS_Quick_Search_Widget' );
 class PLS_Quick_Search_Widget extends WP_Widget {
    
     public function __construct() {

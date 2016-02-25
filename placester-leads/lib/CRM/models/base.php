@@ -61,7 +61,7 @@ abstract class PL_CRM_Base {
 
 		// Use a local cert to make sure we have a valid one when not on the hosted network...
 		if (!defined("HOSTED_PLUGIN_KEY")) {
-			curl_setopt($handle, CURLOPT_CAINFO, trailingslashit(PLACESTER_PLUGIN_DIR) . "config/cacert.pem");
+			curl_setopt($handle, CURLOPT_CAINFO, trailingslashit(PLACESTER_PLUGIN_DIR) . "cacert.pem");
 		}
 
 		// Set the HTTP method...

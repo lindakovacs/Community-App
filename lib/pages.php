@@ -7,24 +7,13 @@ PL_Pages::init();
 class PL_Pages {
 
 	public static $property_post_type = 'property';
-	private static $all_taxonomies = array(
-		'state',
-		'zip',
-		'city',
-		'neighborhood',
-		'street',
-		'beds',
-		'baths',
-		'half-baths',
-		'mlsid'
-	);
 	private static $listing_details = null;
-	private static $taxonomy_object = null;
 
 	public static function init () {
 		add_action('init', array(__CLASS__, 'setup_rewrite'));
-		add_filter('pre_get_posts', array(__CLASS__, 'detect_virtual_page'));
+
 		add_filter('query_vars', array(__CLASS__, 'setup_url_vars'));
+		add_filter('pre_get_posts', array(__CLASS__, 'detect_virtual_page'));
 		add_filter('the_posts', array(__CLASS__, 'the_posts'));
 		add_filter('post_type_link', array(__CLASS__, 'get_property_permalink'), 10, 3);
 				
@@ -33,77 +22,14 @@ class PL_Pages {
 		add_action('404_template', array(__CLASS__, 'dump_permalinks'));
 	}
 
-	public static function create_once ($pages_to_create, $force_template = true) {
-		foreach ($pages_to_create as $page_info) {
-			$page = get_page_by_title($page_info['title']);
-			if (!isset($page->ID)) {
-				$page_details = array();
-				$page_details['title'] = $page_info['title'];
-				if (isset($page_info['template'])) {
-          			$page_details['post_meta'] = array('_wp_page_template' => $page_info['template']);
-				}
-				if (isset($page_info['content'])) {
-          			$page_details['content'] = $page_info['content'];
-				}
-
-        		self::manage($page_details);
-			}
-			elseif ($force_template) {
-		        if (isset($page_info['template'])) {
-		        	delete_post_meta($page->ID, '_wp_page_template');
-		        	add_post_meta($page->ID, '_wp_page_template', get_template_directory_uri().'/'.$page_info['template']);
-		        }
-			}
-		}
-	}
-
-	//create page
-	public static function manage ($args = array()) {
-		$defaults = array('post_id' => false, 'type' => 'page', 'title' => '', 'name' => false, 'content' => ' ', 'status' => 'publish', 'post_meta' => array(), 'taxonomies' => array());
-		extract(wp_parse_args($args, $defaults));
-
-		$post = array(
-			'post_type'   => $type,
-			'post_title'  => $title,
-			'post_name'   => $name,
-			'post_status' => $status,
-			'post_author' => 1,
-			'post_content'=> $content,
-			'filter'      => 'db',
-			'guid'        => @$guid
-		);
-
-		if ($post_id <= 0) {
-			$post_id = wp_insert_post($post);
-
-			if (!empty($post_meta)) {
-				foreach ($post_meta as $key => $value) {
-					add_post_meta($post_id, $key, $value, TRUE);
-				}
-			}
-
-			if (!empty($taxonomies)) {
-				foreach ($taxonomies as $taxonomy => $term) {
-					wp_set_object_terms($post_id, $term, $taxonomy);
-				}
-			}
-		}
-		else {
-			$post['ID'] = $post_id;
-			$post_id = wp_update_post($post);
-		}
-
-        return $post_id;
-	}
-
 	/**
 	 * Load rules
 	 */
 	public static function setup_rewrite(){
 		// do not make public or Yoast will create sitemaps - we are making our own elsewhere
 		register_post_type(self::$property_post_type, array('labels'=>array('name'=>__('Properties'), 'singular_name'=>__('property')), 'public'=>false, 'has_archive'=>true, 'rewrite'=>true, 'query_var'=>true, 'taxonomies'=>array(), 'exclude_from_search'=>true, 'publicly_queryable'=>false));
+
 		add_rewrite_rule('property/([^/]*)/([^/]*)/([^/]*)/([^/]*)/([^/]*)/([^/]+)/?$', 'index.php?property=$matches[6]', 'top');
-		// in case someone has old style link cached
 		add_rewrite_rule('property/([^/]+)/?$', 'index.php?property=$matches[1]', 'top');
 	}
 
@@ -184,50 +110,6 @@ class PL_Pages {
 				unset($wp_query->query['error']);
 				$wp_query->query_vars['error'] = '';
 				$wp_query->is_404 = false;
-			}
-		}
-		elseif (!empty($wp_query->query_vars['taxonomy']) && !empty($wp_query->query_vars[$wp_query->query_vars['taxonomy']])
-			&& (!empty($wp_query->query_vars['neighborhood']) || !empty($wp_query->query_vars['zip']) || !empty($wp_query->query_vars['city']) || !empty($wp_query->query_vars['state']))) {
-			// location page - create a term object if we dont have anything saved for this neighborhood
-			$qo = $wp_query->get_queried_object();
-			if (!is_object($qo)) {
-				$tax = $wp_query->query_vars['taxonomy'];
-				switch($tax) {
-					case 'state':
-						$loc = 'region';
-						break;
-					case 'city':
-						$loc = 'locality';
-						break;
-					case 'zip':
-						$loc = 'postal';
-						break;
-					default:
-						$loc = $tax;
-						break;
-				}
-				$slug = strtolower($wp_query->query_vars[$tax]);
-				// check if this is an mls neighborhood
-				$response = PL_Listing::locations();
-				if (!empty($response[$loc])) {
-					$key = array_search($slug, array_map('sanitize_title_with_dashes', $response[$loc]));
-					if ($key !== false) {
-						$qo = new stdClass();
-						$qo->term_id = -1;
-						$qo->name = $response[$loc][$key];
-						$qo->slug = $slug;
-						$qo->term_group = 0;
-						$qo->term_taxonomy_id = -1;
-						$qo->taxonomy = $tax;
-						$qo->description = '';
-						$qo->parent = 0;
-						$qo->count = 1;
-						$wp_query->$tax = $slug;
-						$wp_query->queried_object = $qo;
-						$wp_query->queried_object_id = -1;
-						self::$taxonomy_object = $qo;
-					}
-				}
 			}
 		}
 

@@ -79,10 +79,6 @@ $pl_admin_page = new PL_Admin_Page('placester', 100, 'placester_settings', 'Sett
 $pl_admin_page->require_script('settings-general', PL_ADMIN_JS_URL . 'general.js', array('jquery-ui-core', 'jquery-ui-dialog'));
 $pl_admin_page->require_style('settings-general', PL_ADMIN_CSS_URL . 'general.css', array('settings-all'));
 
-$pl_admin_page = new PL_Admin_Page('placester_settings', 150, 'placester_filtering', 'Global Filters', 'Global Filters', PL_ADMIN_VIEWS_DIR . 'filtering.php');
-$pl_admin_page->require_script('filtering', PL_ADMIN_JS_URL . 'filtering.js');
-$pl_admin_page->require_style('filtering', PL_ADMIN_CSS_URL . 'filtering.css', array('settings-all'));
-
 $pl_admin_page = new PL_Admin_Page('placester_settings', 180, 'placester_international', 'International', 'International', PL_ADMIN_VIEWS_DIR . 'international.php');
 $pl_admin_page->require_script('international', PL_ADMIN_JS_URL . 'international.js', array('settings-all'));
 $pl_admin_page->require_style('settings-all');
@@ -107,7 +103,7 @@ $pl_admin_page->require_script('jquery-fileupload', PL_ADMIN_JS_URL . 'blueimp/j
 $pl_admin_page->require_script('add-listing', PL_ADMIN_JS_URL . 'add-listing.js', array('jquery-ui-datepicker', 'jquery-fileupload'));
 $pl_admin_page->require_style('add-listing', PL_ADMIN_CSS_URL . 'add-listing.css');
 
-$pl_admin_page = new PL_Admin_Page('placester', 9900, 'placester_support', 'Support', 'Support', PL_ADMIN_VIEWS_DIR . 'support.php');
+$pl_admin_page = new PL_Admin_Page('placester', 9100, 'placester_support', 'Support', 'Support', PL_ADMIN_VIEWS_DIR . 'support.php');
 $pl_admin_page->require_style('support', PL_ADMIN_CSS_URL . 'support.css');
 
 

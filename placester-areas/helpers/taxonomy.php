@@ -2,16 +2,15 @@
 
 PL_Taxonomy_Helper::init();
 class PL_Taxonomy_Helper {
+	private static $taxonomy_object = null;
 
-	// List of taxonomies used to build a search UI
 	private static $location_taxonomies = array('state' => 'State', 'zip' => 'Zip', 'city' => 'City', 'neighborhood' => 'Neighborhood');
-
-	// List of taxonomies used to build URLs, etc.
-	private static $all_loc_taxonomies = array('state', 'zip', 'city', 'neighborhood', 'street');
-	private static $tax_loc_map = array('state'=>'region', 'zip'=>'postal', 'city'=>'locality', 'neighborhood'=>'neighborhood', 'street'=>'address');
+	private static $location_taxonomy_map = array('state'=>'region', 'zip'=>'postal', 'city'=>'locality', 'neighborhood'=>'neighborhood');
 
 	public static function init () {
 		add_action('init', array(__CLASS__, 'register_taxonomies'));
+		add_filter('the_posts', array(__CLASS__, 'the_posts'));
+
 		add_action('wp_ajax_save_polygon', array(__CLASS__, 'save_polygon'));
 		add_action('wp_ajax_update_polygon', array(__CLASS__, 'update_polygon'));
 		add_action('wp_ajax_delete_polygon', array(__CLASS__, 'delete_polygon'));
@@ -31,11 +30,61 @@ class PL_Taxonomy_Helper {
 	}
 
 	public static function register_taxonomies () {
-		// do not make public or Yoast will create sitemaps - we are making our own elsewhere
-		register_taxonomy('state', array('property'), array('hierarchical'=>false, 'labels'=>array('singular_name'=>__('State'), 'name'=>__('States')), 'public'=>false, 'show_ui'=>false, 'query_var'=>true, 'rewrite'=>array('with_front'=>false, 'hierarchical'=>false)));
-		register_taxonomy('zip', array('property'), array('hierarchical'=>false, 'labels'=>array('singular_name'=>__('Zip Codes'), 'name'=>__('Zip Codes')), 'public'=>false, 'show_ui'=>false, 'query_var'=>true,'rewrite'=>array('with_front'=>false, 'hierarchical'=>false) ) );
-		register_taxonomy('city', array('property'), array('hierarchical'=>false, 'labels'=>array('singular_name'=>__('City'), 'name'=>__('Cities')), 'public'=>false, 'show_ui'=>false, 'query_var'=>true,'rewrite'=>array('with_front'=>false, 'hierarchical'=>false) ) );
-		register_taxonomy('neighborhood', array('property'), array('hierarchical'=>false, 'labels'=>array('singular_name'=>__('Neighborhood'), 'name'=>__('Neighborhoods')), 'public'=>false, 'show_ui'=>false, 'query_var'=>true,'rewrite'=>array('with_front'=>false, 'hierarchical'=>false) ) );
+		register_taxonomy('state', array('property'), array('hierarchical'=>false, 'labels'=>array('singular_name'=>__('State'), 'name'=>__('States')), 'public'=>true, 'show_ui'=>false, 'query_var'=>true, 'rewrite'=>array('with_front'=>false, 'hierarchical'=>false)));
+		register_taxonomy('zip', array('property'), array('hierarchical'=>false, 'labels'=>array('singular_name'=>__('Zip Codes'), 'name'=>__('Zip Codes')), 'public'=>true, 'show_ui'=>false, 'query_var'=>true,'rewrite'=>array('with_front'=>false, 'hierarchical'=>false) ) );
+		register_taxonomy('city', array('property'), array('hierarchical'=>false, 'labels'=>array('singular_name'=>__('City'), 'name'=>__('Cities')), 'public'=>true, 'show_ui'=>false, 'query_var'=>true,'rewrite'=>array('with_front'=>false, 'hierarchical'=>false) ) );
+		register_taxonomy('neighborhood', array('property'), array('hierarchical'=>false, 'labels'=>array('singular_name'=>__('Neighborhood'), 'name'=>__('Neighborhoods')), 'public'=>true, 'show_ui'=>false, 'query_var'=>true,'rewrite'=>array('with_front'=>false, 'hierarchical'=>false) ) );
+	}
+
+	public function the_posts($posts) {
+		global $wp, $wp_query;
+
+		if (!empty($wp_query->query_vars['taxonomy']) && !empty($wp_query->query_vars[$wp_query->query_vars['taxonomy']])
+			&& (!empty($wp_query->query_vars['neighborhood']) || !empty($wp_query->query_vars['zip']) || !empty($wp_query->query_vars['city']) || !empty($wp_query->query_vars['state']))) {
+			// location page - create a term object if we dont have anything saved for this neighborhood
+			$qo = $wp_query->get_queried_object();
+			if (!is_object($qo)) {
+				$tax = $wp_query->query_vars['taxonomy'];
+				switch($tax) {
+					case 'state':
+						$loc = 'region';
+						break;
+					case 'city':
+						$loc = 'locality';
+						break;
+					case 'zip':
+						$loc = 'postal';
+						break;
+					default:
+						$loc = $tax;
+						break;
+				}
+				$slug = strtolower($wp_query->query_vars[$tax]);
+				// check if this is an mls neighborhood
+				$response = PL_Listing::locations();
+				if (!empty($response[$loc])) {
+					$key = array_search($slug, array_map('sanitize_title_with_dashes', $response[$loc]));
+					if ($key !== false) {
+						$qo = new stdClass();
+						$qo->term_id = -1;
+						$qo->name = $response[$loc][$key];
+						$qo->slug = $slug;
+						$qo->term_group = 0;
+						$qo->term_taxonomy_id = -1;
+						$qo->taxonomy = $tax;
+						$qo->description = '';
+						$qo->parent = 0;
+						$qo->count = 1;
+						$wp_query->$tax = $slug;
+						$wp_query->queried_object = $qo;
+						$wp_query->queried_object_id = -1;
+						self::$taxonomy_object = $qo;
+					}
+				}
+			}
+		}
+
+		return $posts;
 	}
 
 	public static function create_object($tax, $name, $slug = '') {
@@ -304,7 +353,7 @@ class PL_Taxonomy_Helper {
 		$response = array();
 		$tax = '';
 		// map location type to tax
-		foreach (self::$tax_loc_map as $mtax=>$mloc) {
+		foreach (self::$location_taxonomy_map as $mtax=>$mloc) {
 			if ($mloc == $type) {
 				$tax = $mtax;
 				break;
@@ -410,7 +459,7 @@ class PL_Taxonomy_Helper {
 		$term = get_term_by($field, $value, $taxonomy);
 		if (!$term && $field == 'slug') {
 			// no match in tax db - see if this is a dynamically created location page
-			$cterm = PL_Pages::get_taxonomy_object();
+			$cterm = self::$taxonomy_object;
 			// slug for current page?
 			if ($cterm && $cterm->taxonomy == $taxonomy && $cterm->slug == sanitize_title_with_dashes($value)) {
 				$term = $cterm;
@@ -419,7 +468,7 @@ class PL_Taxonomy_Helper {
 
 		if ($taxonomy) {
 			// if we have a taxonomy we can use api location information
-			if (($loc_type = self::$tax_loc_map[$taxonomy]) && ($locations = PL_Listing_Helper::locations_for_options())) {
+			if (($loc_type = self::$location_taxonomy_map[$taxonomy]) && ($locations = PL_Listing_Helper::locations_for_options())) {
 
 				if (!$term && $field == 'name') {
 					// is the incoming value an mls location?
@@ -490,8 +539,4 @@ class PL_Taxonomy_Helper {
       		}
       	}
     }
-
-    public static function get_tax_loc_map() {
-		return self::$tax_loc_map;
-	}
 }

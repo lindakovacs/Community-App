@@ -43,48 +43,30 @@ define( 'DEMO_API_KEY', '7e63514ebfad7608bbe7b4469ab470ecef4dc651099ae06fc1df680
 
 // core WP functionality
 include_once('lib/pages.php'); // area pages need to be moved
-
-include_once('models/options.php');
-include_once('helpers/option.php');
-
+include_once('lib/options.php');
 include_once('lib/http.php');
 include_once('lib/caching.php');
-include_once('helpers/caching.php');
+include_once('lib/listings.php'); // polygon functionality needs to be moved, handled via a wp filter
 
 
 // v2/v2.1 data interface
-include_once('lib/config.php');
-include_once('lib/validation.php');
-
-include_once('config/api/users.php');
-include_once('models/user.php');
-include_once('helpers/user.php');
-
-include_once('config/api/listings.php');
-include_once('models/listing.php');
-include_once('helpers/listing.php'); // polygon functionality needs to be moved, handled via a wp filter
-
-include_once('config/api/integration.php');
-include_once('models/integration.php');
-include_once('helpers/integrations.php');
-
-include_once('config/api/custom_attributes.php');
-include_once('models/custom_attribute.php');
-include_once('helpers/custom_attributes.php');
-
-include_once('config/api/wordpress.php');
-include_once('models/wordpress.php');
-include_once('helpers/wordpress.php');
-
-// search
-include_once('lib/global-filters.php');
-include_once('placester-search/placester-search.php');
-include_once('placester-maps/placester-maps.php');
+include_once('api/config.php');
+include_once('api/user.php');
+include_once('api/listing.php');
+include_once('api/custom_attribute.php');
+include_once('api/integration.php');
 
 
 // needed on the wp-admin side only (eventually)
 include_once('admin/admin.php');
+include_once('admin/helpers/users.php');
+include_once('admin/helpers/listings.php');
+include_once('admin/helpers/integrations.php');
 
+
+// search
+include_once('placester-search/placester-search.php');
+include_once('placester-maps/placester-maps.php');
 
 // areas and polygons
 include_once('placester-areas/placester-areas.php');
@@ -108,18 +90,11 @@ include_once('placester-customizer/placester-customizer.php');
 include_once('placester-slideshow/placester-slideshow.php');
 
 
-register_activation_hook(__FILE__, 'placester_activate');
-function placester_activate () {
-	PL_WordPress_Helper::report_url();
-}
-
-
 add_action( 'after_setup_theme', 'check_for_blueprint', 18 );
 function check_for_blueprint () {
 	if (!class_exists('Placester_Blueprint')) {
 		include_once('lib/smallprint.php');
-		include_once('lib/agent-widget.php');
-		include_once('lib/listings-widget.php');
+		include_once('placester-agents/widgets/agent.php');
 	}
 }
 
@@ -149,4 +124,3 @@ class PL_Analytics {
 		return null;
 	}
 }
-

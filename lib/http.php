@@ -189,7 +189,7 @@ Class PL_HTTP extends WP_Http {
 		
 		// Use a local cert to make sure we have a valid one when not on the hosted network...
 		if (!defined("HOSTED_PLUGIN_KEY")) {
-			curl_setopt($ch, CURLOPT_CAINFO, trailingslashit(PLACESTER_PLUGIN_DIR) . "config/cacert.pem");
+			curl_setopt($ch, CURLOPT_CAINFO, trailingslashit(PLACESTER_PLUGIN_DIR) . "cacert.pem");
 		}
 
 		// Most importantly, cURL assumes @field as file field...
@@ -325,7 +325,7 @@ class WP_Http_PL_Curl {
 		curl_setopt( $handle, CURLOPT_SSL_VERIFYPEER, $ssl_verify );
 		curl_setopt( $handle, CURLOPT_USERAGENT, $r['user-agent'] );
 		// use a local cert to make sure we have a valid one
-		curl_setopt( $handle, CURLOPT_CAINFO, trailingslashit(PLACESTER_PLUGIN_DIR) . 'config/cacert.pem');
+		curl_setopt( $handle, CURLOPT_CAINFO, trailingslashit(PLACESTER_PLUGIN_DIR) . 'cacert.pem');
 		// The option doesn't work with safe mode or when open_basedir is set, and there's a
 		// bug #17490 with redirected POST requests, so handle redirections outside cURL.
 		curl_setopt( $handle, CURLOPT_FOLLOWLOCATION, false );
