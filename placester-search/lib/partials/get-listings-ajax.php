@@ -243,7 +243,12 @@ class PLS_Partials_Get_Listings_Ajax {
                     }
                 }
 
-                // Swap all existing POST filters for the ones associated with the retrieved saved search...
+                // Swap existing POST filters, but keep incoming sorting and pagination
+                $filters['offset'] = $_POST['offset'];
+                $filters['limit'] = $_POST['limit'];
+                $filters['sort_by'] = $_POST['sort_by'];
+                $filters['sort_type'] = $_POST['sort_type'];
+
                 $saved_search_hash = $saved_search_lookup;
                 $_POST = $filters;
             }

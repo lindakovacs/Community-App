@@ -11,6 +11,7 @@ function Listings (params) {
 	this.property_ids = params.property_ids || false;
 	this.default_filters = params.default_filters || [];
 	this.filter_override = params.filter_override || false;
+	this.is_first_search = true;
 	this.is_new_search = false;
 	this.from_back_button = false;
 	this.search_hash = false;
@@ -39,13 +40,9 @@ Listings.prototype.init = function () {
 
 		jQuery.address.change(function(event) {
 			if (!that.is_new_search) {
-				var hash = jQuery.address.value();
-				if(hash.charAt(0) == '/') {
-					hash = hash.slice(1);
-					if (hash == '' || jQuery.isNumeric(hash)) {
-						that.from_back_button = true;
-						that.get();
-					}
+				if(that.read_search_hash() !== false) {
+					that.from_back_button = true;
+					that.get();
 				}
 			}
 		});
@@ -69,8 +66,8 @@ Listings.prototype.init = function () {
 }
 
 Listings.prototype.get = function (search_criteria_changed) {
-	this.is_new_search = true;
 	var that = this;
+	this.is_new_search = true;
 
 	// if there's a pending request, do nothing.
 	if (Listings.prototype.pending) {
@@ -78,15 +75,8 @@ Listings.prototype.get = function (search_criteria_changed) {
 	}
 
 	// If this param exists/was passed and is set to true, it indicates a meaningful change to the search criteria
-	// (i.e., not just a change in sort, or data pagination)
+	//   (i.e., not just a change in sort, or data pagination)
 	var search_changed = (typeof search_criteria_changed !== "undefined" && search_criteria_changed === true);
-
-	if (search_changed) {
-		// Since search criteria changed, set the datatable back to the first page of 
-		// results but do NOT trigger a new data fetch as it would interfere with the 
-		// one we're currently attempting...
-		this.list.datatable.fnPageChange(0, false);
-	}
 
 	// if there's a single listing, always return that
 	if ( this.map.type == 'single_listing' ) {
@@ -105,9 +95,9 @@ Listings.prototype.get = function (search_criteria_changed) {
 
 		return false;
 	}
-	this.pending = true;
 
-	var that = this;
+	this.pending = true;
+	this.list.show_loading();
 
 	if (that.default_filters.length > 0) {
 		that.active_filters = that.default_filters;
@@ -116,21 +106,6 @@ Listings.prototype.get = function (search_criteria_changed) {
 	// allows the dev to pass in one or many property ids
 	if (this.property_ids) {
 		that.active_filters.push({"name": "property_ids", "value":  this.property_ids});	
-	}
-
-	// get pagination and sorting information
-	if (this.list && this.list.datatable) {
-		this.list.show_loading();
-		var fnSettings = this.list.datatable.fnSettings();
-		that.active_filters.push({"name": "iDisplayLength", "value": fnSettings._iDisplayLength});
-		that.active_filters.push({"name": "iDisplayStart", "value": fnSettings._iDisplayStart});
-		that.active_filters.push({"name": "sEcho", "value":  ++this.list.sEcho});
-		// aoData;
-	} else if (this.list) {
-		this.list.show_loading();
-		that.active_filters.push({"name": "iDisplayLength", "value": this.list.limit_default});
-		that.active_filters.push({"name": "iDisplayStart", "value": 0});
-		that.active_filters.push({"name": "sEcho", "value": 1});
 	}
 
 	if (this.list && this.list.context) {
@@ -175,32 +150,56 @@ Listings.prototype.get = function (search_criteria_changed) {
 	if (that.disable_saved_search === false) {
 
 		// Saved search functionality
-		var filters_hash = '/' + that.generate_search_hash();
-		var current_hash = jQuery.address.value();
+		var filters_hash = that.generate_search_hash();
+		var current_hash = that.read_search_hash();
 
 		// Don't display in preview screens, nor in widget pages
-		if( window.location.href.indexOf('post_type=pl_general_widget') == -1 
+		if (window.location.href.indexOf('post_type=pl_general_widget') == -1
 			&& window.location.href.indexOf('post.php?post=') == -1
 			&& window.location.href.indexOf('/pl_general_widget/') == -1) {
 
 			// Visiting a permalink, or reloading a previous page
-			if ((that.search_hash === false && current_hash != '/') || that.from_back_button) {
-				that.active_filters.push( { "name": "saved_search_lookup", "value" : that.search_hash = current_hash } );
-				if (that.filter) {
-					that.filter.set_values(current_hash);
+			if ((that.is_first_search && current_hash != '') || that.from_back_button) {
+				that.search_hash = current_hash;
+				if (that.filter && filters_hash != current_hash) {
+					that.active_filters.push({"name": "saved_search_lookup", "value": '/' + current_hash});
+					that.filter.set_values('/' + that.search_hash);
 				}
 			}
 
 			// Using POST data (if available) or responding to changes coming from the form
-			else if ((that.search_hash === false && current_hash == '/') || search_changed) {
-				that.active_filters.push( { "name": "saved_search_hash", "value" : that.search_hash = filters_hash } );
-				if(search_changed || filters_hash != '/') {
-					jQuery.address.value(that.search_hash);
-				}
+			else if ((that.is_first_search && current_hash == '') || search_changed) {
+				that.search_hash = filters_hash;
+				if(filters_hash)
+					that.active_filters.push({"name": "saved_search_hash", "value": '/' + filters_hash});
 			}
 		}
 	}
 
+	// Pagination
+	var iDisplayLength, iDisplayStart;
+
+	if(this.list && that.is_first_search) {
+		this.active_filters.push({"name": "sEcho", "value": 1});
+		iDisplayStart = 0; iDisplayLength = this.list.limit_default;
+	}
+	else if(this.list && this.list.datatable) {
+		var fnSettings = this.list.datatable.fnSettings();
+		that.active_filters.push({"name": "sEcho", "value":  ++this.list.sEcho});
+		iDisplayStart = fnSettings._iDisplayStart; iDisplayLength = fnSettings._iDisplayLength;
+	}
+
+	// Use an incoming page, set or reset as necessary
+	if(that.is_first_search || that.from_back_button)
+		iDisplayStart = that.read_page_hash() * iDisplayLength;
+	else if(search_changed)
+		iDisplayStart = 0;
+
+	that.active_filters.push({"name": "iDisplayStart", "value": iDisplayStart});
+	that.active_filters.push({"name": "iDisplayLength", "value": iDisplayLength});
+	that.is_first_search = false;
+
+	// Finally, make and process the query
 	jQuery.ajax({
 		"dataType": 'json',
 		"type": "POST",
@@ -213,7 +212,7 @@ Listings.prototype.get = function (search_criteria_changed) {
 			that.ajax_response = ajax_response;
 
 			// Update the favorite search options if they exist
-			if (that.disable_saved_search === false && jQuery.address.value() != '/') {
+			if (that.disable_saved_search === false && that.search_hash) {
 				jQuery('#pl_favorite_search_links').show();
 				if (typeof ajax_response.favorite_search != "undefined")
 					if (ajax_response.favorite_search) {
@@ -250,30 +249,66 @@ Listings.prototype.get = function (search_criteria_changed) {
 			if (that.list.manual_callback)
 				that.list.manual_callback();
 
+			var fnSettings = that.list.datatable.fnSettings();
+			that.write_hash(that.search_hash, Math.floor(fnSettings._iDisplayStart / fnSettings._iDisplayLength));
+
 			that.active_filters = [];
 		}
 	});
 }
 
-Listings.prototype.generate_search_hash = function () {
-	var joined = ''; var something = false;
-	for (var i = this.active_filters.length - 1; i >= 0; i--) {
-		if (this.active_filters[i]) {
+Listings.prototype.read_search_hash = function () {
+		var hash = jQuery.address.value();
 
-			if (["action", "context", "saved_search_hash", "saved_search_lookup", "sEcho", "sort_by", "sort_type",
-				"iDisplayLength", "iDisplayStart"].indexOf(this.active_filters[i]['name']) >= 0)
-				continue;
-			joined += this.active_filters[i]['name'];
-			joined += this.active_filters[i]['value'];
+		hash = hash.split('/p')[0];
+		if(hash == '')
+			return hash;
 
-			if (!this.active_filters[i]['value'] || this.active_filters[i]['name'].search('_match') >= 0)
-				continue;
-			something = true;
+		if(hash.indexOf('/') >= 0) {
+			hash = hash.split('/');
+			if(hash[0] == '' && (hash[1] == '' || jQuery.isNumeric(hash[1])))
+				return hash[1];
 		}
+
+		return false;
 	}
 
-	return something ? this.fast_hasher(joined) : '';
+Listings.prototype.read_page_hash = function () {
+		var hash = jQuery.address.value();
+
+		if(hash.indexOf('/p') >= 0) {
+			hash = hash.split('/p');
+			hash = hash[hash.length - 1];
+			if (jQuery.isNumeric(hash))
+				return parseInt(hash) - 1;
+		}
+
+		return 0;
 }
+
+Listings.prototype.write_hash = function (search_hash, page) {
+		jQuery.address.value((search_hash ? '/' + search_hash : '') + (page ? '/p' + (1 + page) : ''));
+}
+
+Listings.prototype.generate_search_hash = function () {
+		var joined = ''; var something = false;
+		for (var i = this.active_filters.length - 1; i >= 0; i--) {
+			if (this.active_filters[i]) {
+
+				if (["action", "context", "saved_search_hash", "saved_search_lookup", "sEcho", "sort_by", "sort_type",
+						"iDisplayLength", "iDisplayStart"].indexOf(this.active_filters[i]['name']) >= 0)
+					continue;
+				joined += this.active_filters[i]['name'];
+				joined += this.active_filters[i]['value'];
+
+				if (!this.active_filters[i]['value'] || this.active_filters[i]['name'].search('_match') >= 0)
+					continue;
+				something = true;
+			}
+		}
+
+		return something ? this.fast_hasher(joined) : '';
+	}
 
 Listings.prototype.fast_hasher = function (str) {
     var hash = 0;
