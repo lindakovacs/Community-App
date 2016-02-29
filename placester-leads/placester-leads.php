@@ -40,6 +40,8 @@ $pl_admin_page->require_style('placester-client', PL_LEADS_CSS_URL . 'client.css
 
 add_action('wp_enqueue_scripts', 'placester_membership_enqueue');
 function placester_membership_enqueue() {
+	wp_enqueue_script('placester-membership', PL_LEADS_URL . 'placester-membership/membership.js', array('jquery'), filemtime(PL_LEADS_DIR . 'placester-membership/membership.js'), true);
+
 	if (!class_exists('Placester_Blueprint')) {
 		wp_enqueue_script('jquery-fancybox', PL_LEADS_URL . 'placester-membership/fancybox/jquery.fancybox-1.3.4.js', array('jquery'), '1.3.4', true);
 		wp_enqueue_script('jquery-fancybox-settings', PL_LEADS_URL . 'placester-membership/fancybox/default-settings.js', array('jquery-fancybox'), '1.3.4', true);
@@ -48,8 +50,6 @@ function placester_membership_enqueue() {
 		wp_register_script( 'jquery-cookies', PL_LEADS_URL . 'cookies.jquery.js' , array( 'jquery'), NULL, true );
 		wp_enqueue_script( 'lead-capture', PL_LEADS_URL . 'lead-capture.js' , array( 'jquery-cookies', 'jquery-ui-dialog' ), NULL, true );
 	}
-
-	wp_enqueue_script('placester-membership', PL_LEADS_URL . 'placester-membership/membership.js', array('jquery'), filemtime(PL_LEADS_DIR . 'placester-membership/membership.js'), true);
 }
 
 add_action( 'after_setup_theme', 'placester_add_lead_components', 20 );
