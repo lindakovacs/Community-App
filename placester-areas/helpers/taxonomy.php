@@ -27,6 +27,9 @@ class PL_Taxonomy_Helper {
 		add_action('wp_ajax_lifestyle_polygon', array(__CLASS__, 'lifestyle_polygon'));
 		add_action('wp_ajax_polygon_listings', array(__CLASS__, 'ajax_polygon_listings'));
 		add_action('wp_ajax_nopriv_polygon_listings', array(__CLASS__, 'ajax_polygon_listings'));
+
+		add_filter('wpseo_sitemaps_supported_taxonomies', array(__CLASS__, 'wpseo_taxonomy_filter'));
+		add_filter('wpseo_sitemap_exclude_taxonomy', array(__CLASS__, 'wpseo_taxonomy_exclude'), 10, 2);
 	}
 
 	public static function register_taxonomies () {
@@ -34,6 +37,24 @@ class PL_Taxonomy_Helper {
 		register_taxonomy('zip', array('property'), array('hierarchical'=>false, 'labels'=>array('singular_name'=>__('Zip Codes'), 'name'=>__('Zip Codes')), 'public'=>true, 'show_ui'=>false, 'query_var'=>true,'rewrite'=>array('with_front'=>false, 'hierarchical'=>false) ) );
 		register_taxonomy('city', array('property'), array('hierarchical'=>false, 'labels'=>array('singular_name'=>__('City'), 'name'=>__('Cities')), 'public'=>true, 'show_ui'=>false, 'query_var'=>true,'rewrite'=>array('with_front'=>false, 'hierarchical'=>false) ) );
 		register_taxonomy('neighborhood', array('property'), array('hierarchical'=>false, 'labels'=>array('singular_name'=>__('Neighborhood'), 'name'=>__('Neighborhoods')), 'public'=>true, 'show_ui'=>false, 'query_var'=>true,'rewrite'=>array('with_front'=>false, 'hierarchical'=>false) ) );
+	}
+
+	// we generate the sitemaps for these, so don't let Yoast do it
+	public static function wpseo_taxonomy_filter ($taxonomies) {
+		if(is_array($taxonomies)) {
+			unset($taxonomies['state']);
+			unset($taxonomies['zip']);
+			unset($taxonomies['city']);
+			unset($taxonomies['neighborhood']);
+		}
+		return $taxonomies;
+	}
+
+	public static function wpseo_taxonomy_exclude ($exclude, $name) {
+		if(in_array($name, array('state', 'zip', 'city', 'neighborhood')))
+			return true;
+
+		return $exclude;
 	}
 
 	public function the_posts($posts) {

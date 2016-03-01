@@ -51,6 +51,9 @@ class PL_Shortcode_CPT {
 		// embedded sc support (fetch-widget.js)
 		add_action( 'wp_ajax_handle_widget_script', array( $this, 'handle_iframe_cross_domain' ) );
 		add_action( 'wp_ajax_nopriv_handle_widget_script', array( $this, 'handle_iframe_cross_domain' ) );
+
+		add_filter('wpseo_sitemaps_supported_post_types', array(__CLASS__, 'wpseo_post_type_filter'));
+		add_filter('wpseo_sitemap_exclude_post_type', array(__CLASS__, 'wpseo_post_type_exclude'), 10, 2);
 	}
 
 	/**
@@ -86,6 +89,21 @@ class PL_Shortcode_CPT {
 		register_post_type('pl_general_widget', $args );
 	}
 
+
+	// don't let Yoast sitemap our shortcodes
+	public static function wpseo_post_type_filter ($post_types) {
+		if(is_array($post_types))
+			unset($post_types['pl_general_widget']);
+
+		return $post_types;
+	}
+
+	public static function wpseo_post_type_exclude ($exclude, $name) {
+		if($name == 'pl_general_widget')
+			return true;
+
+		return $exclude;
+	}
 
 	/**
 	 * Return a list of available shortcodes objects
