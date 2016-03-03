@@ -161,8 +161,8 @@ Listings.prototype.get = function (search_criteria_changed) {
 			// Visiting a permalink, or reloading a previous page
 			if ((that.is_first_search && current_hash != '') || that.from_back_button) {
 				that.search_hash = current_hash;
+				that.active_filters.push({"name": "saved_search_lookup", "value": '/' + current_hash});
 				if (that.filter && filters_hash != current_hash) {
-					that.active_filters.push({"name": "saved_search_lookup", "value": '/' + current_hash});
 					that.filter.set_values('/' + that.search_hash);
 				}
 			}

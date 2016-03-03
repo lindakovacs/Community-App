@@ -315,23 +315,29 @@ jQuery(document).ready(function($) {
 		}, 'json');
 	});
 
-/*
- * My Saved Search functionality...
- */
+	/*
+	 * My Saved Search functionality...
+	 */
 
 	$('#pl_save_favorite_search:not(.guest) > a').live('click', function (event) {
 		event.preventDefault();
 
+		// first check to see if we're in a list of user saved searches
+		var search_url = $(this).parent().parent().find("#pl_favorite_search_link").attr('href');
+
+		// otherwise verify we're on a search page and read the hash code -- see listings.js
+		if(!search_url) {
+			if (typeof Listings == 'function' && typeof Listings.prototype.read_search_hash == 'function')
+				search_url = window.location.pathname + '/#/' + Listings.prototype.read_search_hash(); // to clean off any page number
+			else // no search found to save
+				return;
+		}
+
 		var spinner = $(this).parent().parent().find(".pl_favorite_search_spinner");
 		spinner.css('visibility', 'visible');
 
-		data = {
-			action: 'save_favorite_search',
-			search_url: $(this).parent().parent().find("#pl_favorite_search_link").attr('href') || window.location.href
-		};
-
 		var that = this;
-		$.post(info.ajaxurl, data, function (response) {
+		$.post(info.ajaxurl, { action: 'save_favorite_search', search_url: search_url }, function (response) {
 			spinner.css('visibility', 'hidden');
 
 			if (response && response.hash) {
@@ -355,16 +361,22 @@ jQuery(document).ready(function($) {
 	$('#pl_clear_favorite_search > a').live('click', function (event) {
 		event.preventDefault();
 
+		// first check to see if we're in a list of user saved searches
+		var search_hash = $(this).parent().parent().find("#pl_favorite_search_link").attr('href'); // not just the hash, but that's ok
+
+		// otherwise verify we're on a search page and read the hash code -- see listings.js
+		if(!search_hash) {
+			if (typeof Listings == 'function' && typeof Listings.prototype.read_search_hash == 'function')
+				search_hash = Listings.prototype.read_search_hash();
+			else
+				return;
+		}
+
 		var spinner = $(this).parent().parent().find(".pl_favorite_search_spinner");
 		spinner.css('visibility', 'visible');
 
-		data = {
-			action: 'clear_favorite_search',
-			search_hash: $(this).parent().parent().find("#pl_favorite_search_link").attr('href') || window.location.hash
-		};
-
 		var that = this;
-		$.post(info.ajaxurl, data, function (response) {
+		$.post(info.ajaxurl, { action: 'clear_favorite_search', search_hash: search_hash }, function (response) {
 			spinner.css('visibility', 'hidden');
 
 			if (response && response.hash) {
@@ -380,17 +392,22 @@ jQuery(document).ready(function($) {
 	$('#pl_enable_favorite_search > a').live('click', function (event) {
 		event.preventDefault();
 
+		// first check to see if we're in a list of user saved searches
+		var search_hash = $(this).parent().parent().parent().find("#pl_favorite_search_link").attr('href'); // not just the hash, but that's ok
+
+		// otherwise verify we're on a search page and read the hash code -- see listings.js
+		if(!search_hash) {
+			if (typeof Listings == 'function' && typeof Listings.prototype.read_search_hash == 'function')
+				search_hash = Listings.prototype.read_search_hash();
+			else
+				return;
+		}
+
 		var spinner = $(this).parent().parent().parent().find(".pl_favorite_search_spinner");
 		spinner.css('visibility', 'visible');
 
-		data = {
-			action: 'enable_favorite_search',
-			search_hash: $(this).parent().parent().parent().find("#pl_favorite_search_link").attr('href') || window.location.hash,
-			search_enable: 1
-		};
-
 		var that = this;
-		$.post(info.ajaxurl, data, function (response) {
+		$.post(info.ajaxurl, { action: 'enable_favorite_search', search_hash: search_hash, search_enable: 1 }, function (response) {
 			spinner.css('visibility', 'hidden');
 
 			if (response && response.hash) {
@@ -406,17 +423,22 @@ jQuery(document).ready(function($) {
 	$('#pl_disable_favorite_search > a').live('click', function (event) {
 		event.preventDefault();
 
+		// first check to see if we're in a list of user saved searches
+		var search_hash = $(this).parent().parent().parent().find("#pl_favorite_search_link").attr('href'); // not just the hash, but that's ok
+
+		// otherwise verify we're on a search page and read the hash code -- see listings.js
+		if(!search_hash) {
+			if (typeof Listings == 'function' && typeof Listings.prototype.read_search_hash == 'function')
+				search_hash = Listings.prototype.read_search_hash();
+			else
+				return;
+		}
+
 		var spinner = $(this).parent().parent().parent().find(".pl_favorite_search_spinner");
 		spinner.css('visibility', 'visible');
 
-		data = {
-			action: 'enable_favorite_search',
-			search_hash: $(this).parent().parent().parent().find("#pl_favorite_search_link").attr('href') || window.location.hash,
-			search_enable: 0
-		};
-
 		var that = this;
-		$.post(info.ajaxurl, data, function (response) {
+		$.post(info.ajaxurl, { action: 'enable_favorite_search', search_hash: search_hash, search_enable: 0 }, function (response) {
 			spinner.css('visibility', 'hidden');
 
 			if (response && response.hash) {
