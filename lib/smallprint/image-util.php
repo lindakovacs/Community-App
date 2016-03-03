@@ -20,9 +20,6 @@ a link back to my site would be nice too.
 
 */
 
-// Include the GD image manipulation library. 
-// include(trailingslashit (PLS_EXT_DIR) . 'image-util/image-resize-writer.php');
-
 // PLS_Image::init();
 class PLS_Image {
 
@@ -34,38 +31,10 @@ class PLS_Image {
 	}
 
     public static function enqueue() {
-
-        $image_util_support = get_theme_support( 'pls-image-util' );
-
-		if ( !wp_script_is('pls-image-util-fancybox' , 'registered') ) {
-	        wp_register_script( 'pls-image-util-fancybox', trailingslashit( PLS_EXT_URL ) . 'image-util/fancybox/jquery.fancybox-1.3.4.pack.js' , array( 'jquery' ), NULL, true );
-		}
-
-		if ( !wp_script_is('pls-image-util-fancybox-default-settings' , 'registered') ) {
-        	wp_register_script( 'pls-image-util-fancybox-default-settings', trailingslashit( PLS_EXT_URL ) . 'image-util/fancybox/default-settings.js' , array( 'jquery' ), NULL, true );
-		}
-		
-		if ( !wp_style_is('pls-image-util-fancybox-style' , 'registered') ) {
-        	wp_register_style( 'pls-image-util-fancybox-style', trailingslashit( PLS_EXT_URL ) . 'image-util/fancybox/jquery.fancybox-1.3.4.css' );
-		}
-
-        if ( is_array( $image_util_support ) ) {
-            if ( in_array( 'fancybox', $image_util_support[0] ) ) {
-              	if ( !wp_script_is('pls-image-util-fancybox' , 'queue') ) {
-	  				wp_enqueue_script( 'pls-image-util-fancybox' );
-              	}
-
-				if ( !wp_script_is('pls-image-util-fancybox-default-settings' , 'queue') ) {
-	                wp_enqueue_script( 'pls-image-util-fancybox-default-settings' );
-				}
-
-				if ( !wp_style_is('pls-image-util-fancybox-style' , 'queue') ) {
-	                wp_enqueue_style( 'pls-image-util-fancybox-style' );
-				}
-            }
-            return;
-        }
-    }
+		wp_enqueue_script('jquery-fancybox');
+		wp_enqueue_script('jquery-fancybox-settings');
+		wp_enqueue_style('jquery-fancybox');
+	}
 
 	public static function load ($old_image = '', $args = null) {
 		$new_image = false;
@@ -178,5 +147,3 @@ class PLS_Image {
         return $args;	
 	}
 }
-// end class 
-?>

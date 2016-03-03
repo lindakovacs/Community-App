@@ -391,7 +391,7 @@ class PLS_Slideshow {
                 #slider img {
                     width:<?php echo $width; ?>px !important;
                     height:<?php echo $height; ?>px !important;
-                    background: #000 url('<?php echo PLS_EXT_URL; ?>/slideshow/orbit/orbit/loading.gif') no-repeat center center;
+                    background: #000 url('<?php echo PLS_EXT_URL; ?>orbit/orbit/loading.gif') no-repeat center center;
                 }
             </style>
         <?php 

@@ -90,15 +90,54 @@ include_once('placester-customizer/placester-customizer.php');
 include_once('placester-slideshow/placester-slideshow.php');
 
 
-add_action( 'after_setup_theme', 'check_for_blueprint', 18 );
-function check_for_blueprint () {
+// if we're using a blueprint theme, don't duplicate its functionality
+add_action( 'after_setup_theme', 'placester_check_for_blueprint', 18 );
+function placester_check_for_blueprint () {
 	if (!class_exists('Placester_Blueprint')) {
+		define('PLS_JS_URL', PLACESTER_PLUGIN_URL . 'placester-search/js/');
+		define('PLS_IMG_URL', PLACESTER_PLUGIN_URL . 'placester-search/images/');
+		define('PLS_EXT_URL', PLACESTER_PLUGIN_URL . 'placester-slideshow/');
+
 		include_once('lib/smallprint.php');
 		include_once('placester-agents/widgets/agent.php');
 	}
 }
 
+
+// shared front-end libraries used by various components
+add_action('wp_enqueue_scripts', 'placester_register_library_scripts', 5); // must come before the actual enqueueing done by sub-plugins
+function placester_register_library_scripts()
+{
+	wp_register_style('jquery-ui', PLACESTER_PLUGIN_URL . 'lib/jquery-ui/css/smoothness/jquery-ui-1.8.17.custom.css');
+
+	wp_register_script('jquery-datatables', PLACESTER_PLUGIN_URL . 'lib/datatables/jquery.dataTables.js', array('jquery'), NULL, true);
+	wp_register_style('jquery-datatables', PLACESTER_PLUGIN_URL . 'lib/datatables/jquery.dataTables.js', array('jquery-ui'), NULL, true);
+
+	global $i_am_a_placester_theme; // stupid hack for old tampa, remove after new version comes out
+	if($i_am_a_placester_theme && get_stylesheet() == 'tampa') wp_enqueue_script('jquery-datatables');
+
+	if (!class_exists('Placester_Blueprint')) {
+		wp_register_script('jquery-fancybox', PLACESTER_PLUGIN_URL . 'lib/fancybox/jquery.fancybox-1.3.4.js', array('jquery'), '1.3.4', true);
+		wp_register_script('jquery-fancybox-settings', PLACESTER_PLUGIN_URL . 'lib/fancybox/default-settings.js', array('jquery-fancybox'), '1.3.4', true);
+		wp_register_style('jquery-fancybox', PLACESTER_PLUGIN_URL . 'lib/fancybox/jquery.fancybox-1.3.4.css', array());
+	}
+}
+
+
+// shared front-end libraries used by plugin administration
+add_action('admin_enqueue_scripts', 'placester_register_admin_scripts', 5); // must come before the actual enqueueing done by sub-plugins
+function placester_register_admin_scripts()
+{
+	wp_register_style('jquery-ui', PLACESTER_PLUGIN_URL . 'lib/jquery-ui/css/smoothness/jquery-ui-1.8.17.custom.css');
+
+	wp_register_script('jquery-datatables', PLACESTER_PLUGIN_URL . 'lib/datatables/jquery.dataTables.js', array('jquery'), NULL, true);
+	wp_register_style('jquery-datatables', PLACESTER_PLUGIN_URL . 'lib/datatables/jquery.dataTables.js', array('jquery-ui'), NULL, true);
+}
+
+
+// handle the demo data message bar
 add_action('wp_head', 'placester_info_bar');
+add_action('admin_head', 'placester_info_bar');
 function placester_info_bar() {
 	if(PL_Option_Helper::get_demo_data_flag() && current_user_can('manage_options')) {
 		include(PLACESTER_PLUGIN_DIR . 'admin/views/partials/infobar.php');
@@ -106,12 +145,14 @@ function placester_info_bar() {
 }
 
 add_action('wp_enqueue_scripts', 'placester_info_bar_enqueue');
+add_action('admin_enqueue_scripts', 'placester_info_bar_enqueue');
 function placester_info_bar_enqueue() {
 	if(PL_Option_Helper::get_demo_data_flag() && current_user_can('manage_options')) {
 		wp_enqueue_style('placester-global');
 		wp_enqueue_script('placester-infobar', PLACESTER_PLUGIN_URL . 'admin/js/infobar.js', array('jquery'), PL_PLUGIN_VERSION);
 	}
 }
+
 
 // PL_COMPATIBILITY_MODE -- preserve the interface expected by certain previous versions of blueprint
 function placester_post_slug() {
