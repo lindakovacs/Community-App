@@ -126,7 +126,7 @@ To add some text to your listings:<br />
 				unset($atts['id']);
 			}
 		}
-		$atts = wp_parse_args($atts, array('limit' => 0, 'sort_type' => ''));
+		$atts = wp_parse_args($atts, array('limit' => 6, 'sort_type' => ''));
 		$atts['context'] = 'featured_listings_'.(empty($atts['context']) ? 'shortcode' : $atts['context']);
 		
 		if (!has_filter('pls_listings_' . $atts['context'])) {
