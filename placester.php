@@ -113,10 +113,12 @@ function placester_register_library_scripts()
 	wp_register_script('jquery-datatables', PLACESTER_PLUGIN_URL . 'lib/datatables/jquery.dataTables.js', array('jquery'), NULL, true);
 	wp_register_style('jquery-datatables', PLACESTER_PLUGIN_URL . 'lib/datatables/jquery.dataTables.js', array('jquery-ui'), NULL, true);
 
-	global $i_am_a_placester_theme; // stupid hack for old tampa, remove after new version comes out
-	if($i_am_a_placester_theme && get_stylesheet() == 'tampa') wp_enqueue_script('jquery-datatables');
+	// stupid hack for tampa and other old themes, remove after new version comes out
+	if (class_exists('Placester_Blueprint')) {
+		wp_enqueue_script('datatable', PLACESTER_PLUGIN_URL . 'lib/datatables/jquery.dataTables.js', array('jquery'), NULL, true);
+	}
 
-	if (!class_exists('Placester_Blueprint')) {
+	else { //if (!class_exists('Placester_Blueprint')) {
 		wp_register_script('jquery-fancybox', PLACESTER_PLUGIN_URL . 'lib/fancybox/jquery.fancybox-1.3.4.js', array('jquery'), '1.3.4', true);
 		wp_register_script('jquery-fancybox-settings', PLACESTER_PLUGIN_URL . 'lib/fancybox/default-settings.js', array('jquery-fancybox'), '1.3.4', true);
 		wp_register_style('jquery-fancybox', PLACESTER_PLUGIN_URL . 'lib/fancybox/jquery.fancybox-1.3.4.css', array());

@@ -101,8 +101,8 @@ $pl_admin_page->require_script('jquery-fileupload', PL_ADMIN_JS_URL . 'blueimp/j
 $pl_admin_page->require_script('add-listing', PL_ADMIN_JS_URL . 'add-listing.js', array('jquery-ui-datepicker', 'jquery-iframe-transport', 'jquery-fileupload'));
 $pl_admin_page->require_style('add-listing', PL_ADMIN_CSS_URL . 'add-listing.css');
 
-$pl_admin_page = new PL_Admin_Page('placester', 9100, 'placester_support', 'Support', 'Support', PL_ADMIN_VIEWS_DIR . 'support.php');
-$pl_admin_page->require_style('support', PL_ADMIN_CSS_URL . 'support.css');
+//$pl_admin_page = new PL_Admin_Page('placester', 9100, 'placester_support', 'Support', 'Support', PL_ADMIN_VIEWS_DIR . 'support.php');
+//$pl_admin_page->require_style('support', PL_ADMIN_CSS_URL . 'support.css');
 
 
 // miscellaneous touch-ups to standard admin pages

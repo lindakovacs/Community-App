@@ -1,7 +1,7 @@
 <?php
 /**
-Plugin Name: Placester Community Pages
-Description: Community Pages and Polygon Tools for Placester Real Estate Website Builder
+Plugin Name: Placester Area Pages
+Description: Area Pages and Polygon Tools for Placester Real Estate Website Builder
 Plugin URI: https://placester.com/
 Author: Placester.com
 Version: 1.0.0

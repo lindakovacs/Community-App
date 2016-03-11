@@ -4,24 +4,9 @@ span.note {
 }
 
 /* Added for temporary solution (see theme-gallery.php) */
-.theme_wrapper {
-	width: 650px;
-	margin: 50px auto;
-    font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",sans-serif;
-    font-weight: normal;
-    text-shadow: rgba(255, 255, 255, 1) 0 1px 0;
-    text-align: center;
-}
-.theme_wrapper h1 {
-	font-size: 40px;
-	font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",sans-serif;
-    font-weight: normal;
-    text-shadow: rgba(255, 255, 255, 1) 0 1px 0;
-    margin-bottom: 40px;
-}
-.theme_wrapper h3 {
-	font-size: 26px;
-	font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",sans-serif;
-    font-weight: normal;
-    text-shadow: rgba(255, 255, 255, 1) 0 1px 0
+.available-theme {
+	width: 320px;
+	margin: 20px auto;
+	font-size: 115%;
+	text-align: center;
 }

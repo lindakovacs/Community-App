@@ -115,7 +115,7 @@ For example, to only display user name if it has a value:<br />
 			$op .= '<style type="text/css">'.$template['css'].'</style>';
 		}
 
-		self::$form_data = defined('PL_LEADS_ENABLED') ? PL_Lead_Helper::lead_details() : PL_People_Helper::person_details();
+		self::$form_data = PL_People_Helper::person_details();
 		self::$form_data += array('cur_data'=>array(), 'location'=>array());
 		if (is_admin()) {
 			self::$form_data['cur_data'] += array('name'=>'User Name', 'email'=>'email@domain.com', 'phone'=>'123-456-7890', 'company'=>'Company Name');

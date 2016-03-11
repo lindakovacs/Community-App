@@ -130,3 +130,6 @@ class PL_Permalink_Search {
 		}
 	}
 }
+
+// PL_COMPATIBILITY_MODE -- preserve the interface expected by certain previous versions of blueprint
+class PL_Saved_Search extends PL_Permalink_Search {}
