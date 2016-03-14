@@ -480,7 +480,7 @@ class PL_Membership {
 			<?php else : ?>
 
 				<div style='display:none;'>
-				<form name="pl_login_form" id="pl_login_form" action="<?php echo home_url(); ?>/wp-user.php" method="post" class="pl_login_reg_form">
+				<form name="pl_login_form" id="pl_login_form" action="<?php echo wp_login_url(); ?>" method="post" class="pl_login_reg_form">
 
 					<?php pls_do_atomic( 'login_form_before_title' ); ?>
 
