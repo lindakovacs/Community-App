@@ -50,15 +50,21 @@ if(!defined('HOSTED_PLUGIN_KEY')) {
 		global $placester_gallery_themes;
 		if(is_array($value->checked)) foreach($value->checked as $theme => $installed_version) {
 			if(in_array($theme, array_keys($placester_gallery_themes))) {
-				$meta = $placester_gallery_themes[$theme];
-				if($installed_version < $meta['current_version']) {
-					if (!isset($value->response[$theme]) || $value->response[$theme]['new_version'] < $meta['current_version'])
-						$value->response[$theme] = array(
-							'theme' => $theme,
-							'new_version' => $meta['current_version'],
-							'url' => $meta['info_link'],
-							'package' => $meta['download_link']
-						);
+
+				// verify we've got a Placester theme -- don't just rely on the name
+				if(($info = wp_get_theme($theme)) && preg_match('/.*[Pp]lacester.*/', $info->author)) {
+
+					$meta = $placester_gallery_themes[$theme];
+					if ($installed_version < $meta['current_version']) {
+						if (!isset($value->response[$theme]) || $value->response[$theme]['new_version'] < $meta['current_version']) {
+							$value->response[$theme] = array(
+								'theme' => $theme,
+								'new_version' => $meta['current_version'],
+								'url' => $meta['info_link'],
+								'package' => $meta['download_link']
+							);
+						}
+					}
 				}
 			}
 		}
