@@ -48,7 +48,7 @@ function placester_membership_enqueue() {
 		wp_enqueue_style('jquery-fancybox');
 
 		wp_register_script( 'jquery-cookies', PL_LEADS_URL . 'cookies.jquery.js' , array( 'jquery'), NULL, true );
-		wp_enqueue_script( 'lead-capture', PL_LEADS_URL . 'lead-capture.js' , array( 'jquery-cookies', 'jquery-ui-dialog' ), NULL, true );
+		wp_enqueue_script( 'lead-capture', PL_LEADS_URL . 'lead-capture-alternate.js' , array( 'jquery-cookies', 'jquery-ui-dialog' ), NULL, true );
 	}
 }
 
