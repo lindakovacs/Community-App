@@ -124,7 +124,7 @@ class PLS_Slideshow {
                             
                             // In this case, the slide's remaining key will correspond to it's property ID...
                             $property_id = key($slide);
-                            $api_response = PLS_Plugin_API::get_listing_details(array('property_ids' => array($property_id)));
+                            $api_response = PL_Listing_Helper::details(array('property_ids' => array($property_id)));
                             
                             if (!empty($api_response['listings']) && $api_response['listings'][0]['id'] === false ) {
                                 self::$listings_to_delete[] = $property_id;
@@ -135,7 +135,7 @@ class PLS_Slideshow {
                                 $first_valid_img_url = null;
 
                                 // Overwrite the placester url with the local url...
-                                $listing_url = PLS_Plugin_API::get_property_url( $listing['id'], $listing );
+                                $listing_url = PL_Pages::get_url( $listing['id'], $listing );
                                 $data['links'][] = $listing_url;
 
                                 // Try to retrieve the image url if order is set...
@@ -191,12 +191,12 @@ class PLS_Slideshow {
                 } 
 
                 if (empty($api_response['listings'])) {
-                    $api_response = PLS_Plugin_API::get_listings($listings);
+                    $api_response = PL_Listing_Helper::results($listings);
                 }
                 
                 foreach ($api_response['listings'] as $index => $listing) {
                     if (empty($listing['id'])) { continue; }
-                    $listing_url = PLS_Plugin_API::get_property_url( $listing['id'], $listing );
+                    $listing_url = PL_Pages::get_url( $listing['id'], $listing );
                     
                     /** Overwrite the placester url with the local url. */
                     $data['links'][] = $listing_url;
@@ -321,7 +321,7 @@ class PLS_Slideshow {
      */
     private static function empty_slides_and_add_random_listings() {
         $slides = array();
-        $api_response = PLS_Plugin_API::get_listings(array('limit' => 6, 'offset' => 10));
+        $api_response = PL_Listing_Helper::results(array('limit' => 6, 'offset' => 10));
         
         foreach ($api_response['listings'] as $listing) {
           $slides[] = array(

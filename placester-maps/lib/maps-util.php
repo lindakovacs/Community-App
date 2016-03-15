@@ -51,10 +51,10 @@ class PLS_Map {
 
 		$response = array();
 		$form_options = array();
-		$form_options['locality'] = array_merge(array('false' => '---'), PLS_Plugin_API::get_location_list('locality'));
-        $form_options['region'] = array_merge(array('false' => '---'), PLS_Plugin_API::get_location_list('region'));
-        $form_options['postal'] = array_merge(array('false' => '---'),PLS_Plugin_API::get_location_list('postal')); 
-        $form_options['neighborhood'] = array_merge(array('false' => '---'),PLS_Plugin_API::get_location_list('neighborhood')); 
+		$form_options['locality'] = array_merge(array('false' => '---'), PL_Listing_Helper::locations_for_options('locality'));
+        $form_options['region'] = array_merge(array('false' => '---'), PL_Listing_Helper::locations_for_options('region'));
+        $form_options['postal'] = array_merge(array('false' => '---'),PL_Listing_Helper::locations_for_options('postal'));
+        $form_options['neighborhood'] = array_merge(array('false' => '---'),PL_Listing_Helper::locations_for_options('neighborhood'));
         
 	        $response['location'] = '<div class="location_select"><select name="location" class="location" style="width: 140px">
 				<option value="locality">City</option>
@@ -119,7 +119,7 @@ class PLS_Map {
 				self::make_marker($listing, $marker_args);
 			}
 		} elseif ($map_args['auto_load_listings']) {
-			$api_response = PLS_Plugin_API::get_listings($map_args['request_params']);
+			$api_response = PL_Listing_Helper::results($map_args['request_params']);
 			foreach ($api_response['listings'] as $listing) {
 				self::make_marker($listing, $marker_args);
 			}

@@ -22,7 +22,7 @@ class PLS_Widget_Office extends WP_Widget {
 		extract($args);
 
 		wp_enqueue_script('google-maps', 'http://maps.googleapis.com/maps/api/js');
-		$agent = PLS_Plugin_API::get_user_details();
+		$agent = PL_User::whoami();
 
 		// Widget output ?>
 		<section class="widget pls-map widget-pls-map" itemscope itemtype="http://schema.org/LocalBusiness">

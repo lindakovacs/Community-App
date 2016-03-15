@@ -180,7 +180,7 @@ class PLS_Partials_Listing_Search_Form {
     }
     
     /** Get the property type options */
-    $get_type_response = PLS_Plugin_API::get_type_list();
+    $get_type_response = PL_Listing_Helper::types_for_options();
     // error_log("GET_TYPE_RESPONSE\n" . serialize($get_type_response) . "\n");
 		if ( empty($get_type_response) ) {
 			$form_options['property_type'] = array( 'pls_empty_value' => $pls_empty_value['property_type'] );
@@ -193,32 +193,36 @@ class PLS_Partials_Listing_Search_Form {
 		}
 
     /** Get the listing type options. */
-    $form_options['listing_types'] = array( 'pls_empty_value' => $pls_empty_value['listing_types'] ) + PLS_Plugin_API::get_type_values( 'listing' );
+    $form_options['listing_types'] = array( 'pls_empty_value' => $pls_empty_value['listing_types'] ) + array(
+            'housing' => 'Housing',
+            'parking' => 'Parking',
+            'sublet' => 'Sublet',
+            'vacation' => 'Vacation',
+            'land' => 'Land'
+        );
 
     /** Get the zoning type options. */
-    $form_options['zoning_types'] = array( 'pls_empty_value' => $pls_empty_value['zoning_types']) + PLS_Plugin_API::get_type_values( 'zoning' );
-		// removed "All" - it's not giving all listings. jquery needs to change to not include "[]"s
-    // $form_options['zoning_types'] = PLS_Plugin_API::get_type_values( 'zoning' ); // for Multiple, not for single, see below
+    $form_options['zoning_types'] = array( 'pls_empty_value' => $pls_empty_value['zoning_types']) + array(
+            'residential' => 'Residential',
+            'commercial' => 'Commercial'
+        );
 
     /** Get the purchase type options. */
-    $get_type_response = PLS_Plugin_API::get_type_list(false, true, 'purchase_types');
-    // error_log("GET_TYPE_RESPONSE\n" . serialize($get_type_response) . "\n");
+    $get_type_response = PL_Listing_Helper::types_for_options(false, true, 'purchase_types');
+
 	// if API serves up 'false' key in the array, remove it, because we're going to add one.
 	if (isset($get_type_response['false'])) {
 		unset($get_type_response['false']);
 	}
 	$form_options['purchase_types'] = array_merge( array('pls_empty_value' => $pls_empty_value['purchase_types']), $get_type_response );
 
-		// removed "All" - it's not giving all listings. jquery needs to change to not include "[]"s
-		// $form_options['purchase_types'] = PLS_Plugin_API::get_type_values( 'purchase' );
-		
     /** Prepend the default empty valued element. */
     $form_options['available_on'] = array( 'pls_empty_value' => $pls_empty_value['available_on']) + $form_options['available_on'];
 
     /** Prepend the default empty valued element. */
     
-    $locations = PLS_Plugin_API::get_location_list();
-    $neighborhood_polygons_options = PLS_Plugin_API::get_location_list_polygons($neighborhood_polygons_type);
+    $locations = PL_Listing_Helper::locations_for_options();
+    $neighborhood_polygons_options = PL_Listing_Helper::polygon_locations($neighborhood_polygons_type);
 
     if (empty($locations['locality'])) {
         $form_options['cities'] = array('pls_empty_value' => $pls_empty_value['cities']);

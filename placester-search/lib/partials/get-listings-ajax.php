@@ -44,7 +44,7 @@ class PLS_Partials_Get_Listings_Ajax {
     }
 
     public static function get_favorite_listings () {
-        $favorite_ids = PLS_Plugin_API::get_favorite_properties();
+        $favorite_ids = PL_Favorite_Listings::get_favorite_properties();
         
         // Will echo listings as a JSON-encoded output...
         self::get(array('property_ids' => $favorite_ids, 'allow_id_empty' => true));
@@ -115,9 +115,6 @@ class PLS_Partials_Get_Listings_Ajax {
         // Ultimately, sort params in the $_POST array take precedence if they exist...
         $sort_by = isset($_POST['sort_by']) ? $_POST['sort_by'] : $sort_by;
         $sort_type = isset($_POST['sort_type']) ? $_POST['sort_type'] : $sort_type;
-
-        // This page should trigger a compliance message since it's set up to display listings
-        PLS_Plugin_API::$listing_data_requested = true;
 
         ob_start();
         ?>
@@ -222,7 +219,7 @@ class PLS_Partials_Get_Listings_Ajax {
         // Handle saved search...
         if ($saved_search_lookup) {
             // Attempt to retrieve search filters associated with the given saved search lookup ID...
-            $filters = PLS_Plugin_API::get_saved_search_filters($saved_search_lookup);
+            $filters = PL_Permalink_Search::get_saved_search_filters($saved_search_lookup);
             if ($filters && is_array($filters)) {
                 // For backwards compatibility, handle older fields that are no longer stored as saved search filters...
                 $old_field_map = array(
@@ -254,12 +251,12 @@ class PLS_Partials_Get_Listings_Ajax {
             }
         }
         else if ($saved_search_hash) {
-            PLS_Plugin_API::save_search($saved_search_hash, $_POST);
+            PL_Permalink_Search::save_search($saved_search_hash, $_POST);
         }
 
         // Is this one of the user's favorite searches?
         if(is_user_logged_in() && $saved_search_hash)
-            $favorite_search = PLS_Plugin_API::get_favorite_search($saved_search_hash);
+            $favorite_search = PL_User_Saved_Search::get_favorite_search($saved_search_hash);
 
         // Define the default argument array
         $defaults = array(
@@ -317,13 +314,13 @@ class PLS_Partials_Get_Listings_Ajax {
                     $property_ids = explode(',', $property_ids);
                 }
 
-                $api_response = PLS_Plugin_API::get_listing_details(array('property_ids' => $property_ids, 'limit' => $_POST['limit'], 'offset' => $_POST['offset']));
+                $api_response = PL_Listing_Helper::details(array('property_ids' => $property_ids, 'limit' => $_POST['limit'], 'offset' => $_POST['offset']));
             } 
             elseif (isset($search_query['neighborhood_polygons']) && !empty($search_query['neighborhood_polygons']) ) {
-                $api_response = PLS_Plugin_API::get_polygon_listings($search_query);
+                $api_response = PL_Taxonomy_Helper::get_listings_polygon_name($search_query);
             }
             else {
-                $api_response = PLS_Plugin_API::get_listings($search_query);
+                $api_response = PL_Listing_Helper::results($search_query);
             }
 
             // When using an MLS limit use that as a maximum for search result total
@@ -364,7 +361,7 @@ class PLS_Partials_Get_Listings_Ajax {
                         <div class="listing-item-details grid_5 omega">
                             <header>
                                 <p class="listing-item-address h4" itemprop="name">
-                                    <a href="<?php echo PLS_Plugin_API::get_property_url($listing['id'], $listing); ?>" rel="bookmark" title="<?php echo $listing['location']['address'] ?>" itemprop="url">
+                                    <a href="<?php echo PL_Pages::get_url($listing['id'], $listing); ?>" rel="bookmark" title="<?php echo $listing['location']['address'] ?>" itemprop="url">
                                         <?php echo $listing['location']['address'] . ', ' . $listing['location']['locality'] . ' ' . $listing['location']['region'] . ' ' . $listing['location']['postal']  ?>
                                     </a>
                                 </p>
@@ -405,8 +402,8 @@ class PLS_Partials_Get_Listings_Ajax {
                         </div>
 
                         <div class="actions">
-                            <a class="more-link" href="<?php echo PLS_Plugin_API::get_property_url($listing['id'], $listing); ?>" itemprop="url">View Property Details</a>
-                            <?php echo PLS_Plugin_API::placester_favorite_link_toggle(array('property_id' => $listing['id'])); ?>
+                            <a class="more-link" href="<?php echo PL_Pages::get_url($listing['id'], $listing); ?>" itemprop="url">View Property Details</a>
+                            <?php echo PL_Favorite_Listings::placester_favorite_link_toggle(array('property_id' => $listing['id'])); ?>
                         </div>
 
                         <?php PLS_Listing_Helper::get_compliance(array('context' => 'inline_search', 'agent_name' => @$listing['rets']['aname'] , 'office_name' => @$listing['rets']['oname'])); ?>

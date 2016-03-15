@@ -80,23 +80,23 @@ class PLS_Partial_Get_Listings {
               $listings_raw = PLS_Listing_Helper::get_featured($featured_option_id, $args);
 
               if (empty($listings_raw['listings'])) {
-                $listings_raw = PLS_Plugin_API::get_listings($request_params);
+                $listings_raw = PL_Listing_Helper::results($request_params);
                 if($request_params['sort_by'] == 'total_images' && is_array($listings_raw['listings']))
                   shuffle($listings_raw['listings']);  // when sorting by pretty (the default) make them less obviously sorted
               }
             }
 
             elseif ($neighborhood_polygons) {
-              $listings_raw = PLS_Plugin_API::get_polygon_listings( array('neighborhood_polygons' => $neighborhood_polygons ) );
+              $listings_raw = PL_Taxonomy_Helper::get_listings_polygon_name( array('neighborhood_polygons' => $neighborhood_polygons ) );
 
               // Do we ever fall through to here?  And if so, will this give the result we want?
               if (empty($listings_raw['listings'])) {
-                $listings_raw = PLS_Plugin_API::get_listings($request_params);
+                $listings_raw = PL_Listing_Helper::results($request_params);
               }
             }
 
             else {
-              $listings_raw = PLS_Plugin_API::get_listings($request_params);
+              $listings_raw = PL_Listing_Helper::results($request_params);
             }
         }
 
@@ -152,7 +152,7 @@ class PLS_Partial_Get_Listings {
 
                   <div class="listing-item-details grid_5 omega">
                     <p class="listing-item-address h4" itemprop="name">
-                      <a href="<?php echo PLS_Plugin_API::get_property_url($listing_data['id'], $listing_data); ?>" rel="bookmark" title="<?php echo $listing_data['location']['address'] ?>" itemprop="url">
+                      <a href="<?php echo PL_Pages::get_url($listing_data['id'], $listing_data); ?>" rel="bookmark" title="<?php echo $listing_data['location']['address'] ?>" itemprop="url">
                         <?php echo $listing_data['location']['address'] . ', ' . $listing_data['location']['locality'] . ' ' . $listing_data['location']['region'] . ' ' . $listing_data['location']['postal']  ?>
                       </a>
                     </p>
@@ -192,8 +192,8 @@ class PLS_Partial_Get_Listings {
                   </div>
 
                   <div class="actions">
-                    <a class="more-link" href="<?php echo PLS_Plugin_API::get_property_url($listing_data['id'], $listing_data); ?>" itemprop="url">View Property Details</a>
-                    <?php echo PLS_Plugin_API::placester_favorite_link_toggle(array('property_id' => $listing_data['id'])); ?>
+                    <a class="more-link" href="<?php echo PL_Pages::get_url($listing_data['id'], $listing_data); ?>" itemprop="url">View Property Details</a>
+                    <?php echo PL_Favorite_Listings::placester_favorite_link_toggle(array('property_id' => $listing_data['id'])); ?>
                   </div>
 
                   <?php PLS_Listing_Helper::get_compliance(array('context' => 'inline_search', 'agent_name' => @$listing_data['rets']['aname'] , 'office_name' => @$listing_data['rets']['oname'])); ?>

@@ -10,7 +10,7 @@ class PLS_Partials_Property_Details {
 
 	    	$html = '';
 
-          	$listing_data = PLS_Plugin_API::get_listing_in_loop();
+          	$listing_data = PL_Listing_Helper::get_listing_in_loop();
           
 			// re-order images by assigned order
    			$property_images = ( is_array($listing_data['images']) ? $listing_data['images'] : array() );
@@ -23,7 +23,7 @@ class PLS_Partials_Property_Details {
 		    	$listing_data['location']['full_address'] = $listing_data['location']['address'] . ' ' . $listing_data['location']['locality'] . ' ' . $listing_data['location']['region'];
 		    	
 		    	// This has to happen here to ensure it's not filtered out by whatever might be filtering this output...
-		    	echo PLS_Plugin_API::log_snippet_js('listing_view', array('prop_id' => $listing_data['id']));
+		    	echo PL_Analytics::log_snippet_js('listing_view', array('prop_id' => $listing_data['id']));
 
 		        ob_start();
 		        ?>
@@ -31,7 +31,7 @@ class PLS_Partials_Property_Details {
 						<span itemprop="streetAdress"><?php echo $listing_data['location']['address']; ?></span> <span itemprop="addressLocality"><?php echo $listing_data['location']['locality']; ?></span>, <span itemprop="addressRegion"><?php echo $listing_data['location']['region']; ?></span>
 					</h2>
 	
-					<?php echo PLS_Plugin_API::placester_favorite_link_toggle(array('property_id' => $listing_data['id'], 'add_text' => 'Add To Favorites', 'remove_text' => 'Remove From Favorites')); ?>
+					<?php echo PL_Favorite_Listings::placester_favorite_link_toggle(array('property_id' => $listing_data['id'], 'add_text' => 'Add To Favorites', 'remove_text' => 'Remove From Favorites')); ?>
 	
 					<p itemprop="price"><?php echo PLS_Format::number($listing_data['cur_data']['price'], array('abbreviate' => false, 'add_currency_sign' => true)); ?> <span><?php echo PLS_Format::translate_lease_terms($listing_data); ?></span></p>
 	

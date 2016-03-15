@@ -9,11 +9,11 @@ class PLS_Listing_Helper {
 		add_action('wp_ajax_nopriv_pls_get_search_count', array(__CLASS__,'get_search_count'));
 
 		// Set default property URL (can't call functions when declaring class variables)
-		self::$default_listing['url'] = PLS_Plugin_API::get_property_url();
+		self::$default_listing['url'] = PL_Pages::get_url(self::$default_listing['listings'][0]['id'], self::$default_listing['listings'][0]);
 	}
 
 	public static function listings_for_options() {
-		$api_response = PLS_Plugin_API::get_listings($_POST);
+		$api_response = PL_Listing_Helper::results($_POST);
 		$formatted_listings = '';
 
 		if ($api_response['listings']) {
@@ -45,7 +45,7 @@ class PLS_Listing_Helper {
 				$args['property_ids'] = $property_ids;
 			}
 
-			$api_response = PLS_Plugin_API::get_listing_details($args);
+			$api_response = PL_Listing_Helper::details($args);
 		}
 
 		return $api_response;
@@ -71,19 +71,16 @@ class PLS_Listing_Helper {
 		} 
 		
 		if (!empty($property_ids)) {
-			$api_response = PLS_Plugin_API::get_listing_details(array('property_ids' => $property_ids));
+			$api_response = PL_Listing_Helper::details(array('property_ids' => $property_ids));
 		} 
 		
 		return $api_response;
 	}
 
 	public static function get_compliance ($args) {
-		$message = PLS_Plugin_API::mls_message($args);
+		$message = PL_Compliance::mls_message($args);
 		if ($message && !empty($message) && isset($args['context'])) {
 			$_POST['compliance_message'] = $message;
-
-			// clear compliance disclaimer flag, since we're displaying it
-			if($args['context'] == 'search') PLS_Plugin_API::$listing_data_requested = false;
 
 			$template = PLACESTER_PLUGIN_DIR . 'placester-compliance/templates/' . $args['context'] . '-compliance.php';
 			if(file_exists($template))
@@ -93,7 +90,7 @@ class PLS_Listing_Helper {
 	}
 
 	public static function get_search_count() {
-	    $response = PLS_Plugin_API::get_listings($_POST);
+	    $response = PL_Listing_Helper::results($_POST);
 	    echo json_encode(array('count' => $response['total']));
 	    die();
 	}
@@ -102,7 +99,7 @@ class PLS_Listing_Helper {
 	    'total' => '1',
 	    'listings' => array(
 	        array(
-	            'id' => '1',
+	            'id' => '000000000000000000000000',
 	            'property_type' => 'fam_home',
 	            'zoning_types' => array('residential'),
 	            'purchase_types' => array('sale'),

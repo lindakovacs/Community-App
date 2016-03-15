@@ -60,7 +60,7 @@ class PLS_Widget_Agent extends WP_Widget {
 		}
 
 		// Otherwise, try the plugin's registered owner
-		else if($whoami = PLS_Plugin_API::get_user_details()) {
+		else if($whoami = PL_User::whoami()) {
 			$agent_array['name'] = trim($whoami['user']['first_name'] . ' ' . $whoami['user']['last_name']);
 			$agent_array['email'] = $whoami['user']['email'];
 			$agent_array['phone'] = PLS_Format::phone($whoami['user']['phone']);

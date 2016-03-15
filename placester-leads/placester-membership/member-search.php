@@ -161,7 +161,7 @@ class PL_User_Saved_Search {
 	}
 
 	public static function favorite_search_email ($user, $favorite) {
-		$listings = PLS_Plugin_API::get_listings(array_merge(
+		$listings = PL_Listing_Helper::results(array_merge(
 			PL_Permalink_Search::get_saved_search_filters('/' . $favorite['hash']),
 			array('created_at' => gmstrftime("%b %d %Y %H:%M:%S", $favorite['timestamp']), 'created_at_match' => 'gte',
 				'sort_by' => 'cur_data.dom', 'sort_type' => 'asc', 'limit' => 12, 'offset' => 0)));
@@ -170,7 +170,7 @@ class PL_User_Saved_Search {
 
 		if(count($listings['listings']) <= 12) {
 			// when we show all the new listings, we also show the total number that match, old and new
-			$all_listings = PLS_Plugin_API::get_listings(array_merge(
+			$all_listings = PL_Listing_Helper::results(array_merge(
 				PL_Permalink_Search::get_saved_search_filters('/' . $favorite['hash']),
 				array('sort_by' => 'cur_data.dom', 'sort_type' => 'asc', 'limit' => 1, 'offset' => 0)));
 		}
