@@ -31,7 +31,7 @@ class PL_People_Helper {
 		
 		if (!empty($crm_id)) {
 			// Load CRM libs...
-			$path_to_CRM = trailingslashit(PL_LIB_DIR) . 'CRM/controller.php';
+			$path_to_CRM = trailingslashit(PL_LEADS_DIR) . 'lib/CRM/controller.php';
 			include_once($path_to_CRM);
 
 			// Call necessary lib to add the contact to the active/registered CRM...
