@@ -10,13 +10,13 @@ Author URI: https://www.placester.com/
 
 include_once('lib/form.php');
 include_once('lib/filters.php');
-include_once('lib/permalink-search.php');
+include_once('lib/search-permalinks.php');
 
 
 add_action( 'after_setup_theme', 'placester_add_search_components', 20 );
 function placester_add_search_components () {
 	if (!class_exists('Placester_Blueprint')) {
-		include_once('lib/listings.php');
+		include_once('lib/search.php');
 		include_once('lib/partials.php');
 
 		include_once('widgets/listings.php');
