@@ -163,3 +163,6 @@ class PL_Analytics {
 		return null;
 	}
 }
+
+
+include 'lib/ajax-table.php';
