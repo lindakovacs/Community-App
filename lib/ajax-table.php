@@ -38,7 +38,7 @@ class Ajax_Data_Table {
 	}
 
 	public function html() {
-		$html .= $this->html_open();
+		$html = $this->html_open();
 		$html .= $this->html_inner();
 		$html .= $this->html_close();
 		$html .= $this->html_script();
@@ -117,6 +117,7 @@ class Ajax_Data_Table {
 	protected function html_nav_buttons() {
 		$html = $this->html_first_button() . '&nbsp;';
 		$html .= $this->html_prev_button() . '&nbsp;';
+		$html .= $this->html_page_buttons() . '&nbsp;';
 		$html .= $this->html_next_button() . '&nbsp;';
 		$html .= $this->html_last_button();
 		return $html;
@@ -158,10 +159,31 @@ class Ajax_Data_Table {
 		return $this->html_nav_button('next', $offset, '&gt;');
 	}
 
-	protected function html_page_buttons($n = 5) { }
+	protected function html_page_buttons($n = 5) {
+		if(!$this->total || !$this->limit)
+			return $this->html_page_button(1);
+
+		$h = (int) floor($n / 2);
+		$p = (int) ceil($this->offset / $this->limit) + 1;
+
+		$max = (int) ceil($this->total / $this->limit);
+		$p1 = max(1, min($p - $h, $max - 2 * $h));
+		$p2 = min($max, max($p + $h, 1 + 2 * $h));
+
+		$buttons = array();
+		for($i = $p1; $i <= $p2; ++$i)
+			$buttons[] = $this->html_page_button($i);
+
+		return implode('&nbsp;', $buttons);
+	}
 
 	protected function html_page_button($page) {
-		return '<button id="ajax-table-page' . $page . '" class="ajax-table-button" type="submit" name="offset" value="0">' . $page . '</button>';
+		$offset = $this->limit * ($page - 1);
+
+		if($offset >= 0 && $offset < $this->total)
+			return $this->html_nav_button('ajax-table-page-' . $page, $this->limit * ($page - 1), $page);
+		else
+			return '';
 	}
 
 	protected function html_script() {
@@ -177,8 +199,13 @@ jQuery(document).ready(function () {
 		var postdata = jQuery("$selector").serialize();
 		if(offset) postdata += '&offset=' + offset;
 
+		var container = jQuery("$container");
+		container.addClass("updating");
+
 		jQuery.post("$ajax_url", postdata, function (response) {
-			jQuery("$container").html(response);
+			container.html(response);
+			container.removeClass("updating");
+
 			ajax_table_activate();
 		});
 	}
