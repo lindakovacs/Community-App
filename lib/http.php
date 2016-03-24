@@ -10,13 +10,22 @@ Class PL_HTTP extends WP_Http {
 
 	private static $timeout = 60;
 	private static $http = null;
+	private static $cache = null;
 
 	private static function _get_object () {
-		// Enforces a singleton paradigm...
 		if ( is_null(self::$http) )
 			self::$http = new PL_Http();
 
 		return self::$http;
+	}
+
+	private static function _get_cache () {
+		if ( is_null(self::$cache) ) {
+			$force_cache = (defined('PL_ENABLE_CACHE') ? PL_ENABLE_CACHE : false) || (defined('PL_ENABLE_HTTP_CACHE') ? PL_ENABLE_HTTP_CACHE : false);
+			self::$cache = new PL_Cache('http', $force_cache);
+		}
+
+		return self::$cache;
 	}
 
 	public static function add_amp ($str) {
@@ -78,16 +87,9 @@ Class PL_HTTP extends WP_Http {
 	public static function send_request ($url, $request, $method = 'GET', $allow_cache = true, $allow_empty_values = false, $force_return = false, $use_encoding = true) {
 
 		$request_string = self::build_request($request, $allow_empty_values);
-
-		// error_log($url);
-		// error_log($request_string);
-
 		if (!$use_encoding) {
 			$request_string = urldecode($request_string);
 		}
-
-		// error_log(var_export(debug_backtrace(), true));
-		// error_log("Endpoint logged as: {$method} {$url}?{$request_string}");
 
 		$wp_http = self::_get_object();
 
@@ -108,9 +110,8 @@ Class PL_HTTP extends WP_Http {
 				return false;
 
 			case 'GET':
-				$cache = new PL_Cache('http');
+				$cache = self::_get_cache();
 				if ($allow_cache && $transient = $cache->get($url . $request_string)) {
-					// error_log('From cache:  ' . $url . $request_string);
 					return $transient;
 				}
 
@@ -124,21 +125,15 @@ Class PL_HTTP extends WP_Http {
 						$response = $wp_http->get($url . '?' . $request_string, array('timeout' => self::$timeout));
 					}
 
-					// error_log($url . "?" . $request_string);
-					// error_log(var_export($response, true));
-
 					if (is_array($response) && isset($response['response']) && isset($response['response']['code'])) {
 						if (($response['response']['code'] == 200 || $force_return) && !empty($response['body'])) {
 							$body = json_decode($response['body'], true);
-							$cache->save($body, PL_Cache::TTL_HOURS);
-							return $body;
 
-						} else {
-							// error_log("Server returned: {$response['headers']['status']} {$response['body']}.");
+							if($allow_cache)
+								$cache->save($body, PL_Cache::TTL_HOURS);
+
+							return $body;
 						}
-					}
-					else {
-						// error_log("Error processing response.");
 					}
 				}
 				return false;
