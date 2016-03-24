@@ -206,9 +206,6 @@ Listings.prototype.get = function (search_criteria_changed) {
 		"url": this.sSource,
 		"data": that.active_filters,
 		"success": function (ajax_response) {
-			that.pending = false;
-			that.is_new_search = false;
-			that.from_back_button = false;
 			that.ajax_response = ajax_response;
 
 			// Update the favorite search options if they exist
@@ -252,6 +249,9 @@ Listings.prototype.get = function (search_criteria_changed) {
 			var fnSettings = that.list.datatable.fnSettings();
 			that.write_hash(that.search_hash, Math.floor(fnSettings._iDisplayStart / fnSettings._iDisplayLength));
 
+			that.pending = false;
+			that.is_new_search = false;
+			that.from_back_button = false;
 			that.active_filters = [];
 		}
 	});
