@@ -146,15 +146,6 @@ function placester_info_bar() {
 	}
 }
 
-add_action('wp_enqueue_scripts', 'placester_info_bar_enqueue');
-add_action('admin_enqueue_scripts', 'placester_info_bar_enqueue');
-function placester_info_bar_enqueue() {
-	if(PL_Option_Helper::get_demo_data_flag() && current_user_can('manage_options')) {
-		wp_enqueue_style('placester-global');
-		wp_enqueue_script('placester-infobar', PLACESTER_PLUGIN_URL . 'admin/js/infobar.js', array('jquery'), PL_PLUGIN_VERSION);
-	}
-}
-
 
 // PL_COMPATIBILITY_MODE -- preserve the interface expected by certain previous versions of blueprint
 function placester_activate() {
