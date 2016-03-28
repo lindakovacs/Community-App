@@ -796,14 +796,8 @@ class PL_Shortcode_CPT {
 							$f_attrs['label'] = $f_attrs['name'];
 							unset($f_attrs['name']);
 						}
-						if ($f_attrs['key'] == 'days_on_market' && $group == 'uncur_data')	{
-							// TODO: remove when we no longer have days_on_market in uncur_data
-							foreach ($attrs as $key=>$attr) {
-								if ($attr['attribute'] == 'dom') {
-									unset($attrs[$key]);
-									break;
-								}
-							}
+						if ($group == 'uncur_data' && $f_attrs['label'] == 'Days on Market') {
+							$f_attrs['label'] = 'Days on Market (X)'; // Deprecated--should be in cur_data.dom
 						}
 						$attrs[] = array_merge($f_attrs, array('attribute' => $f_attrs['key'], 'group' => $group, 'search_form_group' => $search_form_group, 'attr_type' => $attr_type, 'type' => $attr_type, 'cat'=>ucwords($attr_cat)));
 					}
