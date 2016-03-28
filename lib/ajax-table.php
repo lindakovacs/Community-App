@@ -18,6 +18,42 @@ class Ajax_Data_Set {
 }
 
 
+class Ajax_Data_Filter {
+	protected $id;
+	protected $args;
+
+	public function __construct($args = array()) {
+		$this->args = $args;
+	}
+
+	public function get_args() { return $this->args; }
+	public function get_query_string() {}
+}
+
+
+class Ajax_Data_Form extends Ajax_Data_Filter {
+	protected $filters;
+	protected $inputs;
+
+	public function __construct($inputs, $args = array()) {
+		$this->inputs = $inputs;
+		parent::__construct($args);
+	}
+
+	public function add_filter($id, Ajax_Data_Filter $filter) {
+
+	}
+
+	public function html() {
+		$html = $this->html_open();
+		$html .= $this->html_inner();
+		$html .= $this->html_close();
+		$html .= $this->html_script();
+		return $html;
+	}
+}
+
+
 class Ajax_Data_Table {
 	protected $data;
 	protected $offset;
