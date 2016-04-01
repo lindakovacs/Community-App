@@ -196,11 +196,11 @@ class PL_Lead_Capture_Helper {
 
 
 class PL_Membership {
-	public static function placester_lead_control_panel($args) {
+	public static function get_client_area_url() {
 		return false;
 	}
 
-	public static function get_client_area_url() {
+	public static function placester_lead_control_panel($args) {
 		return false;
 	}
 
