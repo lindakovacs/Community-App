@@ -172,7 +172,8 @@ class PL_Membership {
 
 	// Handles the profile form -- see membership-edit.js
 	public static function ajax_update_site_user () {
-		echo json_encode(self::update_site_user($_POST)['crm_response']);
+		$lead_object = self::update_site_user($_POST);
+		echo json_encode($lead_object['crm_response']);
 		die();
 	}
 

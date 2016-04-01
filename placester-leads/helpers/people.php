@@ -56,7 +56,7 @@ class PL_People_Helper {
 
 	// hook for third party CRMs
 	public static function external_crm_event ($args) {
-		if (!empty(PL_Options::get('pl_active_CRM'))) {
+		if (PL_Options::get('pl_active_CRM')) {
 			include_once(PL_LEADS_DIR . 'lib/CRM/controller.php');
 			PL_CRM_Controller::callCRMLib('createContact', $args);
 		}
@@ -72,7 +72,8 @@ class PL_People_Helper {
 		die();
 	}
 	public static function update_person_ajax () {
-		echo json_encode(PL_Membership::update_site_user($_POST)['crm_response']);
+		$lead_object = PL_Membership::update_site_user($_POST);
+		echo json_encode($lead_object['crm_response']);
 		die();
 	}
 
