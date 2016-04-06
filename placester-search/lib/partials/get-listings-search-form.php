@@ -1038,10 +1038,9 @@ class PLS_Partials_Listing_Search_Form {
         @$form_data->hidden_field . apply_filters( pls_get_merged_strings( array( "pls_listings_search_form_inner", $context ), '_', 'pre', false ), $form, $form_html, $form_options, $section_title, $context_var )
     );
 
-    /** Filter the form. */
-    $result = apply_filters( pls_get_merged_strings( array( "pls_listings_search_form_outer", $context ), '_', 'pre', false ), $form, $form_html, $form_options, $section_title, @$form_data, $form_id, $context_var ); 
+    $result = apply_filters( pls_get_merged_strings( array( "pls_listings_search_form_outer", $context ), '_', 'pre', false ), $form, $form_html, $form_options, $section_title, @$form_data, $form_id, $context_var );
     
-    // Load the filters.js script...
+    // This shouldn't be here, but there are compatibility dependencies.  Cleanup is deferred.
     $result .= '<script type="text/javascript" src="' . PLACESTER_PLUGIN_URL . 'placester-search/js/filters.js"></script>';
 
     $cache->save($result);

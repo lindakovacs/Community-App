@@ -1494,7 +1494,9 @@ To add some text to your listings:<br />
 		}
 
 		if (!empty($js_files['filters'])) {
-			wp_enqueue_script('pl-filters.js', PLACESTER_PLUGIN_URL . 'placester-search/js/filters.js', array('jquery'));
+			// Horror show -- this is hardcode included in the search form partial
+			//   leaving it that way for now since we use blueprint's version when it's available
+			// wp_enqueue_script('pl-filters.js', PLACESTER_PLUGIN_URL . 'placester-search/js/filters.js', array('jquery'));
 		}
 		if (!empty($js_files['lifestyle'])) {
 			wp_enqueue_script('pl-lifestyle.js', PLACESTER_PLUGIN_URL . 'placester-maps/js/lifestyle.js', array('jquery'));
