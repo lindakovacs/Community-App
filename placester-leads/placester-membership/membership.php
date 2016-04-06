@@ -8,105 +8,173 @@ PL_Membership::init();
 class PL_Membership {
 
 	public static function init () {
+		add_role('placester_lead', 'Property Lead', array('read' => true));
+
 		add_action('wp_ajax_nopriv_pl_register_site_user', array(__CLASS__, 'ajax_register_site_user'));
 		add_action('wp_ajax_nopriv_pl_login_site_user', array(__CLASS__, 'ajax_login_site_user'));
+		add_action('wp_ajax_nopriv_pl_update_site_user', array(__CLASS__, 'ajax_update_site_user'));
 
-		add_shortcode('lead_user_navigation', array(__CLASS__, 'placester_lead_control_panel'));
 		add_shortcode('pl_login_block', array(__CLASS__, 'placester_lead_control_panel'));
-		
-		// Create the "Property lead" role
-		add_role('placester_lead', 'Property Lead', array('read' => true));
+		add_shortcode('lead_user_navigation', array(__CLASS__, 'placester_lead_control_panel'));
 	}
 
-	public static function get_client_area_url () {
-		global $wpdb;
-		$page_id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_name = 'client-profile' AND post_status = 'publish'");
-		return $page_id ? get_permalink($page_id) : '';
-	}
-
-	// Callback function for when the frontend lead register form is submitted
+	// $lead_object array contains
+	//  'username' - to use for new account
+	//  'password' - to use for new account
 	//
-	// NOTE: JavaScript in "js/theme/placester.membership.js"
-	public static function ajax_register_site_user () {
-		$errors = array();
+	// plus optional account metadata
+	//  'name'
+	//  'company'
+	//  'email'
+	//  'phone'
+	public static function create_site_user ($lead_object, $local_only = false) {
+		// create WordPress user
+		$wordpress_user_id = wp_insert_user(array(
+			'user_login' => $lead_object['username'],
+			'user_pass' => $lead_object['password'],
+			'user_email' => $lead_object['email'],
+			'role' => 'placester_lead'));
 
-		// Make sure it's from a form we created
+		if (is_wp_error($wordpress_user_id))
+			return false;
+
+		$blogs = get_blogs_of_user($wordpress_user_id);
+		update_user_meta($wordpress_user_id, 'primary_blog', current($blogs)->userblog_id);
+		update_user_meta($wordpress_user_id, 'full_name', $lead_object['name']);
+		update_user_meta($wordpress_user_id, 'phone', $lead_object['phone']);
+
+		$lead_object['wp_id'] = $wordpress_user_id;
+		$lead_object['wp_login'] = $lead_object['username'];
+
+		// create linked Placester.com account
+		if(!$local_only) {
+			$response = $lead_object['crm_response'] = PL_People_Helper::add_person($lead_object);
+			if ($response['id'])
+				update_user_meta($wordpress_user_id, 'placester_api_id', $lead_object['pl_id'] = $response['id']);
+		}
+
+		// send notifications
+		wp_new_user_notification($wordpress_user_id);
+		if (PL_Options::get('pls_send_client_option'))
+			wp_mail($lead_object['email'], 'Your new account on ' . site_url(), PL_Membership_Helper::parse_client_message($lead_object) );
+
+		// login user
+		wp_set_auth_cookie($wordpress_user_id, true, is_ssl());
+
+		return $lead_object;
+	}
+
+	// returned array contains
+	//  'wp_id' - wordpress id in wp_users table
+	//
+	// account metadata
+	//  'name'
+	//  'company'
+	//  'email'
+	//  'phone'
+	//
+	// plus, when available
+	//  'pl_id' - placester unique tracking id
+	//  'cur_data' - custom metadata from crm (array)
+	//  'uncur_data' - custom metadata from crm (array)
+	//  'location' - custom address metadata from crm (array)
+	public static function get_site_user ($wp_id = null, $local_only = false) {
+		$wp_user = $wp_id ? get_userdata($wp_id) : wp_get_current_user();
+		if(!$wp_user || !$wp_user->ID)
+			return array();
+
+		$lead_object = array(
+			'wp_id' => $wp_user->ID,
+			'wp_login' => $wp_user->user_login,
+			'name' => get_user_meta($wp_user->ID, 'full_name', true) ?:
+				$wp_user->first_name . ($wp_user->first_name && $wp_user->last_name ? ' ' : '') . $wp_user->last_name,
+			'email' => $wp_user->user_email,
+			'phone' => get_user_meta($wp_user->ID, 'phone', true)
+		);
+
+		if($placester_id = get_user_meta($wp_user->ID, 'placester_api_id', true)) {
+			$lead_object['pl_id'] = $placester_id;
+
+			if (!$local_only) {
+				$crm_data = PL_People_Helper::get_person($placester_id);
+				if (is_array($crm_data) && $crm_data['id']) {
+					$lead_object['crm_response'] = array('id' => $crm_data['id']); unset($crm_data['id']);
+					$lead_object = array_merge($crm_data, $lead_object);
+				}
+				else
+					$lead_object['crm_response'] = $crm_data;
+			}
+		}
+
+		return $lead_object;
+	}
+
+	// $lead_object array contains
+	//  'wp_id' - wordpress id in wp_users table (if not current user)
+	//
+	// account metadata
+	//  'name'
+	//  'company'
+	//  'email'
+	//  'phone'
+	//
+	//  'metadata' - custom metadata for crm (array)
+	//  'location' - custom address metadata for crm (array)
+	public static function update_site_user ($lead_object = array(), $local_only = false) {
+		$local_user = self::get_site_user($lead_object['wp_id'], true);
+		if(!$local_user || !$local_user['wp_id'])
+			return false;
+
+		$lead_object['wp_id'] = $local_user['wp_id'];
+		$lead_object['wp_login'] = $local_user['wp_login'];
+
+		// can't change email if it's the login id
+		if($local_user['email'] == $local_user['wp_login'])
+			$lead_object['email'] = $local_user['email'];
+
+		// new values may come in metadata array, use crm merge
+		$lead_object = PL_People_Helper::resolve_input($lead_object);
+
+		// update local metadata
+		if(isset($lead_object['name'])) update_user_meta($lead_object['wp_id'], 'full_name', $lead_object['name']);
+		if(isset($lead_object['phone'])) update_user_meta($lead_object['wp_id'], 'phone', $lead_object['phone']);
+		if($lead_object['email'] && $lead_object['email'] != $local_user['email'])
+			wp_update_user(array('ID' => $lead_object['wp_id'], 'user_email' => $lead_object['email']));
+
+		// update the Placester.com account
+		if(!$local_only) {
+			$response = $lead_object['crm_response'] = $local_user['pl_id'] ?
+				PL_People_Helper::update_person(array_merge(array('id' => $local_user['pl_id']), $lead_object)) :
+				PL_People_Helper::add_person($lead_object);
+
+			if ($response['id'])
+				update_user_meta($lead_object['wp_id'], 'placester_api_id', $lead_object['pl_id'] = $response['id']);
+		}
+
+		return $lead_object;
+	}
+
+	// Handles the frontend lead registration form -- see membership.js
+	public static function ajax_register_site_user () {
 		if ( !wp_verify_nonce($_POST['nonce'], 'placester_true_registration') ) {
-			// Malicious...
 			echo "Sorry, your nonce didn't verify -- try using the form on the site";
 			die();
 		}
 
-		// All validation rules in a single place...
 		$lead_object = self::validate_registration($_POST);
+		if($lead_object['errors'])
+			echo json_encode(array("success" => false, "errors" => self::process_registration_errors($lead_object['errors'])));
 
-		// Check for lead errors
-		if (!empty($lead_object['errors'])) {
-			$errors = self::process_registration_errors($lead_object['errors']);
-		}
-		else {
-			// Try to create the lead...
-			$errors = self::create_site_user($lead_object);
-		}
-
-		$result = empty($errors) ? array("success" => true) : array("success" => false, "errors" => $errors);
-		echo json_encode($result);
+		$lead_object = self::create_site_user($lead_object);
+		echo json_encode($lead_object ? array("success" => true) : array("success" => false, "errors" => array('Unable to create account')));
 		die();
 	}
 
-	public static function create_site_user ($lead_object) {
-		$errors = array();
-
-		// Create Wordpress user entity for lead...
-		$userdata = array(
-			'user_pass' => $lead_object['password'],
-			'user_login' => $lead_object['username'],
-			'user_email' => $lead_object['metadata']['email'],
-			'role' => 'placester_lead'
-		);
-
-		$wordpress_user_id = wp_insert_user($userdata);
-		if ( !is_wp_error($wordpress_user_id) ) {
-
-			// Force blog to be set immediately or MU throws errors
-			$blogs = get_blogs_of_user($wordpress_user_id);
-			$first_blog = current($blogs);
-			update_user_meta($wordpress_user_id, 'primary_blog', $first_blog->userblog_id);
-
-			// Create linked Placester.com account...
-			$response = PL_People_Helper::add_person($lead_object);
-			if (isset($response['code'])) {
-				$errors[] = $response['message'];
-				foreach ($response['validations'] as $key => $validation) {
-					$errors[] = $response['human_names'][$key] . implode($validation, ' and ');
-				}
-				$errors[] = 'placester_create_failed';
-			}
-
-			// If the API call was successful, inform the user that his/her password and set the password change
-			if (empty($errors)) {
-				$meta_key = PL_People_Helper::USER_META_KEY;
-				$id = $response['id'];
-
-				// Add API key to new user's meta...
-				update_user_meta($wordpress_user_id, $meta_key, $id);
-			}
-
-			// Notify blog admin(s) of new user, send welcome email...
-			wp_new_user_notification($wordpress_user_id);
-			if (PL_Options::get('pls_send_client_option')) {
-				wp_mail($lead_object['username'], 'Your new account on ' . site_url(), PL_Membership_Helper::parse_client_message($lead_object) );
-			}
-
-			// Login user if successfully signed-up...
-			wp_set_auth_cookie($wordpress_user_id, true, is_ssl());
-		} 
-		else {
-			// Failure...
-			$errors[] = 'wp_user_create_failed';
-		}
-
-	return $errors;
+	// Handles the profile form -- see membership-edit.js
+	public static function ajax_update_site_user () {
+		$lead_object = self::update_site_user($_POST);
+		echo json_encode($lead_object['crm_response']);
+		die();
 	}
 
 	//  AJAX endpoint for authenticating a site user from the frontend
@@ -158,11 +226,10 @@ class PL_Membership {
 	private static function validate_registration ($post_vars) {
 		if (is_array($post_vars)) {
 			$lead_object['username'] = '';
-			$lead_object['metadata']['email'] = '';
+			$lead_object['email'] = '';
 			$lead_object['password'] = '';
 			$lead_object['name'] = '';
 			$lead_object['phone'] = '';
-			$lead_object['lead_type'] = get_bloginfo('url');
 			$lead_object['errors'] = array();
 
 			foreach ($post_vars as $key => $value) {
@@ -194,7 +261,7 @@ class PL_Membership {
 						$lead_object = $email_validation['lead_object'];
 
 						if ( empty($email['errors']) ) {
-							$lead_object['metadata']['email'] = $email['validated'];
+							$lead_object['email'] = $email['validated'];
 						}
 
 						break;
@@ -364,7 +431,7 @@ class PL_Membership {
 					break;
 			}
 		}
-		
+
 		return $error_messages;
 	}
 
@@ -540,6 +607,12 @@ class PL_Membership {
 		}
 
 		return $result;
+	}
+
+	public static function get_client_area_url () {
+		global $wpdb;
+		$page_id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_name = 'client-profile' AND post_status = 'publish'");
+		return $page_id ? get_permalink($page_id) : '';
 	}
 
 	/**

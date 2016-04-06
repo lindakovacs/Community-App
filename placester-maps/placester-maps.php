@@ -14,7 +14,7 @@ function placester_add_maps_if_no_blueprint () {
 		include_once('lib/maps-util.php');
 		include_once('lib/lifestyle.php');
 		include_once('lib/lifestyle_polygon.php');
-		include_once('lib/listings.php');
+		include_once('lib/listing_map.php');
 		include_once('lib/polygon.php');
 		include_once('lib/neighborhood.php');
 

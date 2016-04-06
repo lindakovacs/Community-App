@@ -43,6 +43,8 @@ function placester_membership_enqueue() {
 	wp_enqueue_script('placester-membership', PL_LEADS_URL . 'placester-membership/membership.js', array('jquery'), filemtime(PL_LEADS_DIR . 'placester-membership/membership.js'), true);
 
 	if (!class_exists('Placester_Blueprint')) {
+		wp_enqueue_script('membership-edit', PL_LEADS_URL . 'placester-membership/membership-edit.js', array('jquery'), filemtime(PL_LEADS_DIR . 'placester-membership/membership-edit.js'), true);
+
 		wp_enqueue_script('jquery-fancybox');
 		wp_enqueue_script('jquery-fancybox-settings');
 		wp_enqueue_style('jquery-fancybox');

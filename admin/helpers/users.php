@@ -190,7 +190,7 @@ class PL_Helper_User {
 		switch ($_POST["action"]) {
 			case "demo_data_on":
 				$state = true;
-				$msg = "You're site is now set to use demo data";
+				$msg = "Your site is now set to use demo data";
 				break;
 			case "demo_data_off":
 				$state = false;

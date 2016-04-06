@@ -115,21 +115,21 @@ For example, to only display user name if it has a value:<br />
 			$op .= '<style type="text/css">'.$template['css'].'</style>';
 		}
 
-		self::$form_data = PL_People_Helper::person_details();
+		self::$form_data = PL_Membership::get_site_user();
 		self::$form_data += array('cur_data'=>array(), 'location'=>array());
 		if (is_admin()) {
 			self::$form_data['cur_data'] += array('name'=>'User Name', 'email'=>'email@domain.com', 'phone'=>'123-456-7890', 'company'=>'Company Name');
 			self::$form_data['location'] += array('address'=>'Address', 'locality'=>'City', 'postal'=>'Postal Code', 'region'=>'State', 'country'=>'Country');
-		}
-		elseif (!is_user_logged_in()) {
-			return $op.$template['not_logged_in'];
 		}
 		else {
 			self::$form_data['cur_data'] += array('name'=>'', 'email'=>'', 'phone'=>'', 'company'=>'');
 			self::$form_data['location'] += array('address'=>'', 'locality'=>'', 'postal'=>'', 'region'=>'', 'country'=>'');
 		}
 
-		return $op.self::do_templatetags($template['snippet_body']).self::_get_edit_form();
+		if (!is_user_logged_in())
+			return $op.$template['not_logged_in'];
+		else
+			return $op.self::do_templatetags($template['snippet_body']).self::_get_edit_form();
 	}
 
 	public static function do_templatetags($content) {
@@ -147,25 +147,33 @@ For example, to only display user name if it has a value:<br />
 
 		if ($tag == 'if') {
 			$val = isset($atts['value']) ? $atts['value'] : null;
-			if ((!isset(self::$form_data['cur_data'][$atts['attribute']]) && $val==='') ||
+			if ((!isset(self::$form_data[$atts['attribute']]) && $val==='') ||
+				(isset(self::$form_data[$atts['attribute']]) && (self::$form_data[$atts['attribute']]===$val || (is_null($val) && self::$form_data[$atts['attribute']])))) {
+				return self::_do_templatetags(__CLASS__, array_keys(self::$singleton->subcodes), $content);
+			}
+			else if ((!isset(self::$form_data['cur_data'][$atts['attribute']]) && $val==='') ||
 				(isset(self::$form_data['cur_data'][$atts['attribute']]) && (self::$form_data['cur_data'][$atts['attribute']]===$val || (is_null($val) && self::$form_data['cur_data'][$atts['attribute']])))) {
 				return self::_do_templatetags(__CLASS__, array_keys(self::$singleton->subcodes), $content);
 			}
-			if ((!isset(self::$form_data['location'][$atts['attribute']]) && $val==='') ||
+			else if ((!isset(self::$form_data['location'][$atts['attribute']]) && $val==='') ||
 				(isset(self::$form_data['location'][$atts['attribute']]) && (self::$form_data['location'][$atts['attribute']]===$val || (is_null($val) && self::$form_data['location'][$atts['attribute']])))) {
 				return self::_do_templatetags(__CLASS__, array_keys(self::$singleton->subcodes), $content);
 			}
 			return '';
 		}
-		if ($tag == 'edit') {
+		else if ($tag == 'edit') {
 			$content = empty($content) ? 'Edit Profile' : $content;
 			return '<a href="#" id="edit_profile_button" class="edit_profile_button">'.$content.'</a>';
 		}
-		if ( isset( self::$form_data['cur_data'][$tag] ) ) {
+		else if ( isset( self::$form_data[$tag] ) ) {
+			// use form data from partial to construct
+			return $m[1] . self::$form_data[$tag] . $m[6];
+		}
+		else if ( isset( self::$form_data['cur_data'][$tag] ) ) {
 			// use form data from partial to construct
 			return $m[1] . self::$form_data['cur_data'][$tag] . $m[6];
 		}
-		if ( isset( self::$form_data['location'][$tag] ) ) {
+		else if ( isset( self::$form_data['location'][$tag] ) ) {
 			// use form data from partial to construct
 			return $m[1] . self::$form_data['location'][$tag] . $m[6];
 		}
@@ -174,22 +182,27 @@ For example, to only display user name if it has a value:<br />
 
 	private static function _get_edit_form() {
 		wp_enqueue_script('jquery-ui-dialog');
-		wp_enqueue_style('jquery-ui');
+		//wp_enqueue_style('jquery-ui');
+
 		$form = '
 		<div id="edit_profile" style="display:none;">
 			<div id="edit_profile_message"></div>
 			<form id="edit_profile_form">
 				<div>
 					<label>Name</label>
-					<input type="text" name="metadata[name]" value="'.self::$form_data['cur_data']['name'].'" >
+					<input type="text" name="name" value="'.self::$form_data['name'].'" >
 				</div>
 				<div>
 					<label>Company</label>
-					<input type="text" name="metadata[company]" value="'.self::$form_data['cur_data']['company'].'">
+					<input type="text" name="company" value="'.self::$form_data['company'].'">
+				</div>
+				<div>
+					<label>Email</label>
+					<input type="text" name="email" value="'.self::$form_data['email'].'"'.(self::$form_data['email'] == self::$form_data['wp_login'] ? ' disabled' : '').'>
 				</div>
 				<div>
 					<label>Phone</label>
-					<input type="text" name="metadata[phone]" value="'.self::$form_data['cur_data']['phone'].'">
+					<input type="text" name="phone" value="'.self::$form_data['phone'].'">
 				</div>
 				<div>
 					<label>Street</label>
@@ -202,14 +215,6 @@ For example, to only display user name if it has a value:<br />
 				<div>
 					<label>State</label>
 					<input type="text" name="location[region]" value="'.self::$form_data['location']['region'].'">
-				</div>
-				<div>
-					<label>Zip</label>
-					<input type="text" name="location[postal]" value="'.self::$form_data['location']['postal'].'">
-				</div>
-				<div>
-					<label>Country</label>
-					<input type="text" name="location[country]" value="'.self::$form_data['location']['country'].'">
 				</div>
 			</form>
 		</div>';

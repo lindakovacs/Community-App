@@ -64,7 +64,7 @@ class PLS_Image {
 				'old_image' => $old_image
 			);
 
-			$new_image = PLS_Plugin_API::resize_image($img_args);
+			$new_image = PL_Dragonfly::resize($img_args);
 		}
 
 		if ( $args['fancybox'] || $args['as_html']) {

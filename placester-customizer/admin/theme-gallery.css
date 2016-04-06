@@ -5,8 +5,14 @@ span.note {
 
 /* Added for temporary solution (see theme-gallery.php) */
 .available-theme {
-	width: 320px;
+	width: 360px;
 	margin: 20px auto;
 	font-size: 115%;
 	text-align: center;
+}
+
+.available-theme .screenshot {
+	display: inline-block;
+	width: 300px;
+	height: 225px;
 }

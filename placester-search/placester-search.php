@@ -10,13 +10,13 @@ Author URI: https://www.placester.com/
 
 include_once('lib/form.php');
 include_once('lib/filters.php');
-include_once('lib/permalink-search.php');
+include_once('lib/search-permalinks.php');
 
 
 add_action( 'after_setup_theme', 'placester_add_search_components', 20 );
 function placester_add_search_components () {
 	if (!class_exists('Placester_Blueprint')) {
-		include_once('lib/listings.php');
+		include_once('lib/search.php');
 		include_once('lib/partials.php');
 
 		include_once('widgets/listings.php');
@@ -36,8 +36,6 @@ function placester_add_search_scripts() {
 		</script>
 		<?php
 		echo ob_get_clean();
-
-		//? wp_enqueue_style('jquery-datatables'); //?
 
 		wp_register_script('jquery-address', PLACESTER_PLUGIN_URL . 'placester-search/js/jquery.address.js', array('jquery'), PL_PLUGIN_VERSION, true);
 		wp_enqueue_script('placester-listings', PLACESTER_PLUGIN_URL . 'placester-search/js/listings.js', array('jquery', 'jquery-address', 'jquery-datatables'), PL_PLUGIN_VERSION, true);

@@ -56,7 +56,7 @@ class Placester_Contact_Widget extends WP_Widget {
       global $post;
         
         if (!empty($post) && isset($post->post_type) && $post->post_type == 'property') {
-          $data = PLS_Plugin_API::get_listing_in_loop();
+          $data = PL_Listing_Helper::get_listing_in_loop();
         } else {
           $data = array();
         }
@@ -354,7 +354,7 @@ function ajax_placester_contact() {
 
     if( empty($error) ) {
 
-      $api_whoami = PLS_Plugin_API::get_user_details();
+      $api_whoami = PL_User::whoami();
       $user_email = @pls_get_option('pls-user-email');
 
       // Check what email to send the form to...
@@ -386,12 +386,12 @@ function ajax_placester_contact() {
         $message .= "The visitor was sent to: \n" . $_POST['custom_link'];
       }
 
-      wp_mail($email, 'Prospective client from ' . home_url(), $message, PLS_Plugin_API::merge_bcc_forwarding_addresses_for_sending($headers) );
+      wp_mail($email, 'Prospective client from ' . home_url(), $message, PL_Lead_Capture_Helper::merge_bcc_forwarding_addresses_for_sending($headers) );
 
       $name = trim($_POST['name']);
       $email = trim($_POST['email']);
       $phone = trim($_POST['phone']);
-      PLS_Plugin_API::create_person(array('metadata' => array('name' => $name, 'email' => $email, 'phone' => $phone)));
+      PL_People_Helper::add_person(array('metadata' => array('name' => $name, 'email' => $email, 'phone' => $phone)));
 
       // Send a email confirmation
       if (trim($_POST['email_confirmation']) == true) {

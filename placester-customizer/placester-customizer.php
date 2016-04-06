@@ -20,24 +20,28 @@ if(!defined('HOSTED_PLUGIN_KEY')) {
 			"display_name" => "Columbus",
 			"download_link" => "http://plcstr.com/14Ka7ic",
 			"current_version" => '2.8',
+			"screenshot" => 'http://demo.placester.net/wp-content/themes/columbus/screenshot.png',
 			"info_link" => "https://placester.com/wordpress-themes/columbus"
 		),
 		"manchester" => array(
 			"display_name" => "Manchester",
 			"download_link" => "http://plcstr.com/1237uEg",
 			"current_version" => '2.8',
+			"screenshot" => 'http://demo.placester.net/wp-content/themes/manchester/screenshot.png',
 			"info_link" => "https://placester.com/wordpress-themes/manchester"
 		),
 		"tampa" => array(
 			"display_name" => "Tampa",
 			"download_link" => "http://plcstr.com/16Jco9m",
 			"current_version" => '2.8',
+			"screenshot" => 'http://demo.placester.net/wp-content/themes/tampa/screenshot.png',
 			"info_link" => "https://placester.com/wordpress-themes/tampa"
 		),
 		"ventura" => array(
 			"display_name" => "Ventura",
 			"download_link" => "http://plcstr.com/17LXH4m",
 			"current_version" => '2.8',
+			"screenshot" => 'http://demo.placester.net/wp-content/themes/ventura/screenshot.png',
 			"info_link" => "https://placester.com/wordpress-themes/ventura"
 		)
 	);

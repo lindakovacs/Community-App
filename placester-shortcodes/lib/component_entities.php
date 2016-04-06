@@ -117,16 +117,24 @@ To add some text to your listings:<br />
 			$options = PL_Shortcode_CPT::get_shortcode_options('featured_listings', $atts['id']);
 			if ($options!==false) {
 				$atts = wp_parse_args($atts, $options);
-				$property_ids = self::get_property_ids($atts['id']);
-				if (!empty($property_ids)) {
+				if($property_ids = self::get_property_ids($atts['id']))
 					$atts['property_ids'] = array_keys($property_ids);
-				}
 			}
 			else {
 				unset($atts['id']);
 			}
 		}
-		$atts = wp_parse_args($atts, array('limit' => 6, 'sort_type' => ''));
+
+		if (empty($atts['property_ids'])) {
+			$limit_default = 6;	// if none have been explicitly selected, show 6
+			$sort_by_default = 'total_images';	// pretty ones
+		}
+		else {
+			$limit_default = 0;	// if selected, show all
+			$sort_by_default = 'cur_data.price';
+		}
+
+		$atts = wp_parse_args($atts, array('limit' => $limit_default, 'sort_by' => $sort_by_default));
 		$atts['context'] = 'featured_listings_'.(empty($atts['context']) ? 'shortcode' : $atts['context']);
 		
 		if (!has_filter('pls_listings_' . $atts['context'])) {
@@ -1486,7 +1494,9 @@ To add some text to your listings:<br />
 		}
 
 		if (!empty($js_files['filters'])) {
-			wp_enqueue_script('pl-filters.js', PLACESTER_PLUGIN_URL . 'placester-search/js/filters.js', array('jquery'));
+			// Horror show -- this is hardcode included in the search form partial
+			//   leaving it that way for now since we use blueprint's version when it's available
+			// wp_enqueue_script('pl-filters.js', PLACESTER_PLUGIN_URL . 'placester-search/js/filters.js', array('jquery'));
 		}
 		if (!empty($js_files['lifestyle'])) {
 			wp_enqueue_script('pl-lifestyle.js', PLACESTER_PLUGIN_URL . 'placester-maps/js/lifestyle.js', array('jquery'));

@@ -43,7 +43,7 @@ class PL_Membership_Helper {
 		$settings = self::get_client_settings();
 		$send_client_message_text = $settings['send_client_message_text'];
 		$admin_details = PL_Helper_User::whoami();
-		$replacements = array('%client_email%' => $client['username'], '%email_address%' => $admin_details['user']['email'], '%full_name%' => $admin_details['user']['first_name'] . ' ' . $admin_details['user']['last_name'], '%first_name%' => $admin_details['user']['first_name'], '%website_url%' => site_url()); 
+		$replacements = array('%client_email%' => $client['email'], '%email_address%' => $admin_details['user']['email'], '%full_name%' => $admin_details['user']['first_name'] . ' ' . $admin_details['user']['last_name'], '%first_name%' => $admin_details['user']['first_name'], '%website_url%' => site_url());
 		foreach ($replacements as $key => $value) {
 			$send_client_message_text = str_replace($key, $value, $send_client_message_text);
 		}

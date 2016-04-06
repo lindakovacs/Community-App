@@ -696,7 +696,7 @@ class PLS_Format
 			"victor" => "Victorian",
 			"antiq" => "Antique");
 
-		$api_dictionary = PLS_Plugin_API::get_translations();
+		$api_dictionary = PL_Custom_Attributes::get_translations();
 		$local_dictionary = array_merge($local_dictionary, $api_dictionary);
 
 		global $pls_custom_amenity_dictionary;

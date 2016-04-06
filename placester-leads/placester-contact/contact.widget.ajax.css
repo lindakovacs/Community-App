@@ -109,6 +109,8 @@
   box-sizing: border-box;
   width: 100%;
   margin: 0 0 0.5em 0; }
+div#edit_profile + div.ui-dialog-buttonpane {
+  display: block; }
 
 .placester_contact_form label {
   display: block;

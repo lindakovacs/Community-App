@@ -42,7 +42,7 @@ span.pl-tpl-up-label {
 		<li><span class="pl-tpl-up-label">Phone:</span>[phone]</li>
 		[/if]
 		[if attribute="address"]
-		<li><span class="pl-tpl-up-label">Address:</span>[address] [locality] [region] [postal] [country]</li>
+		<li><span class="pl-tpl-up-label">Address:</span>[address] [locality] [region]</li>
 		[/if]
 	</ul>
 </div>
