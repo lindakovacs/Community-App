@@ -1040,9 +1040,6 @@ class PLS_Partials_Listing_Search_Form {
 
     $result = apply_filters( pls_get_merged_strings( array( "pls_listings_search_form_outer", $context ), '_', 'pre', false ), $form, $form_html, $form_options, $section_title, @$form_data, $form_id, $context_var );
     
-    // This shouldn't be here, but there are compatibility dependencies.  Cleanup is deferred.
-    $result .= '<script type="text/javascript" src="' . PLACESTER_PLUGIN_URL . 'placester-search/js/filters.js"></script>';
-
     $cache->save($result);
     return $result;
 	}
