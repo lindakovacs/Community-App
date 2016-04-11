@@ -141,8 +141,11 @@ class PL_CRM_Contactually extends PL_CRM_Base {
 				$newVal = empty($value) ? "No" : "Yes";
 				break;
 			case "datetime":
-				$date = new DateTime($value);
-				$newVal = $date->format("m/d/Y");
+				$newVal = "";
+				if($value) {
+					$date = new DateTime($value);
+					$newVal = $date->format("m/d/Y");
+				}
 				break;
 			case "array":
 				$newVal = "";

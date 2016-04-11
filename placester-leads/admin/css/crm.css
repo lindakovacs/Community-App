@@ -97,25 +97,15 @@ input.invalid {
 	border-color: red;
 }
 
-.browse-header {
-	height: 60px;
-}
-
-.browse-header > * {
-	float: left;
-}
-
-.browse-header a {
-	margin-top: 12px;
-}
 
 /*
  * Styles used in the contact grid search form
  */
 
-section.pls_search_form {
-  height: 36px;
+.crm-search-box {
+	margin-top: 30px;
 }
+
 .form_group {
   float: left;
   clear: both;
