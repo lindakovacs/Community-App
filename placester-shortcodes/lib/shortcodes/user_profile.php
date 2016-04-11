@@ -205,7 +205,7 @@ For example, to only display user name if it has a value:<br />
 					<input type="text" name="phone" value="'.self::$form_data['phone'].'">
 				</div>
 				<div>
-					<label>Street</label>
+					<label>Address</label>
 					<input type="text" name="location[address]" value="'.self::$form_data['location']['address'].'">
 				</div>
 				<div>

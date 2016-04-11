@@ -8,14 +8,11 @@ Version: 1.0.0
 Author URI: https://www.placester.com/
 */
 
-if (defined('DOING_AJAX') && isset($_POST['action']) && $_POST['action'] == 'crm_ajax_controller') {
-	include_once('lib/CRM/controller.php');
-	return;
-}
-
 include_once('config/api/people.php');
 include_once('models/people.php');
 include_once('helpers/people.php');
+
+include_once('lib/CRM/controller.php');
 
 include_once('placester-membership/membership.php');
 include_once('placester-membership/membership-helper.php');
@@ -25,11 +22,15 @@ include_once('placester-membership/member-search.php');
 include_once('helpers/lead-capture.php');
 
 
-$pl_admin_page = new PL_Admin_Page('placester', 1200, 'placester_leads', 'Leads', 'Email Addresses', PL_LEADS_DIR . 'admin/views/lead-capture.php');
+$pl_admin_page = new PL_Admin_Page('placester', 1200, 'placester_leads', 'Leads', 'All Leads', PL_LEADS_DIR . 'admin/views/internal-crm.php');
+$pl_admin_page->require_script('placester-crm', PL_LEADS_JS_URL . 'crm.js', array('jquery-datatables'));
+$pl_admin_page->require_style('placester-crm', PL_LEADS_CSS_URL . 'crm.css', array('settings-all'));
+
+$pl_admin_page = new PL_Admin_Page('placester_leads', 1210, 'placester_emails', 'Email Notifications', 'Email Notifications', PL_LEADS_DIR . 'admin/views/lead-capture.php');
 $pl_admin_page->require_script('lead-capture', PL_LEADS_JS_URL . 'general.js', array('jquery-ui-core', 'jquery-ui-dialog'));
 $pl_admin_page->require_style('lead-capture', PL_LEADS_CSS_URL . 'general.css', array('settings-all'));
 
-$pl_admin_page = new PL_Admin_Page('placester_leads', 1220, 'placester_crm', 'CRM Integration', 'CRM Integration', PL_LEADS_DIR . 'admin/views/crm.php');
+$pl_admin_page = new PL_Admin_Page('placester_leads', 1220, 'placester_crm', 'CRM Integration', 'CRM Integration', PL_LEADS_DIR . 'admin/views/external-crm.php');
 $pl_admin_page->require_script('placester-crm', PL_LEADS_JS_URL . 'crm.js', array('jquery-datatables'));
 $pl_admin_page->require_style('placester-crm', PL_LEADS_CSS_URL . 'crm.css', array('settings-all'));
 
@@ -61,4 +62,22 @@ function placester_add_lead_components () {
 
 		include_once('helpers/lead-capture-frontend.php');
 	}
+}
+
+// Hook into the wordpress Users page
+add_action('admin_enqueue_scripts', 'placester_admin_users_enqueue');
+function placester_admin_users_enqueue() {
+	if(($screen = get_current_screen()) && ($screen->id == 'users')) {
+		wp_enqueue_script('placester-crm', PL_LEADS_JS_URL . 'crm.js', array('jquery-datatables'), NULL, true);
+		wp_enqueue_style('placeter-crm', PL_LEADS_CSS_URL . 'crm.css');
+	}
+}
+
+add_filter( 'user_row_actions', 'placester_lead_detail_link', 10, 2);
+function placester_lead_detail_link ($actions, $user) {
+	if (in_array('placester_lead', (array) $user->roles) ||
+		$user->has_prop('placester_api_id') || $user->has_prop('pl_member_listings') || $user->has_prop('pl_member_searches'))
+		array_unshift($actions, '<a href="#" class="lead-detail-link" data-lead-login="' . $user->user_login . '">Lead Detail</a>');
+
+	return $actions;
 }

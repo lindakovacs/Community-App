@@ -11,14 +11,13 @@ Easily create and manage real estate sites powered by WordPress.
 
 From the creators of http://placester.com: Create your fully functional real estate website with a single plugin. Some of the features include: 
 
-* RETS integrations available, continuously updated with you MLS.
-* Full international listing support (240+ countries!)
+* RETS integrations available, continuously updated with your MLS.
 * Create / edit / update / search listings.
 * Set listings as "Featured" to highlight them in your sidebar throughout your site.
 * Every listing automatically has a unique landing page created - great for SEO.
 * Fully customizable sidebar layout and custom Placester real estate widgets.
 * Unlimited images per listing.
-* Placester has themes free themes that work seamlessly with this free Placester plugin (hosted premium themes also available).
+* Free themes that work seamlessly with this free Placester plugin (hosted premium themes also available).
 
 
 **See it in Action**
@@ -45,18 +44,16 @@ Find the latest themes and theme updates at [Placester.com/portfolio/](https://p
 
 **Highlights:**
 
-* Easy setup - create a new free Placester account in one step to automatically add your listings to your site. No credit card required.
-* Easily add listings - manually add listings to your website via the plugin admin panel.
+* Easy setup - create a new free Placester account in one step to enable listings on your site. No credit card required.
+* Easily add listings - manually add listings to your website via the plugin admin panel or Placester.com account dashboard
+* Populate your web site with the listing inventory from your MLS or property database company
+* Always up-to-date, Placester automatically updates itself with the the latest listings data
 * Create and manage listing landing pages
-* Populate your web site with the listing inventory from your property database company
 * Tune the listings on the site for the target market
 * Customize sidebar layout using robust widgets
 * Powerful search based on the Placester API and Google Maps
 * Easily promote featured properties across your site
-* Search engine optimized from top to bottom ^
-* Always up-to-date, Placester automatically updates itself with the the latest listings data
-
-Note ^: Feature requires a Placester-enabled theme.
+* Designed for search engine optimization from top to bottom
 
 
 == Installation ==
@@ -91,7 +88,7 @@ Any professional seeking the competitive advantage of having a robust real estat
 
 = Are there any hidden costs or fees here? =
 
-Not unless you want there to be, that is Placester is your marketing partner. Our goal is to help you generate leads for your listing and help you easily create niche web sites for marketing purposes using our themes. There are additional themes available in Placester's [Advanced offering](https://placester.com/pricing/) which includes website hosting.
+Not unless you want there to be. Placester is your marketing partner. Our goal is to help you generate leads for your listing and help you easily create niche web sites for marketing purposes using our themes. There are additional themes available in Placester's [Advanced offering](https://placester.com/pricing/) which includes website hosting.
 
 = Which markets (countries) are supported? =
 
@@ -101,15 +98,15 @@ We'll be adding more as time goes on. [Reach out](mailto:support@placester.com) 
 
 = Where does my information go? Who owns it? =
 
-The data is yours, Placester seeks only to a cost-effective means to generate more leads. All data is Moreover, there is no data "lock-in," if you've created listings (ads) in our system, that data can be exported at any time for use elsewhere. Simply let us know what your needs are.
+The data is yours, Placester seeks only to provide a cost-effective means to generate more leads. Moreover, there is no data "lock-in," if you've created listings (ads) in our system, that data can be exported at any time for use elsewhere. Simply let us know what your needs are.
 
 = How do I get started? =
 
 After installing the plugin simply follow the instructions in the plugin to obtain an API key and begin either adding listings or [notify us](mailto:support@placester.com) if you already work with a property database company so we can enable the integration for your account.
 
-### = Wait, what about my listings, how do I make sure clients don't see actual addresses? =
+= Wait, what about my listings, how do I make sure clients don't see actual addresses? =
 
-### Simple, by default Placester only displays the block address so the client can explore the neighborhood, but they still need you for the showing or to finalize the deal.
+Simple, Placester offers a block address option so the client can explore the neighborhood, but still need you for the showing or to finalize the deal.
 
 = What is "SEO"? How do I get on to Google? =
 
@@ -125,8 +122,7 @@ Placester offers lots of tools on our platform powered by our robust API. So usi
 
 = Does this plugin work with Multi-site? =
 
-Yes it does.
-### Yes it does, however separate instances (API keys) must be used per site.
+Yes it does, however separate instances (API keys) must be used per site.
 
 = How do I get support? =
 
@@ -138,9 +134,19 @@ Absolutely, [reach out](mailto:support@placester.com) to us and let us know what
 
 = How often do you update data? =
 
-In general - real-time. But if you use 3rd party property management services, the updates will only be as recent as your provider allows.
+In general - real-time. But if you use 3rd party property management services, the updates will be only as recent as your provider allows.
 
 == Changelog ==
+
+= 1.4.1 =
+* Improved handling of days on market fields in IDX feeds
+* Added configurability for better control of caching
+* Improvements to Theme Gallery
+* Fixed several minor issues with WordPress 4.4 core changes
+* Additional code reorganization and refactoring
+* Improved compatibility with old versions of Placester themes
+* Fixed and expanded user account profile editor
+* Fixed search inefficiency introduced in 1.4.0
 
 = 1.4.0 =
 * Major code reorganization and refactoring
