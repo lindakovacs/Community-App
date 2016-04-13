@@ -1,12 +1,8 @@
 <?php
-	// Render a contact's details...
-	if (!isset($contact_id)) { return; }
+	if (empty($contact_id)) { return; }
 
-	// If no CRM ID is passed, use the active one... 
 	if (!isset($crm_id)) {
-		$crm_id = PL_CRM_Controller::getActiveCRM();
-
-		// No valid active CRM ID?  Just return...
+		$crm_id = PL_CRM_Controller::getActiveCRMs();
 		if (empty($crm_id)) { return; }
 	}
 
@@ -17,7 +13,6 @@
 <div class="contact-details-overlay"></div>
 
 <div class="contact-details-pane">
-	<?php // error_log(var_export($contact_data, true)); ?>
 	<h2>Lead Detail: <span><?php echo $contact_data["name"]; ?></span></h2>
 	<table>
 		<?php foreach ($contact_data["details"] as $key => $value): ?>
