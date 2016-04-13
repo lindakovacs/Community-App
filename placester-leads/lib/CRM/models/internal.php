@@ -103,7 +103,7 @@ class PL_CRM_Internal extends PL_CRM_Base{
 	private function getIdMap() {
 		global $wpdb;
 		$map = array();
-		$meta_list = $wpdb->get_results( "SELECT user_id, meta_value from wp_usermeta WHERE meta_key = 'placester_api_id'", ARRAY_A );
+		$meta_list = $wpdb->get_results( "SELECT user_id, meta_value from $wpdb->usermeta WHERE meta_key = 'placester_api_id'", ARRAY_A );
 
 		if(is_array($meta_list)) foreach($meta_list as $item) {
 			if($item['meta_value'])
