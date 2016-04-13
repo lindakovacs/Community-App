@@ -45,7 +45,7 @@ else { ?>
 			<?php foreach ($placester_gallery_themes as $theme => $meta): ?>
 				<td class="available-theme top left">
 					<h3><?php echo $meta['display_name']; ?></h3>
-					<div><img class="screenshot" src="<?php echo $meta['screenshot']; ?>"</div>
+					<div><img class="screenshot" src="<?php echo $meta['screenshot']; ?>"></div>
 					<?php echo placester_gallery_install_link($theme); ?>
 					<span>&nbsp;|&nbsp;</span>
 					<a class="download_theme" target="_blank" href="<?php echo $meta['download_link']; ?>">Download</a>
