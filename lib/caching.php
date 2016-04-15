@@ -36,7 +36,7 @@ class PL_Cache {
 			if(!self::$cache_offset) update_option('pl_cache_offset', self::$cache_offset = rand());
 		}
 
-		$this->group = preg_replace("/\W/", "_", strtolower($group));
+		$this->group = $group = preg_replace("/\W/", "_", strtolower($group));
 		$this->always_cache = $always_cache;
 
 		$this->group_offset = get_option('pl_' . $group . '_cache_offset', null);
