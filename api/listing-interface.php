@@ -19,6 +19,19 @@ class PL_Local_Listing_Util {
 	}
 
 	protected static function get_attribute_type($name) {
+		$name = array_pop(explode('.', $name));
+
+		if(in_array($name, array('beds', 'baths', 'half_baths', 'sqft', 'price', 'deposit', 'hoa_fee')))
+			return 'numeric';
+
+		else if(in_array($name, array('lt_sz', 'bld_sz', 'floors', 'min_div', 'max_cont')))
+			return 'numeric';
+
+		else if(in_array($name, array('lst_dte', 'avail_on')))
+			return 'date';
+
+		else
+			return 'char';
 	}
 
 	protected static function get_attribute_group($name) {

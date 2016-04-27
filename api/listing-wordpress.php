@@ -48,7 +48,7 @@ class PL_WordPress_Listing_Util extends PL_SQL_Listing_Util {
 			return null;
 	}
 
-	protected static function build_meta_filter($name, $value, $match = null) {
+	protected static function build_meta_filter($name, $value, $match = null, $type = null) {
 		if($match == 'exists')
 			$filter = array('key' => $name, 'value' => 'bug #23268', 'compare' => ($value ? 'exists' : 'not exists'));
 
@@ -63,6 +63,8 @@ class PL_WordPress_Listing_Util extends PL_SQL_Listing_Util {
 
 		else {
 			$filter = array('key' => $name, 'value' => $value);
+			if($type)
+				$filter['type'] = $type;
 			if($match)
 				$filter['compare'] = self::get_compare_from_match($match);
 		}
@@ -102,11 +104,11 @@ class PL_WordPress_Listing_Util extends PL_SQL_Listing_Util {
 				case 'metadata':
 					foreach((array) $value as $key => $val) if(strpos($key, '_match') !== strlen($key) - 6) {
 						if(strpos($key, 'min_') === 0) {
-							$key = substr($key, 4);
-							$meta_filter['metadata.min_' . $key] = self::build_meta_filter('metadata.' . $key, $val, 'ge');
+							$key = substr($key, 4); $type = self::get_attribute_type($key);
+							$meta_filter['metadata.min_' . $key] = self::build_meta_filter('metadata.' . $key, $val, 'ge', $type);
 						} else if(strpos($key, 'max_') === 0) {
-							$key = substr($key, 4);
-							$meta_filter['metadata.max_' . $key] = self::build_meta_filter('metadata.' . $key, $val, 'le');
+							$key = substr($key, 4); $type = self::get_attribute_type($key);
+							$meta_filter['metadata.max_' . $key] = self::build_meta_filter('metadata.' . $key, $val, 'le', $type);
 						} else {
 							$match = self::get_query_variable($value, $key . '_match');
 							$meta_filter['metadata.' . $key] = self::build_meta_filter('metadata.' . $key, $val, $match);
@@ -167,7 +169,11 @@ class PL_WordPress_Listing extends PL_WordPress_Listing_Util implements PL_Listi
 					if($meta_key = self::get_key_from_attribute($sort_by, false)) { // sanitize!
 						$sort_clause['join'] = " left join $wpdb->postmeta as metasort"
 							. " on (ID = metasort.post_id and metasort.meta_key = '$meta_key')";
-						$sort_clause['order'] = " order by metasort.meta_value";
+
+						if(self::get_attribute_type($meta_key) == 'decimal')
+							$sort_clause['order'] = " order by cast(metasort.meta_value as decimal)";
+						else
+							$sort_clause['order'] = " order by metasort.meta_value";
 					}
 					break;
 			}
