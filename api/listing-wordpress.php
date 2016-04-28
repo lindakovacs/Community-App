@@ -21,14 +21,23 @@ class PL_WordPress_Listing_Util extends PL_SQL_Listing_Util {
 		$listing['cur_data'] = &$listing['metadata'];
 		$listing['uncur_data'] = array();
 
+		$listing['images'] = (array) $listing['images'];
+		$order = 0; foreach($listing['images'] as &$image) {
+			$image['url'] = wp_get_attachment_url($image['id']);
+			$image['order'] = ++$order;
+		}
+
 		return $listing;
 	}
 
-	protected static function get_key_from_attribute($name, $include_plurals = true) {
-		if($name == 'compound_type')
+	protected static function get_key_from_attribute($name) {
+		if($name == 'total_images')
 			return $name;
 
-		else if($include_plurals && in_array($name, array('listing_types', 'zoning_types', 'purchase_types')))
+		else if($name == 'compound_type')
+			return $name;
+
+		else if(in_array($name, array('listing_types', 'zoning_types', 'purchase_types')))
 			return $name;
 
 		else if($name == 'property_type')
@@ -121,29 +130,42 @@ class PL_WordPress_Listing_Util extends PL_SQL_Listing_Util {
 	}
 
 	protected static function store_post_fields($post, $new_fields, $old_fields = array()) {
-		if($old_fields) { // update
-			foreach($old_fields as $name => $value) {
-				if(!isset($new_fields[$name]))
-					delete_post_meta($post, $name);
-			}
-
-			foreach($new_fields as $name => $value) {
-				if(isset($old_fields[$name])) {
-					if($value != $old_fields[$name])
-						update_post_meta($post, $name, $value);
-				}
-				else
-					add_post_meta($post, $name, $value);
-			}
+		foreach($old_fields as $name => $value) {
+			if(!isset($new_fields[$name]))
+				delete_post_meta($post, $name);
 		}
 
-		else { // create
-			foreach($new_fields as $name => $value)
-				add_post_meta($post, $name, $value);
+		foreach($new_fields as $name => $value) {
+			if(!isset($old_fields[$name]) || $value != $old_fields[$name])
+				update_post_meta($post, $name, $value);
 		}
 	}
 
+	protected static function build_post_attachment($post, $filename) {
+		$filebase = basename($filename);
+		$filetype = wp_check_filetype($filebase, null);
+
+		$attachment = array(
+			'post_title' => preg_replace( '/\.[^.]+$/', '', $filebase),
+			'post_status' => 'inherit', 'post_content' => '',
+			'post_mime_type' => $filetype['type']
+		);
+
+		return $attachment_id = wp_insert_attachment($attachment, $filename, $post);
+	}
+
 	protected static function store_post_images($post, $new_images, $old_images = array()) {
+		// if $post is set, we need to attach images to a newly created post
+		if($post) foreach($new_images as $image)
+			wp_update_post(array('ID' => $image['id'], 'post_parent' => $post));
+
+		// if we have old images, check for attachments to delete
+		if($old_images) {
+			$old_ids = array(); foreach($old_images as $image) $old_ids[] = $image['id'];
+			$new_ids = array(); foreach($new_images as $image) $new_ids[] = $image['id'];
+			foreach(array_diff($old_ids, $new_ids) as $id)
+				wp_delete_attachment($id, true);
+		}
 	}
 }
 
@@ -183,11 +205,13 @@ class PL_WordPress_Listing extends PL_WordPress_Listing_Util implements PL_Listi
 					$sort_clause['order'] = " order by post_modified";
 					break;
 
-				case 'total_images':
+				case 'listing_types': // not sortable
+				case 'zoning_types':
+				case 'purchase_types':
 					break;
 
 				default:
-					if($meta_key = self::get_key_from_attribute($sort_by, false)) { // sanitize!
+					if($meta_key = self::get_key_from_attribute($sort_by)) { // sanitize!
 						$sort_clause['join'] = " left join $wpdb->postmeta as metasort"
 							. " on (ID = metasort.post_id and metasort.meta_key = '$meta_key')";
 
@@ -263,7 +287,10 @@ class PL_WordPress_Listing extends PL_WordPress_Listing_Util implements PL_Listi
 
 		$aggr_result = array();
 		foreach((array) $keys as $name)
-			if($meta_key = self::get_key_from_attribute($name, true)) { // sanitize!
+			if($name == 'total_images') // not aggregable
+				continue;
+
+			else if($meta_key = self::get_key_from_attribute($name, true)) { // sanitize!
 
 				$aggr_clause = array('join' => " inner join $wpdb->postmeta as aggregate"
 				. " on (ID = aggregate.post_id and aggregate.meta_key = '$meta_key')");
@@ -279,30 +306,45 @@ class PL_WordPress_Listing extends PL_WordPress_Listing_Util implements PL_Listi
 	}
 
 	public static function create ($args = array()) {
-		$listing = array(
-			'compound_type' => isset($args['compound_type']) ? $args['compound_type'] : null,
-			'location' => isset($args['location']) ? $args['location'] : array(),
-			'metadata' => isset($args['metadata']) ? $args['metadata'] : array());
+		$args['location'] = isset($args['location']) ? $args['location'] : array();
+		$args['metadata'] = isset($args['metadata']) ? $args['metadata'] : array();
+		$args['images'] = isset($args['images']) ? $args['images'] : array();
 
+		$listing = array();
+		$listing['compound_type'] = isset($args['compound_type']) ? $args['compound_type'] : null;
 		if($listing['compound_type'] && $map = self::get_listing_type_map($listing['compound_type'])) {
 			$listing['listing_types'] = $map[0];
 			$listing['zoning_types'] = $map[1];
 			$listing['purchase_types'] = $map[2];
 		}
 
-		$meta = $listing; unset($meta['location']); unset($meta['metadata']);
+		$new_meta = $listing;
+
+		$listing['location'] = $args['location'];
 		foreach($listing['location'] as $name => $value)
-			$meta['location.' . $name] = $value;
+			$new_meta['location.' . $name] = $value;
+
+		$listing['metadata'] = $args['metadata'];
 		foreach($listing['metadata'] as $name => $value)
-			$meta['metadata.' . $name] = $value;
+			$new_meta['metadata.' . $name] = $value;
+
+		$listing['images'] = array();
+		foreach($args['images'] as $image)
+			if(isset($image['filename'])) {
+				if($attachment_id = self::build_post_attachment(0, $image['filename']))
+					$listing['images'][] = array('id' => $attachment_id);
+			}
+
+		$listing['total_images'] = count($listing['images']);
+		$new_meta['total_images'] = $listing['total_images'];
 
 		$post = wp_insert_post(array(
 			'post_type' => 'property',
 			'post_content' => serialize($listing)));
 
 		if($post) {
-			self::store_post_fields($post, $meta);
-			self::store_post_images($post, array(), array());
+			self::store_post_fields($post, $new_meta);
+			self::store_post_images($post, $listing['images'], array());
 			return array('id' => $post);
 		}
 
@@ -321,6 +363,8 @@ class PL_WordPress_Listing extends PL_WordPress_Listing_Util implements PL_Listi
 			return null;
 
 		$new_meta = $old_meta = array();
+		$new_imgs = $old_imgs = array();
+
 		if(isset($args['location'])) {
 			foreach($listing['location'] as $name => $value)
 				$old_meta['location.' . $name] = $value;
@@ -329,6 +373,7 @@ class PL_WordPress_Listing extends PL_WordPress_Listing_Util implements PL_Listi
 			foreach($listing['location'] as $name => $value)
 				$new_meta['location.' . $name] = $value;
 		}
+
 		if(isset($args['metadata'])) {
 			foreach($listing['metadata'] as $name => $value)
 				$old_meta['metadata.' . $name] = $value;
@@ -338,13 +383,30 @@ class PL_WordPress_Listing extends PL_WordPress_Listing_Util implements PL_Listi
 				$new_meta['metadata.' . $name] = $value;
 		}
 
+		if(isset($args['images'])) {
+			foreach($args['images'] as $image)
+				if(isset($image['image_id']))
+					$new_imgs[] = array('id' => $image['image_id']);
+				else if(isset($image['filename'])) {
+					if($attachment_id = self::build_post_attachment($listing['id'], $image['filename']))
+						$new_imgs[] = array('id' => $attachment_id);
+				}
+
+			$old_imgs = $listing['images'];
+			$listing['images'] = $new_imgs;
+
+			$listing['total_images'] = count($listing['images']);
+			$new_meta['total_images'] = $listing['total_images'];
+		}
+
+
 		$post = wp_update_post(array(
 			'ID' => $listing['id'],
 			'post_content' => serialize($listing)));
 
 		if($post) {
 			self::store_post_fields($post, $new_meta, $old_meta);
-			self::store_post_images($post, array(), array());
+			self::store_post_images(0, $new_imgs, $old_imgs);
 			return array('id' => $post);
 		}
 
