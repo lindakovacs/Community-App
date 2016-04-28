@@ -121,6 +121,26 @@ class PL_WordPress_Listing_Util extends PL_SQL_Listing_Util {
 	}
 
 	protected static function store_post_fields($post, $new_fields, $old_fields = array()) {
+		if($old_fields) { // update
+			foreach($old_fields as $name => $value) {
+				if(!isset($new_fields[$name]))
+					delete_post_meta($post, $name);
+			}
+
+			foreach($new_fields as $name => $value) {
+				if(isset($old_fields[$name])) {
+					if($value != $old_fields[$name])
+						update_post_meta($post, $name, $value);
+				}
+				else
+					add_post_meta($post, $name, $value);
+			}
+		}
+
+		else { // create
+			foreach($new_fields as $name => $value)
+				add_post_meta($post, $name, $value);
+		}
 	}
 
 	protected static function store_post_images($post, $new_images, $old_images = array()) {
@@ -145,6 +165,7 @@ class PL_WordPress_Listing extends PL_WordPress_Listing_Util implements PL_Listi
 
 		if($filters['post_filter'])
 			$post_clause['where'] .= " and (" . implode(') and (', $filters['post_filter']) . ")";
+
 		if($filters['meta_filter']) {
 			$meta_query = new WP_Meta_Query($filters['meta_filter']);
 			$meta_clause = $meta_query->get_sql('post', $wpdb->posts, 'ID');
@@ -231,6 +252,7 @@ class PL_WordPress_Listing extends PL_WordPress_Listing_Util implements PL_Listi
 
 		if($filters['post_filter'])
 			$post_clause['where'] .= " and (" . implode(') and (', $filters['post_filter']) . ")";
+
 		if($filters['meta_filter']) {
 			$meta_query = new WP_Meta_Query($filters['meta_filter']);
 			$meta_clause = $meta_query->get_sql('post', $wpdb->posts, 'ID');
@@ -279,9 +301,8 @@ class PL_WordPress_Listing extends PL_WordPress_Listing_Util implements PL_Listi
 			'post_content' => serialize($listing)));
 
 		if($post) {
-			foreach($meta as $name => $value)
-				add_post_meta($post, $name, $value);
-
+			self::store_post_fields($post, $meta);
+			self::store_post_images($post, array(), array());
 			return array('id' => $post);
 		}
 
@@ -299,16 +320,22 @@ class PL_WordPress_Listing extends PL_WordPress_Listing_Util implements PL_Listi
 		if(!isset($args['id']) || !($listing = self::read($args)))
 			return null;
 
-		$meta = array();
+		$new_meta = $old_meta = array();
 		if(isset($args['location'])) {
+			foreach($listing['location'] as $name => $value)
+				$old_meta['location.' . $name] = $value;
+
 			$listing['location'] = $args['location'];
-			foreach($args['location'] as $name => $value)
-				$meta['location.' . $name] = $value;
+			foreach($listing['location'] as $name => $value)
+				$new_meta['location.' . $name] = $value;
 		}
 		if(isset($args['metadata'])) {
+			foreach($listing['metadata'] as $name => $value)
+				$old_meta['metadata.' . $name] = $value;
+
 			$listing['metadata'] = $args['metadata'];
-			foreach($args['metadata'] as $name => $value)
-				$meta['metadata.' . $name] = $value;
+			foreach($listing['metadata'] as $name => $value)
+				$new_meta['metadata.' . $name] = $value;
 		}
 
 		$post = wp_update_post(array(
@@ -316,14 +343,8 @@ class PL_WordPress_Listing extends PL_WordPress_Listing_Util implements PL_Listi
 			'post_content' => serialize($listing)));
 
 		if($post) {
-			global $wpdb;
-			$wpdb->query(
-				"delete from $wpdb->postmeta where post_id = '${listing['id']}'"
-				. " and (meta_key like 'location.%' or meta_key like 'metadata.%')");
-
-			foreach($meta as $name => $value)
-				add_post_meta($post, $name, $value);
-
+			self::store_post_fields($post, $new_meta, $old_meta);
+			self::store_post_images($post, array(), array());
 			return array('id' => $post);
 		}
 
