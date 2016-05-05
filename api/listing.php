@@ -730,7 +730,9 @@ if(!$PL_API_LISTINGS) {
 							'method' => 'supported_countries',
 							'default' => array('PL_Listing','convert_default_country')
 						)
-					)
+					),
+					'coords_latitude' => array('type' => 'hidden','group' => 'location', 'label' => 'Latitude'),
+					'coords_longitude' => array('type' => 'hidden','group' => 'location', 'label' => 'Longitude')
 				),
 				// // binds to keys / values of all attributes (cur + uncur)
 				'metadata' => array(

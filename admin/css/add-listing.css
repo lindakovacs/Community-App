@@ -120,7 +120,7 @@ section.pls_search_form label {
 	float: left;
 	width: 100px;
 }
-#post_title, {
+#post_title {
 	float: left;
 }
 input#post_title, label#post_title {
@@ -129,7 +129,7 @@ input#post_title, label#post_title {
 }
 
 .has-right-sidebar #post-body-content {
-	margin-right: 320px;	
+	margin-right: 320px;
 }
 input#property_type {
 	font-size: 20px;
@@ -154,6 +154,40 @@ input#property_type {
 }
 
 
+/* Map Messages */
+div.location-address-box {
+	margin-top: 16px;
+
+	background-color: lightgrey;
+	border-radius: 5px;
+	padding: 4px 5px;
+	border: 1px solid black;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+div.location-message-box {
+	margin-top: 4px;
+
+	background-color: white;
+	border-radius: 0;
+	padding: 2px 3px;
+	border: 1px solid black;
+	font-size: 12px;
+	font-weight: normal;
+}
+
+div.location-message-box span {
+	display: block;
+	padding: 4px;
+}
+
+div.location-message-box span.achtung {
+	background-color: #FFEBE8;
+	border: 1px solid #C00;
+	padding: 3px;
+}
+
 
 /* Uploading Images */
 #fileupload-holder-message li {
@@ -169,7 +203,7 @@ input#property_type {
 	float: left;
 	font-size: 16px;
 	margin: 10px 0 0 21px;
-	clear: both;	
+	clear: both;
 }
 .advanced_toggle {
 	float: right;

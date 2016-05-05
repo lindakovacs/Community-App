@@ -54,10 +54,17 @@
 				<div class="clear"></div>
 
 				<?php echo new PL_Admin_Box(null, 'Location', null,
-					PL_Form::generate_form(
-						PL_Config::bundler('PL_API_LISTINGS', array('create', 'args'), array('location')),
-						array('method' => 'POST', 'include_submit' => false, 'wrap_form' => false, 'echo_form' => false)
-					)
+					'<div class="location-entry">' .
+						PL_Form::generate_form(
+							PL_Config::bundler('PL_API_LISTINGS', array('create', 'args'), array('location')),
+							array('method' => 'POST', 'include_submit' => false, 'wrap_form' => false, 'echo_form' => false)
+						) .
+					'</div>' .
+					'<div class="location-map">' .
+						'<input id="location-coords-latitude" type="hidden" name="location[coords_latitude]" value="' . $_POST['location']['coords'][0] . '">' .
+						'<input id="location-coords-longitude" type="hidden" name="location[coords_longitude]" value="' . $_POST['location']['coords'][1] . '">' .
+						'<div id="location-map-canvas" style="height: 500px;"></div>' .
+					'</div>'
 				) ?>
 
 				<!-- Residential Sales -->
