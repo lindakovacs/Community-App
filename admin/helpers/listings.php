@@ -29,7 +29,7 @@ class PL_Listing_Admin_Helper {
 			'cur_data.baths',
 			'cur_data.price',
 			'cur_data.sqft',
-			'cur_data.avail_on'
+			'cur_data.status'
 		);
 
 		$args['sort_by'] = $columns[$_POST['iSortCol_0']];
@@ -125,15 +125,24 @@ class PL_Listing_Admin_Helper {
 			$images = $listing['images'];
 			$listings[$key][] = ((is_array($images) && isset($images[0])) ? '<img width=50 height=50 src="' . $images[0]['url'] . '" />' : '');
 
-			$edit_link = admin_url('admin.php?page=placester_property_edit&id=' . $listing['id']);
 			$address = $listing["location"]["address"] . ' ' . $listing["location"]["locality"] . ' ' . $listing["location"]["region"];
-			$listings[$key][] = '<a class="address" href="' . $edit_link . '">' . $address . '</a>' .
-				'<div class="row_actions">' .
-					'<a href="' . $edit_link . '">Edit</a><span>|</span>' .
-					'<a href=' . PL_Pages::get_url($listing['id'], $listing) . '>View</a><span>|</span>' .
-					'<a class="red" id="pls_delete_listing" href="#" ref="'.$listing['id'].'">Delete</a>' .
-				'</div>';
 
+			if(isset($listing['import_id']) || isset($listing['provider_id'])) { // imported MLS listing, cannot be edited
+				$view_url = PL_Pages::get_url($listing['id'], $listing);
+				$address_link = '<a class="address" href="' . $view_url . '">' . $address . '</a>';
+				$action_links = '<span class="grey">Edit</span>';
+				$action_links .= '<span>|</span><a href=' . $view_url . '>View</a>';
+				$action_links .= '<span>|</span><span class="grey">Delete</span>';
+			}
+			else {
+				$edit_url = admin_url('admin.php?page=placester_property_edit&id=' . $listing['id']);
+				$address_link = '<a class="address" href="' . $edit_url . '">' . $address . '</a>';
+				$action_links = '<a href="' . $edit_url . '">Edit</a>';
+				$action_links .= '<span>|</span><a href=' . PL_Pages::get_url($listing['id'], $listing) . '>View</a>';
+				$action_links .= '<span>|</span><a class="red" id="pls_delete_listing" href="#" data-ref="' . $listing['id'] . '">Delete</a>';
+			}
+
+			$listings[$key][] = $address_link . '<div class="row_actions">' . $action_links . '</div>';
 			$listings[$key][] = $listing["location"]["postal"];
 
 			global $PL_API_LISTINGS;
@@ -144,7 +153,8 @@ class PL_Listing_Admin_Helper {
 			$listings[$key][] = $listing["cur_data"]["baths"] === false ? '' : $listing["cur_data"]["baths"];
 			$listings[$key][] = is_null($listing["cur_data"]["price"]) ? '' : $listing["cur_data"]["price"];
 			$listings[$key][] = is_null($listing["cur_data"]["sqft"]) ? '' : $listing["cur_data"]["sqft"];
-			$listings[$key][] = $listing["cur_data"]["avail_on"] ? date_format(date_create($listing["cur_data"]["avail_on"]), "jS F, Y g:i A.") : '';
+			$listings[$key][] = $listing["cur_data"]["status"] ? $listing["cur_data"]["status"] : '';
+			// $listings[$key][] = $listing["cur_data"]["avail_on"] ? date_format(date_create($listing["cur_data"]["avail_on"]), "jS F, Y g:i A.") : '';
 		}
 
 		// Required for datatables.js to function properly.
