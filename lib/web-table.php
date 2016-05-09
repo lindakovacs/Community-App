@@ -1,7 +1,7 @@
 <?php
 
 
-class Ajax_Data_Set {
+class Web_Data_Set {
 	protected $args;
 
 	public function __construct($args = array()) {
@@ -18,7 +18,7 @@ class Ajax_Data_Set {
 }
 
 
-class Ajax_Data_Filter {
+class Web_Data_Filter {
 	protected $id;
 	protected $args;
 
@@ -31,7 +31,7 @@ class Ajax_Data_Filter {
 }
 
 
-class Ajax_Data_Form extends Ajax_Data_Filter {
+class Web_Data_Form extends Web_Data_Filter {
 	protected $filters;
 	protected $inputs;
 
@@ -40,7 +40,7 @@ class Ajax_Data_Form extends Ajax_Data_Filter {
 		parent::__construct($args);
 	}
 
-	public function add_filter($id, Ajax_Data_Filter $filter) {
+	public function add_filter($id, Web_Data_Filter $filter) {
 
 	}
 
@@ -54,7 +54,7 @@ class Ajax_Data_Form extends Ajax_Data_Filter {
 }
 
 
-class Ajax_Data_Table {
+class Web_Data_Table {
 	protected $data;
 	protected $offset;
 	protected $limit;
@@ -62,7 +62,7 @@ class Ajax_Data_Table {
 	protected $id;
 	protected $classes;
 
-	public function __construct(Ajax_Data_Set $data, $offset = 0, $limit = 0) {
+	public function __construct(Web_Data_Set $data, $offset = 0, $limit = 0) {
 		$this->id = 'ajax-data-table';
 		$this->classes = 'ajax-data-table';
 
@@ -263,7 +263,7 @@ SCRIPT;
 }
 
 
-class Listing_Data_Set extends Ajax_Data_Set {
+class Listing_Data_Set extends Web_Data_Set {
 	protected $listings;
 	protected $data;
 	protected $index;
@@ -299,7 +299,7 @@ class Listing_Data_Set extends Ajax_Data_Set {
 }
 
 
-class Ajax_Listing_Table extends Ajax_Data_Table {
+class Web_Listing_Table extends Web_Data_Table {
 }
 
 
@@ -323,7 +323,7 @@ function placester_insert_table($args = array()) {
 	unset($args['limit']);
 	$data = new Listing_Data_Set($args);
 
-	$table = new Ajax_Listing_Table($data, $offset, $limit);
+	$table = new Web_Listing_Table($data, $offset, $limit);
 	return $table->html();
 }
 
@@ -340,7 +340,7 @@ function placester_update_table() {
 	unset($args['limit']);
 	$data = new Listing_Data_Set($args);
 
-	$table = new Ajax_Listing_Table($data, $offset, $limit);
+	$table = new Web_Listing_Table($data, $offset, $limit);
 	echo $table->html_inner();
 	die();
 }
