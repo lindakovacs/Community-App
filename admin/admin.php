@@ -95,14 +95,14 @@ $pl_admin_page->require_style('my-listings', PL_ADMIN_CSS_URL . 'my-listings.css
 
 $pl_admin_page = new PL_Admin_Page('placester_properties', 320, 'placester_property_add', 'Add Listing', 'Add Listing', PL_ADMIN_VIEWS_DIR . 'add-listing.php');
 $pl_admin_page->require_script('jquery-iframe-transport', PL_ADMIN_JS_URL . 'blueimp/js/jquery.iframe-transport.js', array('jquery'));
-$pl_admin_page->require_script('jquery-fileupload', PL_ADMIN_JS_URL . 'blueimp/js/jquery.fileupload.js', array('jquery-ui-widget'));
+$pl_admin_page->require_script('jquery-fileupload', PL_ADMIN_JS_URL . 'blueimp/js/jquery.fileupload.js', array('jquery-ui-widget', 'jquery-ui-sortable'));
 $pl_admin_page->require_script('add-listing', PL_ADMIN_JS_URL . 'add-listing.js', array('jquery-ui-datepicker', 'jquery-iframe-transport', 'jquery-fileupload'));
 $pl_admin_page->require_script('location-map', PL_ADMIN_JS_URL . 'location-map.js', array('add-listing', 'google-maps', 'text-overlay'));
 $pl_admin_page->require_style('add-listing', PL_ADMIN_CSS_URL . 'add-listing.css');
 
 $pl_admin_page = new PL_Admin_Page('placester_properties_x', 325, 'placester_property_edit', 'Edit Listing', 'Edit Listing', PL_ADMIN_VIEWS_DIR . 'add-listing.php');
 $pl_admin_page->require_script('jquery-iframe-transport', PL_ADMIN_JS_URL . 'blueimp/js/jquery.iframe-transport.js', array('jquery'));
-$pl_admin_page->require_script('jquery-fileupload', PL_ADMIN_JS_URL . 'blueimp/js/jquery.fileupload.js', array('jquery-ui-widget'));
+$pl_admin_page->require_script('jquery-fileupload', PL_ADMIN_JS_URL . 'blueimp/js/jquery.fileupload.js', array('jquery-ui-widget', 'jquery-ui-sortable'));
 $pl_admin_page->require_script('add-listing', PL_ADMIN_JS_URL . 'add-listing.js', array('jquery-ui-datepicker', 'jquery-iframe-transport', 'jquery-fileupload'));
 $pl_admin_page->require_script('location-map', PL_ADMIN_JS_URL . 'location-map.js', array('add-listing', 'google-maps', 'text-overlay'));
 $pl_admin_page->require_style('add-listing', PL_ADMIN_CSS_URL . 'add-listing.css');

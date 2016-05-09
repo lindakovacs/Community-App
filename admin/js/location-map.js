@@ -151,7 +151,7 @@ jQuery(document).ready(function($) {
   function display_address_incomplete(address) {
     console.log('incomplete');
     clear_address_box();
-    set_message_box("<span class='achtung'>Address is incomplete: <em>" + address + "</em>.  You can drag the map marker to specify a location.</span>");
+    set_message_box("<span class='message'>Address is incomplete: <em>" + address + "</em>.</span>");
   }
 
   function set_address_box(latitude, longitude, text) {
