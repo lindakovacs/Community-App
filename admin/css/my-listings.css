@@ -1,8 +1,5 @@
-#placester_listings_list_wrapper {
-  position: relative;
-}
+
 #placester_listings_list_processing {
-    /*float: left;*/
     text-indent: 20px;
     color: #444;
     visibility: visible;
@@ -21,103 +18,40 @@
 }
 
 
-/* Search Filter Filters*/
-.form_group#Show_Filters .pls_search_form.address_search {
-  float: right;
-  width: auto;
-  font-size: 18px;
-  overflow: hidden;
+/* Top section -- filter the filters */
+form#pls_admin_my_listings_filters {
+    text-align: center;
+    line-height: 36px;
 }
-.form_group#Show_Filters .pls_search_form.address_search label {
-  float: none;
-  width: auto !important;
+
+/* Or search by address */
+.pls_search_form#address_search {
+    margin-left: 150px;
+    text-align: right;
+
+    font-size: 18px;
 }
-.form_group#Show_Filters .pls_search_form.address_search input {
-  float: none;
-  width: 200px;
+.pls_search_form#address_search input {
+    width: 300px;
 }
-.form_group#Show_Filters section.pls_search_form {
-  width: 120px;
-  float: left;
+
+
+/* Form sections */
+form#pls_admin_my_listings {
+    text-align: left;
+    line-height: 36px;
 }
-.form_group#Show_Filters section.pls_search_form label {
-  width: 95px;
-  float: left;
-  margin-left: 3px
-}
-.form_group#Show_Filters section.pls_search_form input[type="checkbox"] {
+.form_group, .form-subgroup {
     display: block;
-    width: 16px;
-    height: 16px;
-    margin: 1px;
-    float: left;
-    clear: both;
+    margin: 0;
 }
-/*Search filter filters*/
-
-.wrapper .pls_search_form {
-  float: left;
-  padding: 5px;
+.pls_search_form {
+    display: inline-block;
+}
+.pls_search_form:not(:first-of-type) {
+    margin-left: 30px;
 }
 
-.form_group,
-.form_subgroup {
-  float: none;
-  clear: both;
-  margin: 10px 0;
-  overflow: hidden;
-  position: relative;
-  padding-left: 120px;
-}
-.form_subgroup {
-  margin-left: -120px;
-}
-.form_group section.pls_search_form {
-  width: 200px;
-  float: left;
-}
-.form_group section.pls_search_form label {
-  width: 170px;
-  float: left;
-  margin-left: 3px
-  background: none;
-}
-.form_group section.pls_search_form input, .form_group section.pls_search_form select {
-  width: 150px;
-  float: left;
-}
-.form_group section.pls_search_form input[type="checkbox"] {
-  display: block;
-  width: 16px;
-  height: 16px;
-  margin: 1px;
-  float: left;
-  clear: both;
-}
-
-.form_group h3 {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 120px;
-  margin: 10px 0 10px 0;
-}
-
-#Show_Filters {
-  margin-top:0px;
-  margin-bottom:-5px;
-}
-#Show_Filters h3 {
-  height: 20px;
-  font-weight: normal;
-  font-size:13px;
-}
-
-
-/* Search Filters */
-#pls_admin_my_listings .form_group {
-	display: none;
-}
 
 
 .row_actions {
