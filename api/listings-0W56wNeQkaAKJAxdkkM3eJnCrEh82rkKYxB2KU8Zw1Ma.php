@@ -114,6 +114,22 @@ $PL_API_LISTINGS = array(
 			),
 
 			'metadata' => array(
+
+// feed-specific modifications
+				'property_subtype' => array(
+					'attr_type' => 'text',
+					'multi' => '1',
+					'label' => 'Property Subtype',
+					'type' => 'select',
+					'group' => 'listing types',
+					'bound' => array(
+						'class' => 'PL_Listing_Helper',
+						'method' => 'types_for_options',
+						'params' => array(false, false, 'uncur_data.property_subtype')
+					)
+				),
+//
+
 				'status' => array(
 					'attr_type' => 'text',
 					'multi' => '1',
@@ -126,22 +142,6 @@ $PL_API_LISTINGS = array(
 						'params' => array(false, false, 'cur_data.status')
 					)
 				),
-
-// feed-specific modifications
-				'style' => array(
-					'attr_type' => 'text',
-					'multi' => '1',
-					'label' => 'Style',
-					'type' => 'select',
-					'group' => 'listing types',
-					'bound' => array(
-						'class' => 'PL_Listing_Helper',
-						'method' => 'types_for_options',
-						'params' => array(false, false, 'cur_data.style')
-					)
-				),
-//
-
 				'price' => array(
 					'attr_type' => 'int',
 					'label' => 'Price',
@@ -264,7 +264,7 @@ $PL_API_LISTINGS = array(
 					)
 //				),
 //				'condo_level' => array(
-//					'attr_type' => 'text',
+//					'attr_type' => 'int',
 //					'label' => 'Condo Level',
 //					'type' => 'text',
 //					'group' => 'building'
