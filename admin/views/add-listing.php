@@ -118,7 +118,7 @@ else if(isset($_POST['action']) && $_POST['action'] == 'add_listing') {
 				<?php echo new PL_Admin_Box('res_sale_details_admin_ui_basic', 'Basic Residential Sales Details', null,
 					PL_Form::generate_form(
 						PL_Config::bundler('PL_API_LISTINGS', array('create', 'args'), array(array(
-							'metadata' => array('beds', 'baths', 'half_baths', 'price', 'avail_on', 'sqft')
+							'metadata' => array('sqft', 'beds', 'baths', 'half_baths', 'price')
 						))),
 						array('method' => 'POST', 'include_submit' => false, 'wrap_form' => false, 'echo_form' => false, 'title' => true)
 					) . '<a id="res_sale" class="advanced_toggle show_advanced" >Show Advanced</a>'
@@ -144,7 +144,7 @@ else if(isset($_POST['action']) && $_POST['action'] == 'add_listing') {
 				<?php echo new PL_Admin_Box('res_rental_details_admin_ui_basic', 'Basic Residential Rental Details', 'display: none',
 					PL_Form::generate_form(
 						PL_Config::bundler('PL_API_LISTINGS', array('create', 'args'), array(array(
-							'metadata' => array('beds', 'baths', 'half_baths', 'price', 'avail_on', 'sqft')
+							'metadata' => array('sqft', 'beds', 'baths', 'half_baths', 'price', 'avail_on')
 						))),
 						array('method' => 'POST', 'include_submit' => false, 'wrap_form' => false, 'echo_form' => false, 'title' => true)
 					) . '<a id="res_rental" class="advanced_toggle show_advanced" >Show Advanced</a>'
@@ -153,7 +153,7 @@ else if(isset($_POST['action']) && $_POST['action'] == 'add_listing') {
 				<?php echo new PL_Admin_Box('res_rental_details_admin_ui_advanced', 'Advanced Residential Rental Details', 'display: none',
 					PL_Form::generate_form(
 						PL_Config::bundler('PL_API_LISTINGS', array('create', 'args'), array(array(
-							'metadata' => array('lt_sz', 'lt_sz_unit', 'pk_spce', 'lse_type', 'lse_trms', 'deposit', 'pk_lease',
+							'metadata' => array('lt_sz', 'lt_sz_unit', 'pk_spce', 'lse_trms', 'deposit', 'pk_lease',
 								'ngb_trans', 'ngb_shop', 'ngb_swim', 'ngb_court', 'ngb_park', 'ngb_trails', 'ngb_stbles', 'ngb_golf',
 								'ngb_med', 'ngb_bike', 'ngb_cons', 'ngb_hgwy', 'ngb_mar', 'ngb_pvtsch', 'ngb_pubsch', 'ngb_uni',
 								'grnt_tops', 'air_cond', 'cent_ac', 'frnshed', 'cent_ht', 'frplce', 'hv_ceil', 'wlk_clst', 'hdwdflr',

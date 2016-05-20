@@ -1,41 +1,30 @@
-<?php 
+<?php
+?>
 
-$filter_filters = array(
-	'listing_types' => array(
-		'label' => 'Type filters',
-		'group' => 'Show Filters',
-		'type' => 'checkbox'
-	),
-	'location' => array(
-		'label' => 'Location filters',
-		'group' => 'Show Filters',
-		'type' => 'checkbox'
-	),
-	'basic' => array(
-		'label' => 'Basic filters',
-		'group' => 'Show Filters',
-		'type' => 'checkbox'
-	),
-	'advanced' => array(
-		'label' => 'Advanced filters',
-		'group' => 'Show Filters',
-		'type' => 'checkbox'
-	),
-	'custom' => array(
-		'label' => 'Custom filters',
-		'group' => 'Show Filters',
-		'type' => 'checkbox'
-	),
-	'address_search' => array(
-		'label' => 'Address Search',
-		'group' => 'Show Filters',
-		'type' => 'text'
-	)
-);
+<form name="input" method="POST" url="" class="complex-search" id="pls_admin_my_listings_filters">
+	<section class="form_group form_group_show_filters" id="show_filters">
+		<section id="listing_types" class="pls_search_form listing_types">
+			<input id="listing_types" type="checkbox" name="listing_types" value="true"  />
+			<label for="listing_types" class="checkbox">Type filters</label>
+		</section><section id="location" class="pls_search_form location">
+			<input id="location" type="checkbox" name="location" value="true"  />
+			<label for="location" class="checkbox">Location filters</label>
+		</section><section id="basic" class="pls_search_form basic">
+			<input id="basic" type="checkbox" name="basic" value="true"  />
+			<label for="basic" class="checkbox">Basic filters</label>
+		</section><section id="advanced" class="pls_search_form advanced">
+			<input id="advanced" type="checkbox" name="advanced" value="true"  />
+			<label for="advanced" class="checkbox">Advanced filters</label>
+		</section><section id="custom" class="pls_search_form custom">
+			<input id="custom" type="checkbox" name="custom" value="true"  />
+			<label for="custom" class="checkbox">Custom filters</label>
+		</section><section id="address_search" class="pls_search_form address_search">
+			<label for="address_search" class="text">Address Search</label>
+			<input id="address_search" class="form_item_text" type="text" name="address_search" value="" data-attr_type="text" />
+		</section></section>
+</form>
 
-// to make various groups of listing fields visible for filter selection
-PL_Form::generate_form($filter_filters, array('method' => "POST", 'title' => false, 'include_submit' => false, 'id' => 'pls_admin_my_listings_filters') );
-
+<?php
 // to set filtering values on any of the available listing attributes
 PL_Form::generate_form(PL_Config::PL_API_LISTINGS('get', 'args'), array('method' => "POST", 'title' => true, 'include_submit' => false, 'id' => 'pls_admin_my_listings', 'textarea_as_text' => true));
 
