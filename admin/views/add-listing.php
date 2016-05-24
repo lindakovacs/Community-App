@@ -1,6 +1,10 @@
 <?php
 
 
+require_once(trailingslashit(PLACESTER_PLUGIN_DIR) . 'libnew/attributes.php');
+require_once(trailingslashit(PLACESTER_PLUGIN_DIR) . 'libnew/forms.php');
+
+
 if(isset($_GET['id'])) {
 	if($_POST['action'] == 'update_listing' && isset($_POST['id']) && $_GET['id'] == $_POST['id']) {
 		$api_response = PL_Listing_Admin_Helper::update_listing();
