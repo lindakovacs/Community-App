@@ -1,7 +1,7 @@
 <?php
 
 
-class PL_Attributes {
+class PLX_Attributes {
 	const BOOLEAN = 1;
 	const NUMERIC = 2;
 	const CURRENCY = 5;
@@ -11,6 +11,7 @@ class PL_Attributes {
 	const SHORT_TEXT = 15;
 	const LONG_TEXT = 16;
 
+	static protected $groups;
 	static protected $attributes;
 
 	public static function get($name) {
@@ -20,30 +21,208 @@ class PL_Attributes {
 		return isset(self::$attributes[$name]) ? self::$attributes[$name] : null;
 	}
 
-	public static function get_attributes($static = true, $dynamic = true, $none = 'Any') {
-		if(!isset(self::$values))
-			self::$values = self::_define_values();
+	public static function get_attributes() {
+		if(!isset(self::$attributes))
+			self::$attributes = self::_define_attributes();
 
-		return isset(self::$values[$name]) ? self::$values[$name] : null;
+		return self::$attributes;
 	}
 
-	public static function get_static_attributes($none = null) {
-		if(!isset(self::$values))
-			self::$values = self::_define_values();
+	public static function get_group_title($group, $listing_type = null) {
+		if($group == 'Basic') {
+			if($listing_type == 'res_sale' || $listing_type == 'res_rental')
+				return 'Basic Residential Details';
+			if($listing_type == 'comm_sale' || $listing_type == 'comm_rental')
+				return 'Basic Commercial Details';
+			if($listing_type == 'vac_rental')
+				return 'Basic Vacation Details';
 
-		return isset(self::$values[$name]) ? self::$values[$name] : null;
+			return 'Basic Property Details';
+		}
+
+		if($group == 'Listing') return 'Listing';
+		if($group == 'Location') return 'Location';
+
+		if($group == 'Terms') return 'Lease Terms';
+		if($group == 'Notes') return 'Financial Notes';
+		if($group == 'Building') return 'Building Details';
+		if($group == 'Parking') return 'Parking Information';
+		if($group == 'Pets') return 'Pets';
+		if($group == 'Schools') return 'Schools';
+		if($group == 'Lot') return 'Lot Details';
+		if($group == 'Amenities') return 'Property Amenities';
+		if($group == 'Neighborhood') return 'Neighborhood Features';
+
+		return $group;
 	}
 
-	public static function get_dynamic_attributes($none = null) {
-		if(!isset(self::$values))
-			self::$values = self::_define_values();
+	public static function get_group_attributes($groups, $flatten = false) {
+		if(!isset(self::$attributes))
+			self::$attributes = self::_define_attributes();
 
-		return isset(self::$values[$name]) ? self::$values[$name] : null;
+		$groups = (array) $groups;
+		$results = $flatten ? array() : array_fill_keys($groups, array());
+
+		foreach(self::$attributes as $attribute)
+			if(in_array($attribute['group'], $groups))
+				if($flatten)
+					$results[] = $attribute;
+				else
+					$results[$attribute['group']][] = $attribute;
+
+		return $results;
+	}
+
+	public static function get_basic_attributes($listing_type = null) {
+		if(!isset(self::$attributes))
+			self::$attributes = self::_define_attributes();
+
+		$basic_attributes = self::get_group_attributes(array('Listing', 'Location', 'Basic', 'Terms'));
+
+		// generic attributes for display
+		if(!$listing_type)
+			return $basic_attributes;
+
+		// the parameter is used to select attributes for private listing creation
+		$listing_attributes = array(
+			'Listing' => array(
+				'listing_type' => self::$attributes['listing_type'],
+				'property_type' => self::$attributes['property_type'],
+				'status' => self::$attributes['status']),
+
+			'Location' => $basic_attributes['Location']
+		);
+
+		switch($listing_type) {
+			case 'res_sale':
+				$listing_attributes['Basic'] = $basic_attributes['Basic'];
+				break;
+
+			case 'res_rental':
+				$listing_attributes['Basic'] = $basic_attributes['Basic'];
+				$listing_attributes['Terms'] = $basic_attributes['Terms'];
+				break;
+
+			case 'comm_sale':
+				$listing_attributes['Basic'] = array(
+					'price' => self::$attributes['price'],
+					'sqft' => self::$attributes['sqft'],
+					'loc_desc' => self::$attributes['loc_desc'],
+					'zone_desc' => self::$attributes['zone_desc'],
+					'desc' => self::$attributes['desc']
+				);
+				break;
+
+			case 'comm_rental':
+				$listing_attributes['Basic'] = array(
+					'price' => self::$attributes['price'],
+					'sqft' => self::$attributes['sqft'],
+					'spc_ava' => self::$attributes['spc_ava'],
+					'min_div' => self::$attributes['min_div'],
+					'max_cont' => self::$attributes['max_cont'],
+					'loc_desc' => self::$attributes['loc_desc'],
+					'zone_desc' => self::$attributes['zone_desc'],
+					'desc' => self::$attributes['desc']
+				);
+				$listing_attributes['Terms'] = array(
+					'lse_trms' => self::$attributes['lse_trms'],
+					'lse_type' => self::$attributes['lse_type'],
+					'comm_rate_unit' => self::$attributes['comm_rate_unit'],
+					'avail_on' => self::$attributes['avail_on'],
+					'sublse' => self::$attributes['sublse'],
+					'bld_suit' => self::$attributes['bld_suit'],
+				);
+				break;
+
+			case 'vac_rental':
+				$listing_attributes['Basic'] = array(
+					'price' => self::$attributes['price'],
+					'sqft' => self::$attributes['sqft'],
+					'beds' => self::$attributes['beds'],
+					'baths' => self::$attributes['baths'],
+					'half_baths' => self::$attributes['half_baths'],
+					'accoms' => self::$attributes['accoms'],
+					'desc' => self::$attributes['desc']
+				);
+				$listing_attributes['Terms'] = array(
+					'lse_trms' => self::$attributes['lse_trms'],
+					'avail_on' => self::$attributes['avail_on'],
+					'avail_info' => self::$attributes['avail_info'],
+					'deposit' => self::$attributes['deposit'],
+				);
+				break;
+
+			default:
+				$basic_attributes['Listing'] = $listing_attributes['Listing'];
+				$listing_attributes = $basic_attributes;
+				break;
+		}
+
+		return $listing_attributes;
+	}
+
+	public static function get_extended_attributes($listing_type = null) {
+		if(!isset(self::$attributes))
+			self::$attributes = self::_define_attributes();
+
+		$extended_attributes = self::get_group_attributes(array('Notes', 'Building', 'Parking',
+			'Pets', 'Schools', 'Lot', 'Amenities', 'Neighborhood', 'Commercial', 'Vacation'));
+
+		// generic attributes for display
+		if(!$listing_type)
+			return $extended_attributes;
+
+		$listing_attributes = array();
+		switch($listing_type) {
+			case 'res_sale':
+				$listing_attributes['Notes'] = $extended_attributes['Notes'];
+				$listing_attributes['Building'] = $extended_attributes['Building'];
+				$listing_attributes['Parking'] = $extended_attributes['Parking'];
+				$listing_attributes['Pets'] = $extended_attributes['Pets'];
+				$listing_attributes['Schools'] = $extended_attributes['Schools'];
+				$listing_attributes['Lot'] = $extended_attributes['Lot'];
+				$listing_attributes['Amenities'] = $extended_attributes['Amenities'];
+				$listing_attributes['Neighborhood'] = $extended_attributes['Neighborhood'];
+				break;
+
+			case 'res_rental':
+				$listing_attributes['Building'] = $extended_attributes['Building'];
+				$listing_attributes['Parking'] = $extended_attributes['Parking'];
+				$listing_attributes['Pets'] = $extended_attributes['Pets'];
+				$listing_attributes['Amenities'] = $extended_attributes['Amenities'];
+				$listing_attributes['Neighborhood'] = $extended_attributes['Neighborhood'];
+				break;
+
+			case 'comm_sale':
+				$listing_attributes['Building'] = $extended_attributes['Building'];
+				$listing_attributes['Lot'] = $extended_attributes['Lot'];
+				break;
+
+			case 'comm_rental':
+				$listing_attributes['Building'] = $extended_attributes['Building'];
+				$listing_attributes['Parking'] = $extended_attributes['Parking'];
+				break;
+
+			case 'vac_rental':
+				$listing_attributes['Parking'] = $extended_attributes['Parking'];
+				$listing_attributes['Pets'] = $extended_attributes['Pets'];
+				$listing_attributes['Amenities'] = $extended_attributes['Amenities'];
+				break;
+
+			default:
+				$listing_attributes = $extended_attributes;
+		}
+
+		return $listing_attributes;
+	}
+
+	public static function get_listing_attributes($listing_type = null) {
+		return array_merge(self::get_basic_attributes($listing_type), self::get_extended_attributes($listing_type));
 	}
 
 	private static function _define_attributes() {
 		return array (
-			'pdx_id' =>           array(   'name' => 'pdx_id',           'type' => self::TEXT_ID,        'group' => 'Listing',                'display' => 'Placester ID'                ),
+			'pdx_id' =>           array(   'name' => 'pdx_id',           'type' => self::TEXT_ID,        'group' => 'Listing',                'display' => 'PDX ID'                      ),
 			'mls_id' =>           array(   'name' => 'mls_id',           'type' => self::TEXT_ID,        'group' => 'Listing',                'display' => 'MLS ID'                      ),
 
 			'listing_type' =>     array(   'name' => 'listing_type',     'type' => self::TEXT_VALUE,     'group' => 'Listing',                'display' => 'Listing Type'                ),
@@ -75,15 +254,15 @@ class PL_Attributes {
 			// Basic Info
 			'price' =>            array(   'name' => 'price',            'type' => self::CURRENCY,       'group' => 'Basic',                  'display' => 'Price'                       ),
 			'sqft' =>             array(   'name' => 'sqft',             'type' => self::NUMERIC,        'group' => 'Basic',                  'display' => 'Square Feet'                 ),
-			'beds' =>             array(   'name' => 'beds',             'type' => self::NUMERIC,        'group' => 'Basic (Residential)',    'display' => 'Bedrooms'                    ),
-			'baths' =>            array(   'name' => 'baths',            'type' => self::NUMERIC,        'group' => 'Basic (Residential)',    'display' => 'Bathrooms'                   ),
-			'half_baths' =>       array(   'name' => 'half_baths',       'type' => self::NUMERIC,        'group' => 'Basic (Residential)',    'display' => 'Half Baths'                  ),
+			'beds' =>             array(   'name' => 'beds',             'type' => self::NUMERIC,        'group' => 'Basic',                  'display' => 'Bedrooms'                    ),
+			'baths' =>            array(   'name' => 'baths',            'type' => self::NUMERIC,        'group' => 'Basic',                  'display' => 'Bathrooms'                   ),
+			'half_baths' =>       array(   'name' => 'half_baths',       'type' => self::NUMERIC,        'group' => 'Basic',                  'display' => 'Half Baths'                  ),
 			'desc' =>             array(   'name' => 'desc',             'type' => self::LONG_TEXT,      'group' => 'Basic',                  'display' => 'Description'                 ),
 
 			// Lease Info
-			'avail_on' =>         array(   'name' => 'avail_on',         'type' => self::DATE_TIME,      'group' => 'Lease',                  'display' => 'Date Available'              ),
-			'deposit' =>          array(   'name' => 'deposit',          'type' => self::CURRENCY,       'group' => 'Lease',                  'display' => 'Deposit'                     ),
-			'lse_trms' =>         array(   'name' => 'lse_trms',         'type' => self::TEXT_VALUE,     'group' => 'Lease',                  'display' => 'Lease Interval'              ),
+			'lse_trms' =>         array(   'name' => 'lse_trms',         'type' => self::TEXT_VALUE,     'group' => 'Terms',                  'display' => 'Lease Interval'              ),
+			'avail_on' =>         array(   'name' => 'avail_on',         'type' => self::DATE_TIME,      'group' => 'Terms',                  'display' => 'Date Available'              ),
+			'deposit' =>          array(   'name' => 'deposit',          'type' => self::CURRENCY,       'group' => 'Terms',                  'display' => 'Deposit'                     ),
 
 			// Attribution
 			'aid' =>              array(   'name' => 'aid',              'type' => self::TEXT_ID,        'group' => 'Attribution',            'display' => 'Agent ID'                    ),
@@ -108,9 +287,9 @@ class PL_Attributes {
 			'year_blt' =>         array(   'name' => 'year_blt',         'type' => self::NUMERIC,        'group' => 'Building',               'display' => 'Year Built'                  ),
 
 			// Parking Info
+			'pk_lease' =>         array(   'name' => 'pk_lease',         'type' => self::BOOLEAN,        'group' => 'Parking',                'display' => 'Parking Included'            ),
 			'park_type' =>        array(   'name' => 'park_type',        'type' => self::TEXT_VALUE,     'group' => 'Parking',                'display' => 'Parking Type'                ),
 			'pk_spce' =>          array(   'name' => 'pk_spce',          'type' => self::NUMERIC,        'group' => 'Parking',                'display' => 'Parking Spaces'              ),
-			'pk_lease' =>         array(   'name' => 'pk_lease',         'type' => self::BOOLEAN,        'group' => 'Parking',                'display' => 'Parking Included'            ),
 			'valet' =>            array(   'name' => 'valet',            'type' => self::BOOLEAN,        'group' => 'Parking',                'display' => 'Valet'                       ),
 			'guard' =>            array(   'name' => 'guard',            'type' => self::BOOLEAN,        'group' => 'Parking',                'display' => 'Guarded'                     ),
 			'heat' =>             array(   'name' => 'heat',             'type' => self::BOOLEAN,        'group' => 'Parking',                'display' => 'Heated'                      ),
@@ -187,38 +366,38 @@ class PL_Attributes {
 			'cble_rdy' =>         array(   'name' => 'cble_rdy',         'type' => self::BOOLEAN,        'group' => 'Amenities',              'display' => 'Cable-ready'                 ),
 			'hghspd_net' =>       array(   'name' => 'hghspd_net',       'type' => self::BOOLEAN,        'group' => 'Amenities',              'display' => 'High-speed Internet'         ),
 
-			// Local Points of Interest
-			'ngb_trans' =>        array(   'name' => 'ngb_trans',        'type' => self::BOOLEAN,        'group' => 'Local Interest',         'display' => 'Public Transportation'       ),
-			'ngb_shop' =>         array(   'name' => 'ngb_shop',         'type' => self::BOOLEAN,        'group' => 'Local Interest',         'display' => 'Shopping'                    ),
-			'ngb_pool' =>         array(   'name' => 'ngb_pool',         'type' => self::BOOLEAN,        'group' => 'Local Interest',         'display' => 'Swimming Pool'               ),
-			'ngb_court' =>        array(   'name' => 'ngb_court',        'type' => self::BOOLEAN,        'group' => 'Local Interest',         'display' => 'Tennis Court'                ),
-			'ngb_park' =>         array(   'name' => 'ngb_park',         'type' => self::BOOLEAN,        'group' => 'Local Interest',         'display' => 'Park'                        ),
-			'ngb_trails' =>       array(   'name' => 'ngb_trails',       'type' => self::BOOLEAN,        'group' => 'Local Interest',         'display' => 'Walk/Jog Trails'             ),
-			'ngb_stbles' =>       array(   'name' => 'ngb_stbles',       'type' => self::BOOLEAN,        'group' => 'Local Interest',         'display' => 'Stables'                     ),
-			'ngb_golf' =>         array(   'name' => 'ngb_golf',         'type' => self::BOOLEAN,        'group' => 'Local Interest',         'display' => 'Golf Courses'                ),
-			'ngb_med' =>          array(   'name' => 'ngb_med',          'type' => self::BOOLEAN,        'group' => 'Local Interest',         'display' => 'Medical Facilities'          ),
-			'ngb_bike' =>         array(   'name' => 'ngb_bike',         'type' => self::BOOLEAN,        'group' => 'Local Interest',         'display' => 'Bike Path'                   ),
-			'ngb_cons' =>         array(   'name' => 'ngb_cons',         'type' => self::BOOLEAN,        'group' => 'Local Interest',         'display' => 'Conservation Area'           ),
-			'ngb_hgwy' =>         array(   'name' => 'ngb_hgwy',         'type' => self::BOOLEAN,        'group' => 'Local Interest',         'display' => 'Highway Access'              ),
-			'ngb_mar' =>          array(   'name' => 'ngb_mar',          'type' => self::BOOLEAN,        'group' => 'Local Interest',         'display' => 'Marina'                      ),
-			'ngb_pvtsch' =>       array(   'name' => 'ngb_pvtsch',       'type' => self::BOOLEAN,        'group' => 'Local Interest',         'display' => 'Private School'              ),
-			'ngb_pubsch' =>       array(   'name' => 'ngb_pubsch',       'type' => self::BOOLEAN,        'group' => 'Local Interest',         'display' => 'Public School'               ),
-			'ngb_uni' =>          array(   'name' => 'ngb_uni',          'type' => self::BOOLEAN,        'group' => 'Local Interest',         'display' => 'University'                  ),
+			// Neighborhood Features
+			'ngb_trans' =>        array(   'name' => 'ngb_trans',        'type' => self::BOOLEAN,        'group' => 'Neighborhood',           'display' => 'Public Transportation'       ),
+			'ngb_shop' =>         array(   'name' => 'ngb_shop',         'type' => self::BOOLEAN,        'group' => 'Neighborhood',           'display' => 'Shopping'                    ),
+			'ngb_pool' =>         array(   'name' => 'ngb_pool',         'type' => self::BOOLEAN,        'group' => 'Neighborhood',           'display' => 'Swimming Pool'               ),
+			'ngb_court' =>        array(   'name' => 'ngb_court',        'type' => self::BOOLEAN,        'group' => 'Neighborhood',           'display' => 'Tennis Court'                ),
+			'ngb_park' =>         array(   'name' => 'ngb_park',         'type' => self::BOOLEAN,        'group' => 'Neighborhood',           'display' => 'Park'                        ),
+			'ngb_trails' =>       array(   'name' => 'ngb_trails',       'type' => self::BOOLEAN,        'group' => 'Neighborhood',           'display' => 'Walk/Jog Trails'             ),
+			'ngb_stbles' =>       array(   'name' => 'ngb_stbles',       'type' => self::BOOLEAN,        'group' => 'Neighborhood',           'display' => 'Stables'                     ),
+			'ngb_golf' =>         array(   'name' => 'ngb_golf',         'type' => self::BOOLEAN,        'group' => 'Neighborhood',           'display' => 'Golf Courses'                ),
+			'ngb_med' =>          array(   'name' => 'ngb_med',          'type' => self::BOOLEAN,        'group' => 'Neighborhood',           'display' => 'Medical Facilities'          ),
+			'ngb_bike' =>         array(   'name' => 'ngb_bike',         'type' => self::BOOLEAN,        'group' => 'Neighborhood',           'display' => 'Bike Path'                   ),
+			'ngb_cons' =>         array(   'name' => 'ngb_cons',         'type' => self::BOOLEAN,        'group' => 'Neighborhood',           'display' => 'Conservation Area'           ),
+			'ngb_hgwy' =>         array(   'name' => 'ngb_hgwy',         'type' => self::BOOLEAN,        'group' => 'Neighborhood',           'display' => 'Highway Access'              ),
+			'ngb_mar' =>          array(   'name' => 'ngb_mar',          'type' => self::BOOLEAN,        'group' => 'Neighborhood',           'display' => 'Marina'                      ),
+			'ngb_pvtsch' =>       array(   'name' => 'ngb_pvtsch',       'type' => self::BOOLEAN,        'group' => 'Neighborhood',           'display' => 'Private School'              ),
+			'ngb_pubsch' =>       array(   'name' => 'ngb_pubsch',       'type' => self::BOOLEAN,        'group' => 'Neighborhood',           'display' => 'Public School'               ),
+			'ngb_uni' =>          array(   'name' => 'ngb_uni',          'type' => self::BOOLEAN,        'group' => 'Neighborhood',           'display' => 'University'                  ),
 
 			// Commercial Info
-			'loc_desc' =>         array(   'name' => 'loc_desc',         'type' => self::SHORT_TEXT,     'group' => 'Basic (Commercial)',     'display' => 'Location Description'        ),
-			'zone_desc' =>        array(   'name' => 'zone_desc',        'type' => self::SHORT_TEXT,     'group' => 'Basic (Commercial)',     'display' => 'Zoning Description'          ),
-			'spc_ava' =>          array(   'name' => 'spc_ava',          'type' => self::NUMERIC,        'group' => 'Lease (Commercial)',     'display' => 'Space Available (Sqft)'      ),
-			'min_div' =>          array(   'name' => 'min_div',          'type' => self::NUMERIC,        'group' => 'Lease (Commercial)',     'display' => 'Minimum Divisible'           ),
-			'max_cont' =>         array(   'name' => 'max_cont',         'type' => self::NUMERIC,        'group' => 'Lease (Commercial)',     'display' => 'Maximum Contiguous'          ),
-			'lse_type' =>         array(   'name' => 'lse_type',         'type' => self::TEXT_VALUE,     'group' => 'Lease (Commercial)',     'display' => 'Lease Type'                  ),
-			'comm_rate_unit' =>   array(   'name' => 'comm_rate_unit',   'type' => self::TEXT_VALUE,     'group' => 'Lease (Commercial)',     'display' => 'Rental Rate'                 ),
-			'sublse' =>           array(   'name' => 'sublse',           'type' => self::BOOLEAN,        'group' => 'Lease (Commercial)',     'display' => 'Sublease'                    ),
-			'bld_suit' =>         array(   'name' => 'bld_suit',         'type' => self::BOOLEAN,        'group' => 'Lease (Commercial)',     'display' => 'Build to Suit'               ),
+			'loc_desc' =>         array(   'name' => 'loc_desc',         'type' => self::SHORT_TEXT,     'group' => 'Commercial',             'display' => 'Location Description'        ),
+			'zone_desc' =>        array(   'name' => 'zone_desc',        'type' => self::SHORT_TEXT,     'group' => 'Commercial',             'display' => 'Zoning Description'          ),
+			'spc_ava' =>          array(   'name' => 'spc_ava',          'type' => self::NUMERIC,        'group' => 'Commercial',             'display' => 'Space Available (Sqft)'      ),
+			'min_div' =>          array(   'name' => 'min_div',          'type' => self::NUMERIC,        'group' => 'Commercial',             'display' => 'Minimum Divisible'           ),
+			'max_cont' =>         array(   'name' => 'max_cont',         'type' => self::NUMERIC,        'group' => 'Commercial',             'display' => 'Maximum Contiguous'          ),
+			'lse_type' =>         array(   'name' => 'lse_type',         'type' => self::TEXT_VALUE,     'group' => 'Commercial',             'display' => 'Lease Type'                  ),
+			'comm_rate_unit' =>   array(   'name' => 'comm_rate_unit',   'type' => self::TEXT_VALUE,     'group' => 'Commercial',             'display' => 'Rental Rate'                 ),
+			'sublse' =>           array(   'name' => 'sublse',           'type' => self::BOOLEAN,        'group' => 'Commercial',             'display' => 'Sublease'                    ),
+			'bld_suit' =>         array(   'name' => 'bld_suit',         'type' => self::BOOLEAN,        'group' => 'Commercial',             'display' => 'Build to Suit'               ),
 
 			// Vacation Rental Info
-			'accoms' =>           array(   'name' => 'accoms',           'type' => self::SHORT_TEXT,     'group' => 'Basic (Vacation)',       'display' => 'Accomodates'                 ),
-			'avail_info' =>       array(   'name' => 'avail_info',       'type' => self::SHORT_TEXT,     'group' => 'Basic (Vacation)',       'display' => 'Availability'                ),
+			'accoms' =>           array(   'name' => 'accoms',           'type' => self::SHORT_TEXT,     'group' => 'Vacation',               'display' => 'Accomodates'                 ),
+			'avail_info' =>       array(   'name' => 'avail_info',       'type' => self::SHORT_TEXT,     'group' => 'Vacation',               'display' => 'Availability'                ),
 
 			// Co-attribution
 			'acoid' =>            array(   'name' => 'acoid',            'type' => self::TEXT_ID,        'group' => 'Attribution',            'display' => 'Co-agent ID'                 ),
@@ -234,7 +413,7 @@ class PL_Attributes {
 }
 
 
-class PL_Search_Terms extends PL_Attributes {
+class PLX_Search_Terms extends PLX_Attributes {
 	static protected $terms;
 
 	public static function get($name) {
@@ -296,7 +475,7 @@ class PL_Search_Terms extends PL_Attributes {
 }
 
 
-class PL_Attribute_Values {
+class PLX_Attribute_Values {
 	static protected $values;
 
 	public static function get($name) {
@@ -306,25 +485,25 @@ class PL_Attribute_Values {
 		return isset(self::$values[$name]) ? self::$values[$name] : null;
 	}
 
-	public static function get_values($name, $static = true, $dynamic = true, $none = 'Any') {
+	public static function get_values($name, $static = true, $dynamic = true, $none = null) {
 		if(!isset(self::$values))
 			self::$values = self::_define_values();
 
-		return isset(self::$values[$name]) ? self::$values[$name] : null;
+		return isset(self::$values[$name]) ? self::$values[$name]['options'] : null;
 	}
 
 	public static function get_static_values($name, $none = null) {
 		if(!isset(self::$values))
 			self::$values = self::_define_values();
 
-		return isset(self::$values[$name]) ? self::$values[$name] : null;
+		return isset(self::$values[$name]) ? self::$values[$name]['options'] : null;
 	}
 
 	public static function get_dynamic_values($name, $none = null) {
 		if(!isset(self::$values))
 			self::$values = self::_define_values();
 
-		return isset(self::$values[$name]) ? self::$values[$name] : null;
+		return isset(self::$values[$name]) ? null : null;
 	}
 
 	private static function _define_values() {
@@ -338,18 +517,19 @@ class PL_Attribute_Values {
 			)),
 
 			'zoning_type' =>      array(   'name' => 'zoning_type',      'fixed' => true,     'options' => array(
-				'residential',
-				'commercial'
+				'residential' =>    'Residential',
+				'commercial' =>     'Commercial'
 			)),
 
 			'purchase_type' =>    array(   'name' => 'purchase_type',    'fixed' => true,     'options' => array(
-				'sale',
-				'rental'
+				'sale' =>           'Sale',
+				'rental' =>         'Residential'
 			)),
 
 			'status' =>           array(   'name' => 'status',           'fixed' => false,    'options' => array(
 				'Active',
-				'Pending'
+				'Pending',
+				'Sold'
 			)),
 
 			'lse_trms' =>         array(   'name' => 'lse_trms',         'fixed' => true,     'options' => array(
@@ -360,16 +540,19 @@ class PL_Attribute_Values {
 			)),
 
 			'lndr_own' =>         array(   'name' => 'lndr_own',         'fixed' => true,     'options' => array(
+				'' =>               'No',
 				'true' =>           'Yes',
 				'undis' =>          'Undisclosed'
 			)),
 
 			'cons_stts' =>        array(   'name' => 'cons_stts',        'fixed' => true,     'options' => array(
 				'exstng' =>         'Existing',
-				'und_prop' =>       'Under Construction / Proposed'
+				'new_cnst' =>       'New Construction', // in rc?
+				'prpsd' =>          'Proposed', // in rc?
+				'und_prop' =>       'Under Construction'
 			)),
 
-			'style' =>            array(   'name' => 'style',            'fixed' => true,     'options' => array(
+			'style' =>            array(   'name' => 'style',            'fixed' => false,    'options' => array(
 				'bungal' =>         'Bungalow',
 				'cape' =>           'Cape Cod',
 				'colonial' =>       'Colonial',
@@ -377,7 +560,7 @@ class PL_Attribute_Values {
 				'cott' =>           'Cottage',
 				'farmh' =>          'Farmhouse',
 				'fnt_bk_splt' =>    'Front to Back Split',
-				'gamb_dutc'=>       'Gambrel/Dutch',
+				'gamb_dutc'=>       'Gambrel / Dutch',
 				'garrison' =>       'Garrison',
 				'greek_rev' =>      'Greek Revival',
 				'loft_splt' =>      'Lofted Split',
@@ -391,12 +574,12 @@ class PL_Attribute_Values {
 				'antiq' =>          'Antique'
 			)),
 
-			'park_type' =>        array(   'name' => 'park_type',        'fixed' => true,     'options' => array(
+			'park_type' =>        array(   'name' => 'park_type',        'fixed' => false,    'options' => array(
 				'atch_gar' =>       'Attached Garage',
-				'cov' =>            'Covered',
 				'dtch_gar' =>       'Detached Garage',
-				'off_str' =>        'Off-street',
+				'cov' =>            'Covered',
 				'strt' =>           'On-street',
+				'off_str' =>        'Off-street',
 				'tan' =>            'Tandem'
 			)),
 
@@ -679,209 +862,5 @@ class PL_Attribute_Values {
 }
 
 
-class PL_Search_Options extends PL_Attribute_Values {
-	
+class PLX_Search_Options extends PLX_Attribute_Values {
 }
-
-
-class PL_Form {
-	const INPUT = 1;
-	const RADIO = 5;
-	const CHECKBOX = 6;
-	const SELECT = 11;
-	const MULTISELECT = 12;
-	const RADIO_GROUP = 15;
-	const CHECKBOX_GROUP = 16;
-	const TEXTAREA = 21;
-
-	public function get_form_item($name, $display, $type, $options, $value = null) {
-		if(is_scalar($options)) { // $options is required to be scalar for a radio or checkbox -- it is used as the HTML "value" attribute
-			$option = $options;
-			$options = array($option => $option);
-		}
-		else if(is_array($options)) {
-			$option = 'Must be scalar';
-			if(array_keys($options) !== range(0, count($options) - 1))
-				$options = array_combine($options, $options);
-		}
-		else {
-			$option = 'true';
-			$options = array();
-		}
-
-		if(is_scalar($value)) {
-			$values = array($value);
-		}
-		else if(is_array($value)) {
-			$values = $value;
-			$value = reset($values);
-		}
-		else {
-			$value = null;
-			$values = array();
-		}
-
-		ob_start();
-
-		if ($type == self::INPUT) {
-		?>
-			<div id="<?php echo "pl-form-item-$name"; ?>" class="pl-form-item pl-form-input-item">
-				<label for="<?php echo "pl-form-$name"; ?>" class="pl-form-item-label pl-form-input-label"><?php echo self::esc($display); ?></label>
-				<input id="<?php echo "pl-form-$name"; ?>" class="pl-form-input" type="text" name="<?php echo $name; ?>"
-					value="<?php echo self::esc($value); ?>" />
-			</div>
-		<?php
-		}
-		elseif ($type == self::RADIO) {
-			$id_name = "$name-" . $this->idify($option);
-		?>
-			<div id="<?php echo "pl-form-item-$id_name"; ?>" class="pl-form-item pl-form-radio-item">
-				<input id="<?php echo "pl-form-$id_name"; ?>" class="pl-form-radio" type="radio" name="<?php echo $name; ?>"
-					value="<?php echo self::esc($option); ?>"<?php if($value === true || $value === $option) echo ' checked="checked"'; ?> />
-				<label for="<?php echo "pl-form-$id_name"; ?>" class="pl-form-item-label pl-form-radio-label"><?php echo self::esc($display); ?></label>
-			</div>
-		<?php
-		}
-		elseif ($type == self::CHECKBOX) {
-			$id_name = "$name-" . $this->idify($option);
-		?>
-			<div id="<?php echo "pl-form-item-$id_name"; ?>" class="pl-form-item pl-form-checkbox-item">
-				<input id="<?php echo "pl-form-$id_name"; ?>" class="pl-form-checkbox" type="checkbox" name="<?php echo $name; ?>"
-					value="<?php echo self::esc($option); ?>"<?php if($value === true || $value === $option) echo ' checked="checked"'; ?>/>
-				<label for="<?php echo "pl-form-$id_name"; ?>" class="pl-form-item-label pl-form-checkbox-label"><?php echo self::esc($display); ?></label>
-			</div>
-		<?php	
-		}
-		elseif ($type == self::SELECT) {
-		?>
-			<div id="<?php echo "pl-form-item-$name"; ?>" class="pl-form-item pl-form-select-item">
-				<label for="<?php echo "pl-form-$name"; ?>" class="pl-form-item-label pl-form-select-label"><?php echo $display; ?></label>
-				<select id="<?php echo "pl-form-$name"; ?>" class="pl-form-select" name="<?php echo $name; ?>">
-				<?php foreach($options as $option_name => $option_display) { ?>
-					<option class="pl-form-option" value="<?php echo $option_name; ?>"<?php if($option_name === $value) echo ' selected="selected"'; ?>>
-						<?php echo self::esc($option_display); ?>
-					</option>
-				<?php } ?>
-			</div>
-		<?php
-		}
-		elseif ($type == self::MULTISELECT) {
-		?>
-			<div id="<?php echo "pl-form-item-$name"; ?>" class="pl-form-item pl-form-multiselect-item">
-				<label for="<?php echo "pl-form-$name"; ?>" class="pl-form-item-label pl-form-multiselect-label"><?php echo $display; ?></label>
-				<select id="<?php echo "pl-form-$name"; ?>" class="pl-form-multiselect" name="<?php echo $name; ?>">
-				<?php foreach($options as $option_name => $option_display) { ?>
-					<option class="pl-form-option" value="<?php echo $option_name; ?>"<?php if(in_array($option_name, $values)) echo ' selected="selected"'; ?>>
-						<?php echo self::esc($option_display); ?>
-					</option>
-				<?php } ?>
-			</div>
-		<?php
-		}
-		elseif ($type == self::RADIO_GROUP) {
-		?>
-			<fieldset id="<?php echo "pl-form-item-$name"; ?>" class="pl-form-item pl-form-radio-group">
-				<legend class="pl-form-item-legend pl-form-radio-legend"><?php echo $display; ?></legend>
-				<?php foreach($options as $option_name => $option_display) {
-					echo self::get_form_item($name, $option_display, self::RADIO, $option_name, $option_name === $value ? $option_name : null);
-				} ?>
-			</fieldset>
-		<?php
-		}
-		elseif ($type == self::CHECKBOX_GROUP) {
-		?>
-			<fieldset id="<?php echo "pl-form-item-$name"; ?>" class="pl-form-item pl-form-checkbox-group">
-				<legend class="pl-form-item-legend pl-form-checkbox-legend"><?php echo $display; ?></legend>
-				<?php foreach($options as $option_name => $option_display) {
-					echo self::get_form_item($name, $option_display, self::CHECKBOX, $option_name, in_array($option_name, $values) ? $option_name : null);
-				} ?>
-			</fieldset>
-		<?php
-		}
-		elseif ($type == self::TEXTAREA) {
-		?>
-			<div id="<?php echo "pl-form-item-$name"; ?>" class="pl-form-item pl-form-textarea-item">
-				<label for="<?php echo "pl-form-$name"; ?>" class="pl-form-item-label pl-form-textarea-label"><?php echo self::esc($display); ?></label>
-				<textarea id="<?php echo "pl-form-$name"; ?>" class="pl-form-textarea" name="<?php echo $name; ?>">
-					<?php echo self::esc($value); ?>
-				</textarea>
-			</div>
-		<?php
-		}
-
-		return ob_get_clean();
-	}
-
-	private function esc($string) {
-		return htmlentities($string);
-	}
-
-	private function idify($string) {
-		return $string;
-	}
-}
-
-class PL_Attribute_Form extends PL_Form {
-	protected $form_data;
-
-	public function set_form_data($data) {
-		$this->form_data = $data;
-	}
-
-	public function get_form_item($name, $display = null, $type = null, $options = null, $default = null) {
-		if(is_null($display) && $attribute = PL_Attributes::get($name))
-			$display = $attribute['display'];
-
-		if(is_null($type) && (isset($attribute) || $attribute = PL_Attributes::get($name)))
-			$type = $this->get_default_item_type($attribute);
-
-		if(is_null($options) && (isset($attribute) || $attribute = PL_Attributes::get($name)))
-			$options = $this->get_default_item_options($attribute);
-
-		if(!isset($attribute)) $attribute = PL_Attributes::get($name);
-		$value = $this->get_item_value($attribute) ?: $default;
-
-		return parent::get_form_item($name, $display, $type, $options, $value);
-	}
-
-	protected function get_item_value($attribute) {
-		if(!isset($this->form_data))
-			$this->form_data = &$_POST;
-
-		return isset($this->form_data[$attribute['name']]) ? $this->form_data[$attribute['name']] : null;
-	}
-
-	static protected function get_default_item_type($attribute) {
-		switch($attribute['type']) {
-			case PL_Attributes::BOOLEAN:
-				return PL_Form::CHECKBOX;
-
-			case PL_Attributes::NUMERIC:
-			case PL_Attributes::CURRENCY:
-				return PL_Form::INPUT;
-
-			case PL_Attributes::DATE_TIME:
-				return null; // no implementation for these
-
-			case PL_Attributes::TEXT_ID:
-				return PL_Form::INPUT;
-
-			case PL_Attributes::TEXT_VALUE:
-				return PL_Form::SELECT;
-
-			case PL_Attributes::SHORT_TEXT:
-				return PL_Form::INPUT;
-
-			case PL_Attributes::LONG_TEXT:
-				return PL_Form::TEXTAREA;
-		}
-
-		return null;
-	}
-
-	protected function get_default_item_options($attribute) {
-		return null;
-	}
-}
-
-class PL_Search_Form extends PL_Attribute_Form {}
