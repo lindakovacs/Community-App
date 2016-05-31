@@ -82,7 +82,7 @@ $pl_admin_page->require_script('settings-general', PL_ADMIN_JS_URL . 'general.js
 $pl_admin_page->require_style('settings-general', PL_ADMIN_CSS_URL . 'general.css', array('settings-all'));
 
 $pl_admin_page = new PL_Admin_Page('placester_settings', 180, 'placester_international', 'International', 'International', PL_ADMIN_VIEWS_DIR . 'international.php');
-$pl_admin_page->require_script('international', PL_ADMIN_JS_URL . 'international.js', array('settings-all'));
+$pl_admin_page->require_script('international', PL_ADMIN_JS_URL . 'international.js');
 $pl_admin_page->require_style('settings-all');
 
 $pl_admin_page = new PL_Admin_Page('placester', 200, 'placester_integration', 'IDX/MLS', 'IDX/MLS', PL_ADMIN_VIEWS_DIR . 'integration.php');

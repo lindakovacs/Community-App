@@ -6,6 +6,7 @@ class PLX_Attributes {
 	const NUMERIC = 2;
 	const CURRENCY = 5;
 	const DATE_TIME = 8;
+	const COORDINATE = 9;
 	const TEXT_ID = 11;
 	const TEXT_VALUE = 12;
 	const SHORT_TEXT = 15;
@@ -142,14 +143,10 @@ class PLX_Attributes {
 					'baths' => self::$attributes['baths'],
 					'half_baths' => self::$attributes['half_baths'],
 					'accoms' => self::$attributes['accoms'],
+					'avail_info' => self::$attributes['avail_info'],
 					'desc' => self::$attributes['desc']
 				);
-				$listing_attributes['Terms'] = array(
-					'lse_trms' => self::$attributes['lse_trms'],
-					'avail_on' => self::$attributes['avail_on'],
-					'avail_info' => self::$attributes['avail_info'],
-					'deposit' => self::$attributes['deposit'],
-				);
+				$listing_attributes['Terms'] = $basic_attributes['Terms'];
 				break;
 
 			default:
@@ -244,12 +241,13 @@ class PLX_Attributes {
 			'locality' =>         array(   'name' => 'locality',         'type' => self::TEXT_VALUE,     'group' => 'Location',               'display' => 'City'                        ),
 			'region' =>           array(   'name' => 'region',           'type' => self::TEXT_VALUE,     'group' => 'Location',               'display' => 'State'                       ),
 			'postal' =>           array(   'name' => 'postal',           'type' => self::TEXT_VALUE,     'group' => 'Location',               'display' => 'Zip'                         ),
-			'neighborhood' =>     array(   'name' => 'neighborhood',     'type' => self::TEXT_VALUE,     'group' => 'Location',               'display' => 'Neighborhood'                ),
-			'county' =>           array(   'name' => 'county',           'type' => self::TEXT_VALUE,     'group' => 'Location',               'display' => 'County'                      ),
 			'country' =>          array(   'name' => 'country',          'type' => self::TEXT_VALUE,     'group' => 'Location',               'display' => 'Country'                     ),
 
-			'latitude' =>         array(   'name' => 'latitude',         'type' => self::NUMERIC,        'group' => 'Location',               'display' => 'Latitude'                    ),
-			'longitude' =>        array(   'name' => 'longitude',        'type' => self::NUMERIC,        'group' => 'Location',               'display' => 'Longitude'                   ),
+			'neighborhood' =>     array(   'name' => 'neighborhood',     'type' => self::TEXT_VALUE,     'group' => 'Location',               'display' => 'Neighborhood'                ),
+			'county' =>           array(   'name' => 'county',           'type' => self::TEXT_VALUE,     'group' => 'Location',               'display' => 'County'                      ),
+
+			'latitude' =>         array(   'name' => 'latitude',         'type' => self::COORDINATE,     'group' => 'Location',               'display' => 'Latitude'                    ),
+			'longitude' =>        array(   'name' => 'longitude',        'type' => self::COORDINATE,     'group' => 'Location',               'display' => 'Longitude'                   ),
 
 			// Basic Info
 			'price' =>            array(   'name' => 'price',            'type' => self::CURRENCY,       'group' => 'Basic',                  'display' => 'Price'                       ),
@@ -275,21 +273,21 @@ class PLX_Attributes {
 			'ophone' =>           array(   'name' => 'ophone',           'type' => self::SHORT_TEXT,     'group' => 'Attribution',            'display' => 'Office Phone'                ),
 
 			// Sale Notes
+			'lndr_own' =>         array(   'name' => 'lndr_own',         'type' => self::TEXT_VALUE,     'group' => 'Notes',                  'display' => 'Lender Owned'                ),
 			'hoa_fee' =>          array(   'name' => 'hoa_fee',          'type' => self::CURRENCY,       'group' => 'Notes',                  'display' => 'HOA Fee'                     ),
 			'hoa_mand' =>         array(   'name' => 'hoa_mand',         'type' => self::BOOLEAN,        'group' => 'Notes',                  'display' => 'HOA Mandatory'               ),
-			'lndr_own' =>         array(   'name' => 'lndr_own',         'type' => self::TEXT_VALUE,     'group' => 'Notes',                  'display' => 'Lender Owned'                ),
 
 			// Building Info
-			'prop_name' =>        array(   'name' => 'prop_name',        'type' => self::SHORT_TEXT,     'group' => 'Building',               'display' => 'Property Name'               ),
 			'cons_stts' =>        array(   'name' => 'cons_stts',        'type' => self::TEXT_VALUE,     'group' => 'Building',               'display' => 'Construction Status'         ),
+			'prop_name' =>        array(   'name' => 'prop_name',        'type' => self::SHORT_TEXT,     'group' => 'Building',               'display' => 'Property Name'               ),
 			'style' =>            array(   'name' => 'style',            'type' => self::TEXT_VALUE,     'group' => 'Building',               'display' => 'Style'                       ),
 			'floors' =>           array(   'name' => 'floors',           'type' => self::NUMERIC,        'group' => 'Building',               'display' => 'Floors'                      ),
 			'year_blt' =>         array(   'name' => 'year_blt',         'type' => self::NUMERIC,        'group' => 'Building',               'display' => 'Year Built'                  ),
 
 			// Parking Info
-			'pk_lease' =>         array(   'name' => 'pk_lease',         'type' => self::BOOLEAN,        'group' => 'Parking',                'display' => 'Parking Included'            ),
 			'park_type' =>        array(   'name' => 'park_type',        'type' => self::TEXT_VALUE,     'group' => 'Parking',                'display' => 'Parking Type'                ),
 			'pk_spce' =>          array(   'name' => 'pk_spce',          'type' => self::NUMERIC,        'group' => 'Parking',                'display' => 'Parking Spaces'              ),
+			'pk_lease' =>         array(   'name' => 'pk_lease',         'type' => self::BOOLEAN,        'group' => 'Parking',                'display' => 'Parking Included'            ),
 			'valet' =>            array(   'name' => 'valet',            'type' => self::BOOLEAN,        'group' => 'Parking',                'display' => 'Valet'                       ),
 			'guard' =>            array(   'name' => 'guard',            'type' => self::BOOLEAN,        'group' => 'Parking',                'display' => 'Guarded'                     ),
 			'heat' =>             array(   'name' => 'heat',             'type' => self::BOOLEAN,        'group' => 'Parking',                'display' => 'Heated'                      ),

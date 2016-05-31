@@ -1,6 +1,6 @@
 jQuery(document).ready(function($) {
 
-	var listing_type_select = $('select#compound_type');
+	var listing_type_select = $('#pl-form-listing_type');
 	set_property_type();
 
 	//if we're editing, disable listing type.
@@ -29,37 +29,8 @@ jQuery(document).ready(function($) {
 	});
 
 	function set_property_type() {
-		//res_sale
-		$('div#res_sale_details_admin_ui_basic').hide().find('input, select').prop('disabled', true);
-		$('div#res_sale_details_admin_ui_advanced').hide().find('input, select').prop('disabled', true);
-
-		//res_rental
-		$('div#res_rental_details_admin_ui_basic').hide().find('input, select').prop('disabled', true);
-		$('div#res_rental_details_admin_ui_advanced').hide().find('input, select').prop('disabled', true);
-
-		//vac rental
-		$('div#vac_rental_details_admin_ui_basic').hide().find('input, select').prop('disabled', true);
-		$('div#vac_rental_details_admin_ui_advanced').hide().find('input, select').prop('disabled', true);
-
-		//sublet
-		$('div#sublet_details_admin_ui_basic').hide().find('input, select').prop('disabled', true);
-		$('div#sublet_details_admin_ui_advanced').hide().find('input, select').prop('disabled', true);
-
-		//Com Rentals
-		$('div#comm_rental_details_admin_ui_basic').hide().find('input, select').prop('disabled', true);
-		$('div#comm_rental_details_admin_ui_advanced').hide().find('input, select').prop('disabled', true);
-
-		//Com Sales
-		$('div#comm_sale_details_admin_ui_basic').hide().find('input, select').prop('disabled', true);
-		$('div#comm_sale_details_admin_ui_advanced').hide().find('input, select').prop('disabled', true);
-
-		//Parking
-		$('div#park_rental_details_admin_ui_basic').hide().find('input, select').prop('disabled', true);
-		$('div#park_rental_details_admin_ui_advanced').hide().find('input, select').prop('disabled', true);
-
-		//show the right boxes
-		$('#' + listing_type_select.val() + '_details_admin_ui_basic' ).show().find('input, select').prop('disabled', false);
-		$('#' + listing_type_select.val() + '_details_admin_ui_advanced' ).find('input, select').prop('disabled', false);
+		$('div.basic-attributes, div.extended-attributes').hide().find('.pl-form-value').prop('disabled', true);
+		$('div.' + listing_type_select.val() + '-attributes').show().find('.pl-form-value').prop('disabled', false);
 	}
 
 	// Initialize the jQuery File Upload widget:
