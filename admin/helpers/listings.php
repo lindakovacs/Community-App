@@ -154,7 +154,6 @@ class PL_Listing_Admin_Helper {
 			$listings[$key][] = is_null($listing["cur_data"]["price"]) ? '' : $listing["cur_data"]["price"];
 			$listings[$key][] = is_null($listing["cur_data"]["sqft"]) ? '' : $listing["cur_data"]["sqft"];
 			$listings[$key][] = $listing["cur_data"]["status"] ? $listing["cur_data"]["status"] : '';
-			// $listings[$key][] = $listing["cur_data"]["avail_on"] ? date_format(date_create($listing["cur_data"]["avail_on"]), "jS F, Y g:i A.") : '';
 		}
 
 		// Required for datatables.js to function properly.

@@ -4,7 +4,7 @@
 require_once('listing-interface.php');
 
 
-class PL_WordPress_Listing_Util extends PL_SQL_Listing_Util {
+class PLX_WordPress_Listing_Util extends PLX_SQL_Listing_Util {
 	protected static function get_listing_from_post($post) {
 		$listing = unserialize($post->post_content);
 		$listing['id'] = $post->ID;
@@ -170,7 +170,7 @@ class PL_WordPress_Listing_Util extends PL_SQL_Listing_Util {
 }
 
 
-class PL_WordPress_Listing extends PL_WordPress_Listing_Util implements PL_Listing_Interface {
+class PLX_WordPress_Listing extends PLX_WordPress_Listing_Util implements PLX_Listing_Interface {
 	public static function get ($args = array()) {
 		global $wpdb;
 

@@ -1,4 +1,10 @@
 <?php
+
+
+require_once(trailingslashit(PLACESTER_PLUGIN_DIR) . 'libnew/attributes.php');
+PLX_Dynamic_Attributes::check_attributes();
+
+
 $integration_obj = PL_Integration_Helper::get();
 extract($integration_obj);
 ?>

@@ -27,14 +27,8 @@ if(isset($_GET['id'])) {
 		$_POST = array();
 
 	if(empty($_POST)) {
-		$listings = PL_Listing::get(array('listing_ids' => array($_GET['id']), 'address_mode' => 'exact'));
-		$_POST = empty($listings['listings']) ? null : $listings['listings'][0];
-
-		$curated_data = is_array($_POST['cur_data']) ? $_POST['cur_data'] : array();
-		$uncurated_data = is_array($_POST['uncur_data']) ? $_POST['uncur_data'] : array();
-
-		$_POST['metadata'] = array_merge($curated_data, $uncurated_data);
-		unset($_POST['cur_data'], $_POST['uncur_data']);
+		$listing = PL_Listing::read(array('id' => $_GET['id']));
+		$_POST = $listing;
 	}
 }
 

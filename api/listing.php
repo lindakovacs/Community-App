@@ -6,7 +6,7 @@ require_once('listing-legacy.php');
 require_once('listing-wordpress.php');
 
 
-class PL_Listing extends PL_WordPress_Listing {};
+class PL_Listing extends PLX_Legacy_Listing {};
 
 
 // v2/2.1 ruby core API

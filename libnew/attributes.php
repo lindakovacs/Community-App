@@ -118,9 +118,6 @@ class PLX_Attributes {
 				$listing_attributes['Basic'] = array(
 					'price' => self::$attributes['price'],
 					'sqft' => self::$attributes['sqft'],
-					'spc_ava' => self::$attributes['spc_ava'],
-					'min_div' => self::$attributes['min_div'],
-					'max_cont' => self::$attributes['max_cont'],
 					'loc_desc' => self::$attributes['loc_desc'],
 					'zone_desc' => self::$attributes['zone_desc'],
 					'desc' => self::$attributes['desc']
@@ -385,9 +382,6 @@ class PLX_Attributes {
 			// Commercial Info
 			'loc_desc' =>         array(   'name' => 'loc_desc',         'type' => self::SHORT_TEXT,     'group' => 'Commercial',             'display' => 'Location Description'        ),
 			'zone_desc' =>        array(   'name' => 'zone_desc',        'type' => self::SHORT_TEXT,     'group' => 'Commercial',             'display' => 'Zoning Description'          ),
-			'spc_ava' =>          array(   'name' => 'spc_ava',          'type' => self::NUMERIC,        'group' => 'Commercial',             'display' => 'Space Available (Sqft)'      ),
-			'min_div' =>          array(   'name' => 'min_div',          'type' => self::NUMERIC,        'group' => 'Commercial',             'display' => 'Minimum Divisible'           ),
-			'max_cont' =>         array(   'name' => 'max_cont',         'type' => self::NUMERIC,        'group' => 'Commercial',             'display' => 'Maximum Contiguous'          ),
 			'lse_type' =>         array(   'name' => 'lse_type',         'type' => self::TEXT_VALUE,     'group' => 'Commercial',             'display' => 'Lease Type'                  ),
 			'comm_rate_unit' =>   array(   'name' => 'comm_rate_unit',   'type' => self::TEXT_VALUE,     'group' => 'Commercial',             'display' => 'Rental Rate'                 ),
 			'sublse' =>           array(   'name' => 'sublse',           'type' => self::BOOLEAN,        'group' => 'Commercial',             'display' => 'Sublease'                    ),
@@ -861,4 +855,70 @@ class PLX_Attribute_Values {
 
 
 class PLX_Search_Options extends PLX_Attribute_Values {
+}
+
+
+class PLX_Dynamic_Attributes extends PLX_Attributes {
+	public static function check_attributes() {
+		$providers = PL_Listing::aggregates(array('keys' => array('provider_id')));
+		$providers = $providers['provider_id'];
+
+		$response = PL_Listing::get(array('non_import' => 1, 'limit' => 1));
+		if($response['total']) $non_import = 1; else $non_import = 0;
+
+		// $attributes = self::get_extended_attributes();
+		$attributes = self::get_group_attributes(array('Building', 'Parking'));
+
+		echo '<table>' . "\n";
+
+		foreach($attributes as $name => $group)
+			foreach($group as $attribute) {
+
+				echo '<tr><td>' . $attribute['display'] . '</td>';
+
+				foreach($providers as $provider) {
+					$response = PL_Listing::get(array(
+						'provider_id' => $provider, 'limit' => 1,
+						'metadata[' . $attribute['name'] . '_match]' => 'exists',
+						'metadata[' . $attribute['name'] . ']' => 1));
+
+					echo '<td>';
+
+					if(!isset($response['total']))
+						echo '?';
+					else if($response['total'] > 0 && !isset($response['listings'][0]['cur_data'][$attribute['name']]))
+						echo 'x';
+					else
+						echo $response['total'];
+
+					echo '</td>';
+				}
+
+				if($non_import) {
+					$response = PL_Listing::get(array(
+						'non_import' => 1, 'limit' => 1,
+						'metadata[' . $attribute['name'] . '_match]' => 'exists',
+						'metadata[' . $attribute['name'] . ']' => 1));
+
+					echo '<td>';
+
+					if(!isset($response['total']))
+						echo '?';
+					else if($response['total'] > 0 && !isset($response['listings'][0]['cur_data'][$attribute['name']]))
+						echo 'x';
+					else
+						echo $response['total'];
+
+					echo '</td>';
+				}
+
+				echo '</tr>' . "\n";
+			}
+
+		echo '</table>' . "\n";
+	}
+
+	public static function custom_attributes() {
+
+	}
 }

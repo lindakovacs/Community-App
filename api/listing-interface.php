@@ -1,7 +1,7 @@
 <?php 
 
 
-interface PL_Listing_Interface {
+interface PLX_Listing_Interface {
 	static function create($args);
 	static function read($args);
 	static function update($args);
@@ -13,7 +13,7 @@ interface PL_Listing_Interface {
 }
 
 
-class PL_Local_Listing_Util {
+class PLX_Local_Listing_Util {
 	protected static function get_query_variable($array, $name, $default = null) {
 		return isset($array[$name]) ? $array[$name] : $default;
 	}
@@ -57,7 +57,7 @@ class PL_Local_Listing_Util {
 }
 
 
-class PL_SQL_Listing_Util extends PL_Local_Listing_Util {
+class PLX_SQL_Listing_Util extends PLX_Local_Listing_Util {
 	protected static function get_compare_from_match($match) {
 		static $match_compare_map;
 		if(!isset($match_compare_map))
