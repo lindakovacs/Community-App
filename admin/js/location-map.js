@@ -6,12 +6,12 @@ jQuery(document).ready(function($) {
 
 
   // hidden form fields
-  var latitude_hidden = $("#location-coords-latitude");
-  var longitude_hidden = $("#location-coords-longitude");
+  var latitude_hidden = $("#pl-form-latitude");
+  var longitude_hidden = $("#pl-form-longitude");
 
   // visible form fields, used for geocoding attempts
-  var inputs = $("input#location-address, input#location-locality, input#location-region, input#location-postal");
-  var select = $("select#location-country");
+  var inputs = $("input#pl-form-address, input#pl-form-locality, input#pl-form-region, input#pl-form-postal");
+  var select = $("select#pl-form-country");
   var values = {};
 
   // map components
@@ -77,12 +77,12 @@ jQuery(document).ready(function($) {
     if(timer)
       clearTimeout(timer);
 
-    var address = values['location-address'];
-    address += (address ? ', ' : '') + (values['location-locality']);
-    var region = values['location-region'];
-    region += (region && values['location-postal']) ? (' ' + values['location-postal']) : '';
+    var address = values['pl-form-address'];
+    address += (address ? ', ' : '') + (values['pl-form-locality']);
+    var region = values['pl-form-region'];
+    region += (region && values['pl-form-postal']) ? (' ' + values['pl-form-postal']) : '';
     address += (address ? ', ' : '') + region;
-    address += (address ? ', ' : '') + values['location-country'];
+    address += (address ? ', ' : '') + values['pl-form-country'];
 
     geocoder.geocode({address: address}, function(results, status) {
       if( status != "OK" || results.length == 0 ) {

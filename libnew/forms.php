@@ -10,6 +10,8 @@ class PLX_Form {
 	const RADIO_GROUP = 15;
 	const CHECKBOX_GROUP = 16;
 	const TEXTAREA = 21;
+	const HIDDEN = 31;
+	const READONLY = 35;
 
 	public function get_form_item($name, $display, $type, $options, $value = null) {
 		if(is_scalar($options)) { // $options is required to be scalar for a radio or checkbox -- it is used as the HTML "value" attribute
@@ -18,7 +20,7 @@ class PLX_Form {
 		}
 		else if(is_array($options)) {
 			$option = 'Must be scalar';
-			if(!empty($options) && array_keys($options) !== range(0, count($options) - 1))
+			if(!empty($options) && array_keys($options) === range(0, count($options) - 1))
 				$options = array_combine($options, $options);
 		}
 		else {
@@ -41,24 +43,41 @@ class PLX_Form {
 		ob_start();
 
 		if ($type == self::INPUT) {
-		?>
+			?>
 			<div id="<?php echo "pl-form-item-$name"; ?>" class="pl-form-item pl-form-input-item">
 				<label for="<?php echo "pl-form-$name"; ?>" class="pl-form-item-label pl-form-input-label"><?php echo self::esc($display); ?></label>
-				<input id="<?php echo "pl-form-$name"; ?>" class="pl-form-input" type="text" name="<?php echo $name; ?>"
+				<input id="<?php echo "pl-form-$name"; ?>" class="pl-form-value pl-form-input" type="text" name="<?php echo $name; ?>"
 					value="<?php echo self::esc($value); ?>"<?php if($options) echo "list=\"pl-form-$name-list\""; ?>>
 				<?php if($options) { ?>
-				<datalist id="<?php echo "pl-form-$name-list"; ?>">
-					<?php foreach($options as $option) { ?><option value="<?php echo $option; ?>"><?php } ?>
-				</datalist>
+					<datalist id="<?php echo "pl-form-$name-list"; ?>">
+						<?php foreach($options as $option) { ?><option value="<?php echo $option; ?>"><?php } ?>
+					</datalist>
 				<?php } ?>
 			</div>
-		<?php
+			<?php
+		}
+		else if ($type == self::HIDDEN) {
+			?>
+			<div id="<?php echo "pl-form-item-$name"; ?>" class="pl-form-item pl-form-hidden-item">
+				<input id="<?php echo "pl-form-$name"; ?>" class="pl-form-value pl-form-hidden" type="hidden" name="<?php echo $name; ?>"
+					value="<?php echo self::esc($value); ?>">
+			</div>
+			<?php
+		}
+		else if ($type == self::READONLY) {
+			?>
+			<div id="<?php echo "pl-form-item-$name"; ?>" class="pl-form-item pl-form-readonly-item">
+				<label for="<?php echo "pl-form-$name"; ?>" class="pl-form-item-label pl-form-readonly-label"><?php echo self::esc($display); ?></label>
+				<input id="<?php echo "pl-form-$name"; ?>" class="pl-form-value pl-form-readonly" type="text" name="<?php echo $name; ?>"
+					value="<?php echo self::esc($value); ?>" readonly="readonly">
+			</div>
+			<?php
 		}
 		elseif ($type == self::RADIO) {
 			$id_name = "$name-" . $this->idify($option);
 		?>
 			<div id="<?php echo "pl-form-item-$id_name"; ?>" class="pl-form-item pl-form-radio-item">
-				<input id="<?php echo "pl-form-$id_name"; ?>" class="pl-form-radio" type="radio" name="<?php echo $name; ?>"
+				<input id="<?php echo "pl-form-$id_name"; ?>" class="pl-form-value pl-form-radio" type="radio" name="<?php echo $name; ?>"
 					value="<?php echo self::esc($option); ?>"<?php if($value === true || $value === $option) echo ' checked="checked"'; ?>>
 				<label for="<?php echo "pl-form-$id_name"; ?>" class="pl-form-item-label pl-form-radio-label"><?php echo self::esc($display); ?></label>
 			</div>
@@ -68,7 +87,7 @@ class PLX_Form {
 			$id_name = "$name-" . $this->idify($option);
 		?>
 			<div id="<?php echo "pl-form-item-$id_name"; ?>" class="pl-form-item pl-form-checkbox-item">
-				<input id="<?php echo "pl-form-$id_name"; ?>" class="pl-form-checkbox" type="checkbox" name="<?php echo $name; ?>"
+				<input id="<?php echo "pl-form-$id_name"; ?>" class="pl-form-value pl-form-checkbox" type="checkbox" name="<?php echo $name; ?>"
 					value="<?php echo self::esc($option); ?>"<?php if($value === true || $value === $option) echo ' checked="checked"'; ?>>
 				<label for="<?php echo "pl-form-$id_name"; ?>" class="pl-form-item-label pl-form-checkbox-label"><?php echo self::esc($display); ?></label>
 			</div>
@@ -78,7 +97,7 @@ class PLX_Form {
 		?>
 			<div id="<?php echo "pl-form-item-$name"; ?>" class="pl-form-item pl-form-select-item">
 				<label for="<?php echo "pl-form-$name"; ?>" class="pl-form-item-label pl-form-select-label"><?php echo $display; ?></label>
-				<select id="<?php echo "pl-form-$name"; ?>" class="pl-form-select" name="<?php echo $name; ?>">
+				<select id="<?php echo "pl-form-$name"; ?>" class="pl-form-value pl-form-select" name="<?php echo $name; ?>">
 				<?php foreach($options as $option_name => $option_display) { ?>
 					<option class="pl-form-option" value="<?php echo $option_name; ?>"<?php if($option_name === $value) echo ' selected="selected"'; ?>>
 						<?php echo self::esc($option_display); ?>
@@ -92,7 +111,7 @@ class PLX_Form {
 		?>
 			<div id="<?php echo "pl-form-item-$name"; ?>" class="pl-form-item pl-form-multiselect-item">
 				<label for="<?php echo "pl-form-$name"; ?>" class="pl-form-item-label pl-form-multiselect-label"><?php echo $display; ?></label>
-				<select id="<?php echo "pl-form-$name"; ?>" class="pl-form-multiselect" name="<?php echo $name; ?>" multiple="multiple">
+				<select id="<?php echo "pl-form-$name"; ?>" class="pl-form-value pl-form-multiselect" name="<?php echo $name; ?>" multiple="multiple">
 				<?php foreach($options as $option_name => $option_display) { ?>
 					<option class="pl-form-option" value="<?php echo $option_name; ?>"<?php if(in_array($option_name, $values)) echo ' selected="selected"'; ?>>
 						<?php echo self::esc($option_display); ?>
@@ -125,7 +144,7 @@ class PLX_Form {
 		?>
 			<div id="<?php echo "pl-form-item-$name"; ?>" class="pl-form-item pl-form-textarea-item">
 				<label for="<?php echo "pl-form-$name"; ?>" class="pl-form-item-label pl-form-textarea-label"><?php echo self::esc($display); ?></label>
-				<textarea id="<?php echo "pl-form-$name"; ?>" class="pl-form-textarea" name="<?php echo $name; ?>">
+				<textarea id="<?php echo "pl-form-$name"; ?>" class="pl-form-value pl-form-textarea" name="<?php echo $name; ?>">
 					<?php echo self::esc($value); ?>
 				</textarea>
 			</div>
@@ -186,7 +205,8 @@ class PLX_Attribute_Form extends PLX_Form {
 				return PLX_Form::INPUT;
 
 			case PLX_Attributes::DATE_TIME:
-				return null; // no implementation for these
+			case PLX_Attributes::COORDINATE:
+				return PLX_Form::READONLY;
 
 			case PLX_Attributes::TEXT_ID:
 				return PLX_Form::INPUT;
@@ -212,5 +232,30 @@ class PLX_Attribute_Form extends PLX_Form {
 		return PLX_Attribute_Values::get_values($attribute['name']);
 	}
 }
+
+
+class PLX_Add_Listing_Form extends PLX_Attribute_Form {
+	public function get_form_attributes() {
+		$form_attributes = array('basic' => array(), 'extended' => array());
+
+		foreach(PLX_Attribute_Values::get_values('listing_type') as $type => $display) {
+
+			foreach(PLX_Attributes::get_basic_attributes($type) as $group => $attributes) {
+				if($group == 'Listing' || $group == 'Location') {
+					if(!isset($form_attributes[$group]))
+						$form_attributes[$group] = $attributes;
+				} else {
+					$form_attributes['basic'][$type][$group] = $attributes;
+				}
+			}
+
+			foreach(PLX_Attributes::get_extended_attributes($type) as $group => $attributes)
+				$form_attributes['extended'][$type][$group] = $attributes;
+		}
+
+		return $form_attributes;
+	}
+}
+
 
 class PLX_Search_Form extends PLX_Attribute_Form {}
