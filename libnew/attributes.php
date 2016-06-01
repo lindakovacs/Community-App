@@ -1,7 +1,10 @@
 <?php
 
 
-class PLX_Attributes {
+require_once('interface.php');
+
+
+class PLX_Attributes extends PLX_Data_Internal {
 	const BOOLEAN = 1;
 	const NUMERIC = 2;
 	const CURRENCY = 5;
@@ -12,24 +15,449 @@ class PLX_Attributes {
 	const SHORT_TEXT = 15;
 	const LONG_TEXT = 16;
 
-	static protected $groups;
-	static protected $attributes;
+	private static function this() {
+		if(!isset(self::$attribute_interface))
+			self::$attribute_interface = new self; // default implementation below
+
+		return self::$attribute_interface;
+	}
 
 	public static function get($name) {
-		if(!isset(self::$attributes))
-			self::$attributes = self::_define_attributes();
-
-		return isset(self::$attributes[$name]) ? self::$attributes[$name] : null;
+		return self::this()->_get($name);
 	}
 
 	public static function get_attributes() {
-		if(!isset(self::$attributes))
-			self::$attributes = self::_define_attributes();
-
-		return self::$attributes;
+		return self::this()->_get_attributes();
 	}
 
 	public static function get_group_title($group, $listing_type = null) {
+		return self::this()->_get_group_title($group, $listing_type);
+	}
+
+	public static function get_group_attributes($groups, $flatten = false) {
+		return self::this()->_get_group_attributes($groups, $flatten);
+	}
+
+	public static function get_basic_attributes($listing_type = null) {
+		return self::this()->_get_basic_attributes($listing_type);
+	}
+
+	public static function get_extended_attributes($listing_type = null) {
+		return self::this()->_get_extended_attributes($listing_type);
+	}
+
+	public static function get_listing_attributes($listing_type = null) {
+		return self::this()->_get_listing_attributes($listing_type);
+	}
+
+	public static function get_static_values($name, $none = null) {
+		return self::this()->_get_static_values($name, $none);
+	}
+
+	public static function get_dynamic_values($name, $none = null) {
+		return self::this()->_get_dynamic_values($name, $none);
+	}
+
+	public static function get_attribute_values($name, $static = true, $dynamic = true, $none = null) {
+		return self::this()->_get_attribute_values($name, $static, $dynamic, $none);
+	}
+
+
+	// default implementation -- derive and use PLX_Data_Interface::set_attribute_interface to override
+	protected $attributes;
+
+	protected function _get($name) {
+		if(!isset($this->attributes))
+			$this->attributes = $this->_define_attributes();
+
+		return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
+	}
+
+	public function _get_attributes() {
+		if(!isset($this->attributes))
+			$this->attributes = $this->_define_attributes();
+
+		return $this->attributes;
+	}
+
+	public function _get_group_title($group, $listing_type = null) {
+		if($group == 'Basic') return 'Basic Property Details';
+		if($group == 'Terms') return 'Lease Terms';
+
+		return $group;
+	}
+
+	public function _get_group_attributes($groups, $flatten = false) {
+		if(!isset($this->attributes))
+			$this->attributes = self::_define_attributes();
+
+		$groups = (array) $groups;
+		$results = $flatten ? array() : array_fill_keys($groups, array());
+
+		foreach($this->attributes as $attribute)
+			if(in_array($attribute['group'], $groups))
+				if($flatten)
+					$results[] = $attribute;
+				else
+					$results[$attribute['group']][] = $attribute;
+
+		return $results;
+	}
+
+	public function _get_basic_attributes($listing_type = null) {
+		if(!isset($this->attributes))
+			$this->attributes = self::_define_attributes();
+
+		$basic_attributes = self::get_group_attributes(array('Listing', 'Location', 'Basic', 'Terms'));
+
+		// the parameter is used to select attributes for listing creation
+		if($listing_type) {
+			$basic_attributes['Listing'] = array(
+				'listing_type' => $this->attributes['listing_type'],
+				'property_type' => $this->attributes['property_type'],
+				'status' => $this->attributes['status']);
+
+			if(in_array($listing_type, array('res_sale', 'comm_sale')))
+				unset($basic_attributes['Terms']);
+		}
+
+		return $basic_attributes;
+	}
+
+	protected function _get_extended_attributes($listing_type = null) {
+		return array();
+	}
+
+	protected function _get_listing_attributes($listing_type = null) {
+		if($listing_type)
+			return array_merge($this->_get_basic_attributes($listing_type), $this->_get_extended_attributes($listing_type));
+		else
+			return $this->_get_attributes();
+	}
+
+	protected function _get_static_values($name, $none = null) {
+		if(!isset($this->attributes))
+			$this->attributes = $this->_define_attributes();
+
+		if(!isset($this->attributes[$name]) || $this->attributes[$name]['type'] != self::TEXT_VALUE)
+			return null;
+
+		if(isset($this->attributes[$name]['values']))
+			return $this->attributes[$name]['values'];
+
+		return array();
+	}
+
+	protected function _get_dynamic_values($name, $none = null) {
+		return null;
+	}
+
+	protected function _get_attribute_values($name, $static = true, $dynamic = true, $none = null) {
+		return $this->get_static_values($name);
+	}
+
+
+	protected function _define_attributes() {
+		$attributes = array(
+			'id' =>               array(   'name' => 'pdx_id',           'type' => self::TEXT_ID,        'group' => 'Listing',                'display' => 'Listing ID'                  ),
+
+			'listing_type' =>     array(   'name' => 'listing_type',     'type' => self::TEXT_VALUE,     'group' => 'Listing',                'display' => 'Listing Type'                ),
+			'property_type' =>    array(   'name' => 'property_type',    'type' => self::TEXT_VALUE,     'group' => 'Listing',                'display' => 'Property Type'               ),
+			'zoning_type' =>      array(   'name' => 'zoning_type',      'type' => self::TEXT_VALUE,     'group' => 'Listing',                'display' => 'Zoning Type'                 ),
+			'purchase_type' =>    array(   'name' => 'purchase_type',    'type' => self::TEXT_VALUE,     'group' => 'Listing',                'display' => 'Purchase Type'               ),
+
+			'created_at' =>       array(   'name' => 'created_at',       'type' => self::DATE_TIME,      'group' => 'Listing',                'display' => 'Created at'                  ),
+			'updated_at' =>       array(   'name' => 'updated_at',       'type' => self::DATE_TIME,      'group' => 'Listing',                'display' => 'Updated at'                  ),
+			'status' =>           array(   'name' => 'status',           'type' => self::TEXT_VALUE,     'group' => 'Listing',                'display' => 'Status'                      ),
+			'list_date' =>        array(   'name' => 'list_date',        'type' => self::DATE_TIME,      'group' => 'Listing',                'display' => 'List Date'                   ),
+			'days_on' =>          array(   'name' => 'days_on',          'type' => self::NUMERIC,        'group' => 'Listing',                'display' => 'Days on Market'              ),
+
+			// Address
+			'address' =>          array(   'name' => 'address',          'type' => self::SHORT_TEXT,     'group' => 'Location',               'display' => 'Address'                     ),
+			'unit' =>             array(   'name' => 'unit',             'type' => self::SHORT_TEXT,     'group' => 'Location',               'display' => 'Unit'                        ),
+
+			// Location
+			'locality' =>         array(   'name' => 'locality',         'type' => self::TEXT_VALUE,     'group' => 'Location',               'display' => 'City'                        ),
+			'region' =>           array(   'name' => 'region',           'type' => self::TEXT_VALUE,     'group' => 'Location',               'display' => 'State'                       ),
+			'postal' =>           array(   'name' => 'postal',           'type' => self::TEXT_VALUE,     'group' => 'Location',               'display' => 'Zip'                         ),
+			'country' =>          array(   'name' => 'country',          'type' => self::TEXT_VALUE,     'group' => 'Location',               'display' => 'Country'                     ),
+
+			'neighborhood' =>     array(   'name' => 'neighborhood',     'type' => self::TEXT_VALUE,     'group' => 'Location',               'display' => 'Neighborhood'                ),
+			'county' =>           array(   'name' => 'county',           'type' => self::TEXT_VALUE,     'group' => 'Location',               'display' => 'County'                      ),
+
+			'latitude' =>         array(   'name' => 'latitude',         'type' => self::COORDINATE,     'group' => 'Location',               'display' => 'Latitude'                    ),
+			'longitude' =>        array(   'name' => 'longitude',        'type' => self::COORDINATE,     'group' => 'Location',               'display' => 'Longitude'                   ),
+
+			// Basic Info
+			'price' =>            array(   'name' => 'price',            'type' => self::CURRENCY,       'group' => 'Basic',                  'display' => 'Price'                       ),
+			'sqft' =>             array(   'name' => 'sqft',             'type' => self::NUMERIC,        'group' => 'Basic',                  'display' => 'Square Feet'                 ),
+			'beds' =>             array(   'name' => 'beds',             'type' => self::NUMERIC,        'group' => 'Basic',                  'display' => 'Bedrooms'                    ),
+			'baths' =>            array(   'name' => 'baths',            'type' => self::NUMERIC,        'group' => 'Basic',                  'display' => 'Bathrooms'                   ),
+			'half_baths' =>       array(   'name' => 'half_baths',       'type' => self::NUMERIC,        'group' => 'Basic',                  'display' => 'Half Baths'                  ),
+			'desc' =>             array(   'name' => 'desc',             'type' => self::LONG_TEXT,      'group' => 'Basic',                  'display' => 'Description'                 ),
+
+			// Lease Info
+			'lse_trms' =>         array(   'name' => 'lse_trms',         'type' => self::TEXT_VALUE,     'group' => 'Terms',                  'display' => 'Lease Interval'              ),
+			'avail_on' =>         array(   'name' => 'avail_on',         'type' => self::DATE_TIME,      'group' => 'Terms',                  'display' => 'Date Available'              ),
+			'deposit' =>          array(   'name' => 'deposit',          'type' => self::CURRENCY,       'group' => 'Terms',                  'display' => 'Deposit'                     )
+		);
+
+		// Attribute Values
+		$attributes['listing_type']['fixed'] = true;
+		$attributes['listing_type']['values'] = array(
+			'res_sale' =>       'Residential Sale',
+			'res_rental' =>     'Residential Rental',
+			'comm_sale' =>      'Commercial Sale',
+			'comm_rental' =>    'Commercial Rental'
+		);
+
+		$attributes['property_type']['fixed'] = false;
+
+		$attributes['zoning_type']['fixed'] = true;
+		$attributes['zoning_type']['values'] = array(
+			'residential' =>    'Residential',
+			'commercial' =>     'Commercial'
+		);
+
+		$attributes['purchase_type']['fixed'] = true;
+		$attributes['purchase_type']['values'] = array(
+			'sale' =>           'Sale',
+			'rental' =>         'Rental'
+		);
+
+		$attributes['status']['fixed'] = false;
+		$attributes['status']['values'] = array(
+			'Active',
+			'Pending',
+			'Sold'
+		);
+
+		$attributes['locality']['fixed'] = false;
+		$attributes['region']['fixed'] = false;
+		$attributes['postal']['fixed'] = false;
+		$attributes['country']['fixed'] = false;
+
+		$attributes['neighborhood']['fixed'] = false;
+		$attributes['county']['fixed'] = false;
+
+		$attributes['lse_trms']['fixed'] = true;
+		$attributes['lse_trms']['values'] = array(
+			'per_mnt' =>        'Per Month',
+			'per_ngt' =>        'Per Night',
+			'per_wk' =>         'Per Week',
+			'per_yr' =>         'Per Year'
+		);
+
+		return $attributes;
+	}
+}
+
+
+class PLX_Search_Terms extends PLX_Attributes {
+	static protected $terms;
+
+	public static function get($name) {
+		if(!isset(self::$terms))
+			self::$terms = self::_define_terms(); // additional search terms, non-attribute based
+
+		if(isset(self::$terms[$name])) return self::$terms[$name];
+
+		$term = $name; $prefix = substr($name, 0, 4);
+		if(in_array($prefix, array('min_', 'max_')))
+			$name = substr($name, 4);
+		else
+			$prefix = null;
+
+		if(!$attribute = parent::get($name))
+			if($attribute = parent::get($term))
+				$prefix = null;
+
+		if($attribute) {
+			$caps = self::get_actual_caps($attribute);
+			if(!$caps['search'] || ($prefix && !$caps['minmax']))
+				$attribute = null;
+
+			else {
+				if($prefix) {
+					$attribute['name'] = $term;
+					$attribute['minmax'] = true;
+					$attribute['display'] = str_replace('_', ' ', ucfirst($prefix)) . $attribute['display'];
+				}
+				$attribute['actual_caps'] = $caps;
+				$attribute['public_caps'] = self::get_public_caps($attribute);
+			}
+		}
+
+		return self::$terms[$term] = $attribute;
+	}
+
+	protected static function get_public_caps($attribute) {
+		return null;
+	}
+
+	protected static function get_actual_caps($attribute) {
+		if(!isset(self::$caps))
+			self::$caps = self::_define_caps(); // search feature limitations of the data api
+	}
+
+	private static function _define_terms() {
+		return array (
+			'sort_by' =>          array(   'name' => 'sort_by',           'type' => self::TEXT_VALUE,     'group' => 'Sorting',                'display' => 'Sort By'                     ),
+			'sort_type' =>        array(   'name' => 'sort_type',         'type' => self::TEXT_VALUE,     'group' => 'Sorting',                'display' => 'Direction'                   ),
+
+			'total_images' =>     array(   'name' => 'agency_only',       'type' => self::BOOLEAN,        'group' => 'Images',                 'display' => 'Total Images'                ),
+
+			'agency_only' =>      array(   'name' => 'agency_only',       'type' => self::BOOLEAN,        'group' => 'Listing',                'display' => 'Agency Listings'             ),
+			'non_import' =>       array(   'name' => 'non_import',        'type' => self::BOOLEAN,        'group' => 'Listing',                'display' => 'Private Listings'            ),
+			'include_disabled' => array(   'name' => 'include_disabled',  'type' => self::BOOLEAN,        'group' => 'Listing',                'display' => 'Disabled Listings'           )
+		);
+	}
+}
+
+
+class PLX_Provider_Attributes extends PLX_Attributes {
+	public static function init() {}
+
+	public static function check_attribute() {
+		$providers = PL_Listing::aggregates(array('keys' => array('provider_id')));
+		$providers = $providers['provider_id'];
+
+		$response = PL_Listing::get(array('non_import' => 1, 'limit' => 1));
+		if($response['total']) $non_import = 1; else $non_import = 0;
+
+		// $attributes = self::get_extended_attributes();
+		$attributes = self::get_group_attributes(array('Building', 'Parking'));
+
+		echo '<table>' . "\n";
+
+		foreach($attributes as $name => $group)
+			foreach($group as $attribute) {
+
+				echo '<tr><td>' . $attribute['display'] . '</td>';
+
+				foreach($providers as $provider) {
+					$response = PL_Listing::get(array(
+						'provider_id' => $provider, 'limit' => 1,
+						'metadata[' . $attribute['name'] . '_match]' => 'exists',
+						'metadata[' . $attribute['name'] . ']' => 1));
+
+					echo '<td>';
+
+					if(!isset($response['total']))
+						echo '?';
+					else if($response['total'] > 0 && !isset($response['listings'][0]['cur_data'][$attribute['name']]))
+						echo 'x';
+					else
+						echo $response['total'];
+
+					echo '</td>';
+				}
+
+				if($non_import) {
+					$response = PL_Listing::get(array(
+						'non_import' => 1, 'limit' => 1,
+						'metadata[' . $attribute['name'] . '_match]' => 'exists',
+						'metadata[' . $attribute['name'] . ']' => 1));
+
+					echo '<td>';
+
+					if(!isset($response['total']))
+						echo '?';
+					else if($response['total'] > 0 && !isset($response['listings'][0]['cur_data'][$attribute['name']]))
+						echo 'x';
+					else
+						echo $response['total'];
+
+					echo '</td>';
+				}
+
+				echo '</tr>' . "\n";
+			}
+
+		echo '</table>' . "\n";
+	}
+
+	public static function check_attributes() {
+		$providers = PL_Listing::aggregates(array('keys' => array('provider_id')));
+		$providers = $providers['provider_id'];
+
+		$response = PL_Listing::get(array('non_import' => 1, 'limit' => 1));
+		if($response['total']) $non_import = 1; else $non_import = 0;
+
+		// $attributes = self::get_extended_attributes();
+		$attributes = self::get_group_attributes(array('Building', 'Parking'));
+
+		echo '<table>' . "\n";
+
+		foreach($attributes as $name => $group)
+			foreach($group as $attribute) {
+
+				echo '<tr><td>' . $attribute['display'] . '</td>';
+
+				foreach($providers as $provider) {
+					$response = PL_Listing::get(array(
+						'provider_id' => $provider, 'limit' => 1,
+						'metadata[' . $attribute['name'] . '_match]' => 'exists',
+						'metadata[' . $attribute['name'] . ']' => 1));
+
+					echo '<td>';
+
+					if(!isset($response['total']))
+						echo '?';
+					else if($response['total'] > 0 && !isset($response['listings'][0]['cur_data'][$attribute['name']]))
+						echo 'x';
+					else
+						echo $response['total'];
+
+					echo '</td>';
+				}
+
+				if($non_import) {
+					$response = PL_Listing::get(array(
+						'non_import' => 1, 'limit' => 1,
+						'metadata[' . $attribute['name'] . '_match]' => 'exists',
+						'metadata[' . $attribute['name'] . ']' => 1));
+
+					echo '<td>';
+
+					if(!isset($response['total']))
+						echo '?';
+					else if($response['total'] > 0 && !isset($response['listings'][0]['cur_data'][$attribute['name']]))
+						echo 'x';
+					else
+						echo $response['total'];
+
+					echo '</td>';
+				}
+
+				echo '</tr>' . "\n";
+			}
+
+		echo '</table>' . "\n";
+	}
+
+	public static function custom_attributes() {
+
+	}
+}
+
+
+class Bazinga extends PLX_Attributes {
+	protected function _get($name) {
+		if(!isset($this->attributes))
+			$this->attributes = $this->_define_attributes();
+
+		return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
+	}
+
+	public function _get_attributes() {
+		if(!isset($this->attributes))
+			$this->attributes = $this->_define_attributes();
+
+		return $this->attributes;
+	}
+
+	public function _get_group_title($group, $listing_type = null) {
 		if($group == 'Basic') {
 			if($listing_type == 'res_sale' || $listing_type == 'res_rental')
 				return 'Basic Residential Details';
@@ -57,14 +485,14 @@ class PLX_Attributes {
 		return $group;
 	}
 
-	public static function get_group_attributes($groups, $flatten = false) {
-		if(!isset(self::$attributes))
-			self::$attributes = self::_define_attributes();
+	public function _get_group_attributes($groups, $flatten = false) {
+		if(!isset($this->attributes))
+			$this->attributes = self::_define_attributes();
 
 		$groups = (array) $groups;
 		$results = $flatten ? array() : array_fill_keys($groups, array());
 
-		foreach(self::$attributes as $attribute)
+		foreach($this->attributes as $attribute)
 			if(in_array($attribute['group'], $groups))
 				if($flatten)
 					$results[] = $attribute;
@@ -74,9 +502,9 @@ class PLX_Attributes {
 		return $results;
 	}
 
-	public static function get_basic_attributes($listing_type = null) {
-		if(!isset(self::$attributes))
-			self::$attributes = self::_define_attributes();
+	public function _get_basic_attributes($listing_type = null) {
+		if(!isset($this->attributes))
+			$this->attributes = self::_define_attributes();
 
 		$basic_attributes = self::get_group_attributes(array('Listing', 'Location', 'Basic', 'Terms'));
 
@@ -87,9 +515,9 @@ class PLX_Attributes {
 		// the parameter is used to select attributes for private listing creation
 		$listing_attributes = array(
 			'Listing' => array(
-				'listing_type' => self::$attributes['listing_type'],
-				'property_type' => self::$attributes['property_type'],
-				'status' => self::$attributes['status']),
+				'listing_type' => $this->attributes['listing_type'],
+				'property_type' => $this->attributes['property_type'],
+				'status' => $this->attributes['status']),
 
 			'Location' => $basic_attributes['Location']
 		);
@@ -106,42 +534,42 @@ class PLX_Attributes {
 
 			case 'comm_sale':
 				$listing_attributes['Basic'] = array(
-					'price' => self::$attributes['price'],
-					'sqft' => self::$attributes['sqft'],
-					'loc_desc' => self::$attributes['loc_desc'],
-					'zone_desc' => self::$attributes['zone_desc'],
-					'desc' => self::$attributes['desc']
+					'price' => $this->attributes['price'],
+					'sqft' => $this->attributes['sqft'],
+					'loc_desc' => $this->attributes['loc_desc'],
+					'zone_desc' => $this->attributes['zone_desc'],
+					'desc' => $this->attributes['desc']
 				);
 				break;
 
 			case 'comm_rental':
 				$listing_attributes['Basic'] = array(
-					'price' => self::$attributes['price'],
-					'sqft' => self::$attributes['sqft'],
-					'loc_desc' => self::$attributes['loc_desc'],
-					'zone_desc' => self::$attributes['zone_desc'],
-					'desc' => self::$attributes['desc']
+					'price' => $this->attributes['price'],
+					'sqft' => $this->attributes['sqft'],
+					'loc_desc' => $this->attributes['loc_desc'],
+					'zone_desc' => $this->attributes['zone_desc'],
+					'desc' => $this->attributes['desc']
 				);
 				$listing_attributes['Terms'] = array(
-					'lse_trms' => self::$attributes['lse_trms'],
-					'lse_type' => self::$attributes['lse_type'],
-					'comm_rate_unit' => self::$attributes['comm_rate_unit'],
-					'avail_on' => self::$attributes['avail_on'],
-					'sublse' => self::$attributes['sublse'],
-					'bld_suit' => self::$attributes['bld_suit'],
+					'lse_trms' => $this->attributes['lse_trms'],
+					'lse_type' => $this->attributes['lse_type'],
+					'comm_rate_unit' => $this->attributes['comm_rate_unit'],
+					'avail_on' => $this->attributes['avail_on'],
+					'sublse' => $this->attributes['sublse'],
+					'bld_suit' => $this->attributes['bld_suit'],
 				);
 				break;
 
 			case 'vac_rental':
 				$listing_attributes['Basic'] = array(
-					'price' => self::$attributes['price'],
-					'sqft' => self::$attributes['sqft'],
-					'beds' => self::$attributes['beds'],
-					'baths' => self::$attributes['baths'],
-					'half_baths' => self::$attributes['half_baths'],
-					'accoms' => self::$attributes['accoms'],
-					'avail_info' => self::$attributes['avail_info'],
-					'desc' => self::$attributes['desc']
+					'price' => $this->attributes['price'],
+					'sqft' => $this->attributes['sqft'],
+					'beds' => $this->attributes['beds'],
+					'baths' => $this->attributes['baths'],
+					'half_baths' => $this->attributes['half_baths'],
+					'accoms' => $this->attributes['accoms'],
+					'avail_info' => $this->attributes['avail_info'],
+					'desc' => $this->attributes['desc']
 				);
 				$listing_attributes['Terms'] = $basic_attributes['Terms'];
 				break;
@@ -155,11 +583,11 @@ class PLX_Attributes {
 		return $listing_attributes;
 	}
 
-	public static function get_extended_attributes($listing_type = null) {
-		if(!isset(self::$attributes))
-			self::$attributes = self::_define_attributes();
+	protected function _get_extended_attributes($listing_type = null) {
+		if(!isset($this->attributes))
+			$this->attributes = $this->_define_attributes();
 
-		$extended_attributes = self::get_group_attributes(array('Notes', 'Building', 'Parking',
+		$extended_attributes = $this->_get_group_attributes(array('Notes', 'Building', 'Parking',
 			'Pets', 'Schools', 'Lot', 'Amenities', 'Neighborhood', 'Commercial', 'Vacation'));
 
 		// generic attributes for display
@@ -210,11 +638,33 @@ class PLX_Attributes {
 		return $listing_attributes;
 	}
 
-	public static function get_listing_attributes($listing_type = null) {
-		return array_merge(self::get_basic_attributes($listing_type), self::get_extended_attributes($listing_type));
+	protected function _get_listing_attributes($listing_type = null) {
+		return array_merge($this->_get_basic_attributes($listing_type), $this->_get_extended_attributes($listing_type));
 	}
 
-	private static function _define_attributes() {
+
+	protected function _get_static_values($name, $none = null) {
+		if(!isset($this->values))
+			$this->values = $this->_define_values();
+
+		return isset($this->values[$name]) ? $this->values[$name]['options'] : null;
+	}
+
+	protected function _get_dynamic_values($name, $none = null) {
+		if(!isset($this->values))
+			$this->values = $this->_define_values();
+
+		return isset($this->values[$name]) ? null : null;
+	}
+
+	protected function _get_attribute_values($name, $static = true, $dynamic = true, $none = null) {
+		if(!isset($this->values))
+			$this->values = $this->_define_values();
+
+		return isset($this->values[$name]) ? $this->values[$name]['options'] : null;
+	}
+
+	protected function _define_attributes() {
 		return array (
 			'pdx_id' =>           array(   'name' => 'pdx_id',           'type' => self::TEXT_ID,        'group' => 'Listing',                'display' => 'PDX ID'                      ),
 			'mls_id' =>           array(   'name' => 'mls_id',           'type' => self::TEXT_ID,        'group' => 'Listing',                'display' => 'MLS ID'                      ),
@@ -402,103 +852,8 @@ class PLX_Attributes {
 			'ocophone' =>         array(   'name' => 'ocophone',         'type' => self::SHORT_TEXT,     'group' => 'Attribution',            'display' => 'Co-office Phone'             ),
 		);
 	}
-}
 
-
-class PLX_Search_Terms extends PLX_Attributes {
-	static protected $terms;
-
-	public static function get($name) {
-		if(!isset(self::$terms))
-			self::$terms = self::_define_terms(); // additional search terms, non-attribute based
-
-		if(isset(self::$terms[$name])) return self::$terms[$name];
-
-		$term = $name; $prefix = substr($name, 0, 4);
-		if(in_array($prefix, array('min_', 'max_')))
-			$name = substr($name, 4);
-		else
-			$prefix = null;
-
-		if(!$attribute = parent::get($name))
-			if($attribute = parent::get($term))
-				$prefix = null;
-
-		if($attribute) {
-			$caps = self::get_actual_caps($attribute);
-			if(!$caps['search'] || ($prefix && !$caps['minmax']))
-				$attribute = null;
-
-			else {
-				if($prefix) {
-					$attribute['name'] = $term;
-					$attribute['minmax'] = true;
-					$attribute['display'] = str_replace('_', ' ', ucfirst($prefix)) . $attribute['display'];
-				}
-				$attribute['actual_caps'] = $caps;
-				$attribute['public_caps'] = self::get_public_caps($attribute);
-			}
-		}
-
-		return self::$terms[$term] = $attribute;
-	}
-
-	protected static function get_public_caps($attribute) {
-		return null;
-	}
-
-	protected static function get_actual_caps($attribute) {
-		if(!isset(self::$caps))
-			self::$caps = self::_define_caps(); // search feature limitations of the data api
-	}
-
-	private static function _define_terms() {
-		return array (
-			'sort_by' =>          array(   'name' => 'sort_by',           'type' => self::TEXT_VALUE,     'group' => 'Sorting',                'display' => 'Sort By'                     ),
-			'sort_type' =>        array(   'name' => 'sort_type',         'type' => self::TEXT_VALUE,     'group' => 'Sorting',                'display' => 'Direction'                   ),
-
-			'total_images' =>     array(   'name' => 'agency_only',       'type' => self::BOOLEAN,        'group' => 'Images',                 'display' => 'Total Images'                ),
-
-			'agency_only' =>      array(   'name' => 'agency_only',       'type' => self::BOOLEAN,        'group' => 'Listing',                'display' => 'Agency Listings'             ),
-			'non_import' =>       array(   'name' => 'non_import',        'type' => self::BOOLEAN,        'group' => 'Listing',                'display' => 'Private Listings'            ),
-			'include_disabled' => array(   'name' => 'include_disabled',  'type' => self::BOOLEAN,        'group' => 'Listing',                'display' => 'Disabled Listings'           )
-		);
-	}
-}
-
-
-class PLX_Attribute_Values {
-	static protected $values;
-
-	public static function get($name) {
-		if(!isset(self::$values))
-			self::$values = self::_define_values();
-
-		return isset(self::$values[$name]) ? self::$values[$name] : null;
-	}
-
-	public static function get_values($name, $static = true, $dynamic = true, $none = null) {
-		if(!isset(self::$values))
-			self::$values = self::_define_values();
-
-		return isset(self::$values[$name]) ? self::$values[$name]['options'] : null;
-	}
-
-	public static function get_static_values($name, $none = null) {
-		if(!isset(self::$values))
-			self::$values = self::_define_values();
-
-		return isset(self::$values[$name]) ? self::$values[$name]['options'] : null;
-	}
-
-	public static function get_dynamic_values($name, $none = null) {
-		if(!isset(self::$values))
-			self::$values = self::_define_values();
-
-		return isset(self::$values[$name]) ? null : null;
-	}
-
-	private static function _define_values() {
+	protected function _define_values() {
 		return array (
 			'listing_type' =>     array(   'name' => 'listing_type',     'fixed' => true,     'options' => array(
 				'res_sale' =>       'Residential Sale',
@@ -579,10 +934,8 @@ class PLX_Attribute_Values {
 			)),
 
 			'lse_type' =>         array(   'name' => 'lse_type',         'fixed' => true,     'options' => array(
-
 			)),
 			'comm_rate_unit' =>   array(   'name' => 'comm_rate_unit',   'fixed' => true,     'options' => array(
-
 			)),
 
 			'property_type' =>    array(   'name' => 'property_type',    'fixed' => false   ),
@@ -850,75 +1203,5 @@ class PLX_Attribute_Values {
 				"ZW" =>             "Zimbabwe (ZW)"
 			)),
 		);
-	}
-}
-
-
-class PLX_Search_Options extends PLX_Attribute_Values {
-}
-
-
-class PLX_Dynamic_Attributes extends PLX_Attributes {
-	public static function check_attributes() {
-		$providers = PL_Listing::aggregates(array('keys' => array('provider_id')));
-		$providers = $providers['provider_id'];
-
-		$response = PL_Listing::get(array('non_import' => 1, 'limit' => 1));
-		if($response['total']) $non_import = 1; else $non_import = 0;
-
-		// $attributes = self::get_extended_attributes();
-		$attributes = self::get_group_attributes(array('Building', 'Parking'));
-
-		echo '<table>' . "\n";
-
-		foreach($attributes as $name => $group)
-			foreach($group as $attribute) {
-
-				echo '<tr><td>' . $attribute['display'] . '</td>';
-
-				foreach($providers as $provider) {
-					$response = PL_Listing::get(array(
-						'provider_id' => $provider, 'limit' => 1,
-						'metadata[' . $attribute['name'] . '_match]' => 'exists',
-						'metadata[' . $attribute['name'] . ']' => 1));
-
-					echo '<td>';
-
-					if(!isset($response['total']))
-						echo '?';
-					else if($response['total'] > 0 && !isset($response['listings'][0]['cur_data'][$attribute['name']]))
-						echo 'x';
-					else
-						echo $response['total'];
-
-					echo '</td>';
-				}
-
-				if($non_import) {
-					$response = PL_Listing::get(array(
-						'non_import' => 1, 'limit' => 1,
-						'metadata[' . $attribute['name'] . '_match]' => 'exists',
-						'metadata[' . $attribute['name'] . ']' => 1));
-
-					echo '<td>';
-
-					if(!isset($response['total']))
-						echo '?';
-					else if($response['total'] > 0 && !isset($response['listings'][0]['cur_data'][$attribute['name']]))
-						echo 'x';
-					else
-						echo $response['total'];
-
-					echo '</td>';
-				}
-
-				echo '</tr>' . "\n";
-			}
-
-		echo '</table>' . "\n";
-	}
-
-	public static function custom_attributes() {
-
 	}
 }

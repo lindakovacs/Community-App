@@ -9,9 +9,9 @@ jQuery(document).ready(function($) {
   var latitude_hidden = $("#pl-form-latitude");
   var longitude_hidden = $("#pl-form-longitude");
 
-  // visible form fields, used for geocoding attempts
-  var inputs = $("input#pl-form-address, input#pl-form-locality, input#pl-form-region, input#pl-form-postal");
-  var select = $("select#pl-form-country");
+  // visible form fields, used for geocoding attempts (each address component will have either an input or select, not both)
+  var inputs = $("input#pl-form-address, input#pl-form-locality, input#pl-form-region, input#pl-form-postal, input#pl-form-country");
+  var selects = $("select#pl-form-address, select#pl-form-locality, select#pl-form-region, select#pl-form-postal, select#pl-form-country");
   var values = {};
 
   // map components
@@ -27,7 +27,7 @@ jQuery(document).ready(function($) {
   // initialize the map
   (function () {
     inputs.each(function() { values[$(this).attr("id")] = $(this).val(); });
-    select.each(function() { values[$(this).attr("id")] = $(this).find("option:selected").text(); });
+    selects.each(function() { values[$(this).attr("id")] = $(this).find("option:selected").text(); });
 
     var latitude = latitude_hidden.val();
     var longitude = longitude_hidden.val();
@@ -56,7 +56,7 @@ jQuery(document).ready(function($) {
     timer = setTimeout(geocode_address, 1500);
   });
 
-  select.on("change", function() {
+  selects.on("change", function() {
     values[$(this).attr("id")] = $(this).find("option:selected").text();
     geocode_address();
   });
@@ -77,10 +77,11 @@ jQuery(document).ready(function($) {
     if(timer)
       clearTimeout(timer);
 
-    var address = values['pl-form-address'];
-    address += (address ? ', ' : '') + (values['pl-form-locality']);
     var region = values['pl-form-region'];
     region += (region && values['pl-form-postal']) ? (' ' + values['pl-form-postal']) : '';
+
+    var address = values['pl-form-address'];
+    address += (address ? ', ' : '') + (values['pl-form-locality']);
     address += (address ? ', ' : '') + region;
     address += (address ? ', ' : '') + values['pl-form-country'];
 
@@ -145,7 +146,10 @@ jQuery(document).ready(function($) {
   function display_address_invalid(address) {
     console.log('invalid');
     clear_address_box();
-    set_message_box("<span class='achtung'>Address could not be found: <em>" + address + "</em>.  You can drag the map marker to specify a location.</span>");
+    if(address)
+      set_message_box("<span class='achtung'>Address could not be found: <em>" + address + "</em>.  You can drag the map marker to specify a location.</span>");
+    else
+      set_message_box("<span class='message'>No address provided.</span>");
   }
 
   function display_address_incomplete(address) {

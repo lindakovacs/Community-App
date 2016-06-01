@@ -212,8 +212,7 @@ class PLX_Attribute_Form extends PLX_Form {
 				return PLX_Form::INPUT;
 
 			case PLX_Attributes::TEXT_VALUE:
-				$values = PLX_Attribute_Values::get($attribute['name']);
-				if($values['fixed'])
+				if($attribute['fixed'])
 					return PLX_Form::SELECT;
 				else
 					return PLX_Form::INPUT;
@@ -229,7 +228,7 @@ class PLX_Attribute_Form extends PLX_Form {
 	}
 
 	protected function get_default_item_options($attribute) {
-		return PLX_Attribute_Values::get_values($attribute['name']);
+		return PLX_Attributes::get_attribute_values($attribute['name']);
 	}
 }
 
@@ -238,7 +237,7 @@ class PLX_Add_Listing_Form extends PLX_Attribute_Form {
 	public function get_form_attributes() {
 		$form_attributes = array('basic' => array(), 'extended' => array());
 
-		foreach(PLX_Attribute_Values::get_values('listing_type') as $type => $display) {
+		foreach(PLX_Attributes::get_attribute_values('listing_type') as $type => $display) {
 
 			foreach(PLX_Attributes::get_basic_attributes($type) as $group => $attributes) {
 				if($group == 'Listing' || $group == 'Location') {
