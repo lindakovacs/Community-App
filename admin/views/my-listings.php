@@ -1,7 +1,7 @@
 <?php
 ?>
 
-<form name="input" method="POST" url="" class="complex-search" id="pls_admin_my_listings_filters">
+<form name="input" method="POST" class="complex-search" id="pls_admin_my_listings_filters">
 	<section class="form_group form_group_show_filters" id="show_filters">
 		<section id="listing_types" class="pls_search_form listing_types">
 			<input id="listing_types" type="checkbox" name="listing_types" value="true"  />

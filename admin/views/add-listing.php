@@ -1,8 +1,7 @@
 <?php
 
 
-require_once(trailingslashit(PLACESTER_PLUGIN_DIR) . 'libnew/attributes.php');
-require_once(trailingslashit(PLACESTER_PLUGIN_DIR) . 'libnew/forms.php');
+require_once(PLACESTER_PLUGIN_DIR . 'libnew/forms.php');
 
 
 if(isset($_GET['id'])) {

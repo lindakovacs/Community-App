@@ -1,18 +1,6 @@
 <?php 
 
 
-interface PLX_Listing_Interface {
-	static function create($args);
-	static function read($args);
-	static function update($args);
-	static function delete($args);
-
-	static function get($args);
-	static function locations($args);
-	static function aggregates($args);
-}
-
-
 class PLX_Local_Listing_Util {
 	protected static function get_query_variable($array, $name, $default = null) {
 		return isset($array[$name]) ? $array[$name] : $default;

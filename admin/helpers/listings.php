@@ -20,112 +20,37 @@ class PL_Listing_Admin_Helper {
 		// Sorting
 		// Controls the order of columns returned to the datatable
 		$columns = array(
-			'total_images',
-			'location.address',
-			'location.postal',
-			'compound_type', // the data API doesn't actually support this
-			'cur_data.prop_type',
-			'cur_data.beds',
-			'cur_data.baths',
-			'cur_data.price',
-			'cur_data.sqft',
-			'cur_data.status'
+			'images',
+			'address',
+			'postal',
+			'listing_type', // the data API doesn't actually support this
+			'property_type',
+			'beds',
+			'baths',
+			'price',
+			'sqft',
+			'status'
 		);
 
 		$args['sort_by'] = $columns[$_POST['iSortCol_0']];
 		$args['sort_type'] = $_POST['sSortDir_0'];
 		
 		// text searching on address
-		$args['location']['address'] = @$_POST['sSearch'];
-		$args['location']['address_match'] = 'like';
+		$args['address'] = @$_POST['sSearch'];
+		$args['address_match'] = 'like';
 
 		// Pagination
 		$args['limit'] = $_POST['iDisplayLength'];
 		$args['offset'] = $_POST['iDisplayStart'];		
 
-		// We need to check for and parse compound_type...
-		if (!empty($_POST['compound_type'])) {
-			// First copy to args...
-			$args['compound_type'] = $_POST['compound_type'];
-
-			// Infer other fields based on this field's value...
-			switch ($_POST['compound_type']) {
-				case "res_sale":
-				  	$args['zoning_types'][] = 'residential';
-				  	$args['purchase_types'][] = 'sale';
-				  	break;
-				case "res_rental":
-				  	$args['zoning_types'][] = 'residential';
-				  	$args['purchase_types'][] = 'rental';
-				  	break;
-				case "comm_sale":
-				  	$args['zoning_types'][] = 'commercial';
-				  	$args['purchase_types'][] = 'sale';
-				  	break;
-				case "comm_rental":
-				  	$args['zoning_types'][] = 'commercial';
-				  	$args['purchase_types'][] = 'rental';
-				  	break;
-				case "vac_rental":
-				case "park_rental":
-				case "sublet":
-				default:
-				  	$args['zoning_types'] = false;
-				  	$args['purchase_types'] = false;
-			}
-		}
-
-		// Transfer over control flags...
-		$flags = array('agency_only', 'non_import', 'include_disabled');
-		foreach ($flags as $key) {
-			if (!empty($_POST[$key])) {
-				$args[$key] = $_POST[$key];
-			}
-		}
-
-		// Transfer over pertinent groups of args...
-		$arg_groups = array('zoning_types', 'purchase_types', 'property_type', 'location', 'rets', 'metadata', 'custom');
-		foreach ($arg_groups as $key) {
-			if (!empty($_POST[$key])) {
-				if ($key == 'custom') {
-					// get list of text fields
-					$attrs = PL_Listing_Helper::custom_attributes();
-					$text_fields = array();
-					$textarea_fields = array();
-					foreach($attrs as $attr) {
-						if ($attr['attr_type'] == 2 || $attr['attr_type'] == 3) {
-							$text_fields[] = $attr['key'];
-						}
-					}
-					// custom text fields do a non exact search and they need to be queried as 'metadata'
-					foreach($_POST[$key] as $subkey => $val) {
-						if (!empty($val)) {
-							if (in_array($subkey, $text_fields)) {
-								$args['metadata'][$subkey] = $val;
-								$args['metadata'][$subkey.'_match'] = 'like';
-							}
-							else {
-								$args['metadata'][$subkey] = $val;
-							}
-						}
-					}
-				}
-				else {
-					$args[$key] = $_POST[$key];
-				}
-			}
-		}
-
-		// Get listings from model -- no global filters applied...
 		$api_response = PL_Listing::get($args);
-		
-		// build response for datatables.js
+
 		$listings = array();
 		foreach ($api_response['listings'] as $key => $listing) {
 			$images = $listing['images'];
 			$listings[$key][] = ((is_array($images) && isset($images[0])) ? '<img width=50 height=50 src="' . $images[0]['url'] . '" />' : '');
 
-			$address = $listing["location"]["address"] . ' ' . $listing["location"]["locality"] . ' ' . $listing["location"]["region"];
+			$address = $listing["address"] . ' ' . $listing["locality"] . ' ' . $listing["region"];
 
 			if(isset($listing['import_id']) || isset($listing['provider_id'])) { // imported MLS listing, cannot be edited
 				$view_url = PL_Pages::get_url($listing['id'], $listing);
@@ -143,17 +68,16 @@ class PL_Listing_Admin_Helper {
 			}
 
 			$listings[$key][] = $address_link . '<div class="row_actions">' . $action_links . '</div>';
-			$listings[$key][] = $listing["location"]["postal"];
+			$listings[$key][] = $listing["postal"];
 
-			global $PL_API_LISTINGS;
-			$listings[$key][] = $PL_API_LISTINGS['create']['args']['compound_type']['options'][$listing['compound_type']];
+			$listings[$key][] = $listing["listing_type"];
 
 			$listings[$key][] = $listing["property_type"];
-			$listings[$key][] = $listing["cur_data"]["beds"] === false ? '' : $listing["cur_data"]["beds"];
-			$listings[$key][] = $listing["cur_data"]["baths"] === false ? '' : $listing["cur_data"]["baths"];
-			$listings[$key][] = is_null($listing["cur_data"]["price"]) ? '' : $listing["cur_data"]["price"];
-			$listings[$key][] = is_null($listing["cur_data"]["sqft"]) ? '' : $listing["cur_data"]["sqft"];
-			$listings[$key][] = $listing["cur_data"]["status"] ? $listing["cur_data"]["status"] : '';
+			$listings[$key][] = $listing["beds"] === false ? '' : $listing["beds"];
+			$listings[$key][] = $listing["baths"] === false ? '' : $listing["baths"];
+			$listings[$key][] = is_null($listing["price"]) ? '' : $listing["price"];
+			$listings[$key][] = is_null($listing["sqft"]) ? '' : $listing["sqft"];
+			$listings[$key][] = $listing["status"] ? $listing["status"] : '';
 		}
 
 		// Required for datatables.js to function properly.
@@ -169,11 +93,6 @@ class PL_Listing_Admin_Helper {
 
 	private static function prepare_post_array() {
 		$_POST = stripslashes_deep($_POST);
-
-		if(isset($_POST['property_type'])) {
-			if($_POST['property_type'] && $_POST['property_type'] != 'false')
-				$_POST['metadata']['prop_type'] = $_POST['property_type'];
-		}
 
 		if(is_array($_POST['images'])) {
 			$post_images = array();
@@ -225,11 +144,15 @@ class PL_Listing_Admin_Helper {
 	public static function delete_listing_ajax() {
 		$api_response = PL_Listing::delete($_POST);
 
-		if (empty($api_response)) {
+		if(empty($api_response))
 			echo json_encode(array('response' => true, 'message' => 'Listing successfully deleted. This page will reload momentarily.'));
-		} elseif ( isset($api_response['code']) && $api_response['code'] == 1800 ) {
+
+		else if(isset($api_response['code']) && $api_response['code'] == 1800)
 			echo json_encode(array('response' => false, 'message' => 'Cannot find listing. Try <a href="'.admin_url().'?page=placester_settings">emptying your cache</a>.'));
-		}
+
+		else if($api_response['message'])
+			echo json_encode(array('response' => false, 'message' => 'Unable to delete listing. ' . $api_response['message']));
+
 		die();
 	}
 
