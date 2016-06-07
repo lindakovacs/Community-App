@@ -51,14 +51,9 @@ Class PL_HTTP extends WP_Http {
 
 	            	/* $v is an array */
 					if (is_array($v)) {
-						// Different logic for single & multi-value cases...
-						$multi = ( count($v) > 1 && count($v) != 0 );
-
 						foreach ($v as $i => $j) {
 							$i_show = ( is_int($i) ? '' : $i );
-							$dim2 = ( $multi || !empty($i_show) ? '[' . $i_show . ']' : '' );
-
-							$str .= self::add_amp($str) . urlencode($key) . '[' . $k_show . ']' . $dim2 . '=' . urlencode($j);
+							$str .= self::add_amp($str) . urlencode($key) . '[' . $k_show . ']' . '[' . $i_show . ']' . '=' . urlencode($j);
 						}
 					}
 					/* $v is NOT an array... */
