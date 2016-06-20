@@ -9,7 +9,7 @@ require_once('listings.php');
 class PLX_Legacy_Interface extends PLX_Data_Interface {
 	public static function init() {
 		self::$attribute_interface = new PLX_Legacy_Attributes();
-		// self::$parameter_interface = new PLX_Legacy_Parameters();
+		self::$parameter_interface = new PLX_Legacy_Parameters();
 		self::$listing_interface = new PLX_Legacy_Listings();
 		self::$search_interface = new PLX_Legacy_Search();
 	}

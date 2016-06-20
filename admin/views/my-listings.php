@@ -21,12 +21,19 @@
 		</section><section id="address_search" class="pls_search_form address_search">
 			<label for="address_search" class="text">Address Search</label>
 			<input id="address_search" class="form_item_text" type="text" name="address_search" value="" data-attr_type="text" />
-		</section></section>
+		</section>
+	</section>
 </form>
 
 <?php
 // to set filtering values on any of the available listing attributes
-PL_Form::generate_form(PL_Config::PL_API_LISTINGS('get', 'args'), array('method' => "POST", 'title' => true, 'include_submit' => false, 'id' => 'pls_admin_my_listings', 'textarea_as_text' => true));
+// PL_Form::generate_form(PL_Config::PL_API_LISTINGS('get', 'args'), array('method' => "POST", 'title' => true, 'include_submit' => false, 'id' => 'pls_admin_my_listings', 'textarea_as_text' => true));
+//
+//
+
+$attributes = PLX_Attributes::get_attributes();
+$parameters = PLX_Parameters::get_parameters();
+$temp = false;
 
 ?>
 <div id="container">

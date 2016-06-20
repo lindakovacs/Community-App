@@ -1,7 +1,7 @@
 <?php
 
 
-require_once(PLACESTER_PLUGIN_DIR . 'placester-legacy/placester-legacy.php');
+require_once(PLACESTER_PLUGIN_DIR . 'placester-local/placester-local.php');
 
 
 class PL_Listing extends PLX_Data_Interface {

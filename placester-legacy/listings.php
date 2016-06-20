@@ -84,7 +84,6 @@ class PLX_Legacy_Search extends PLX_Search {
 		return PLX_Legacy_Interface::map_aggregate_response($response);
 	}
 
-
 	private static function api_key () {
 		$api_key = PL_Option_Helper::api_key();
 
