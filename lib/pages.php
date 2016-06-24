@@ -77,7 +77,7 @@ class PL_Pages {
 				$post->post_date = null;			// date of post
 				$post->post_date_gmt = null;
 				$post->post_content = '';
-				$post->post_title = self::$listing_details['location']['address'];
+				$post->post_title = self::$listing_details['address'];
 				$post->post_excerpt = '';
 				$post->post_status = 'publish';
 				$post->comment_status = 'closed';	// mark as closed for comments, since page doesn't exist

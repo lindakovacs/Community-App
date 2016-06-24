@@ -77,7 +77,7 @@ class PLX_Legacy_Interface extends PLX_Data_Interface {
 	}
 
 	public static function map_search_request($request) {
-		$mapped = array();
+		$mapped = array('address_mode' => 'exact');
 
 		foreach($request as $name => $value) {
 			if($name == 'id')

@@ -116,8 +116,8 @@ class PL_Integration_Helper {
 		$response = array();
 		$integration = PL_Integration::get();
 		$whoami = PL_Helper_User::whoami();
-		$listings = PL_Listing::get(array('limit' => 1));
-		$locations = PL_Listing::locations();
+		$listings = PLX_Search::listings(array('limit' => 1));
+		$locations = PLX_Search::locations();
 		return array('integration_status' => array('integration' => $integration, 'whoami' => $whoami, 'listings' => $listings, 'locations' => $locations));
 	}
 

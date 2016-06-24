@@ -79,7 +79,7 @@ class PLX_Legacy_Search extends PLX_Search {
 		$request = array_merge(array("api_key" => self::api_key()), $request);
 
 		global $PL_API_SERVER;
-		$response = PL_HTTP::send_request($PL_API_SERVER . '/v2/listings/aggregate', $request, 'GET');
+		$response = PL_HTTP::send_request($PL_API_SERVER . '/v2.1/listings/aggregate', $request, 'GET');
 
 		return PLX_Legacy_Interface::map_aggregate_response($response);
 	}

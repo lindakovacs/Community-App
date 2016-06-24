@@ -26,7 +26,7 @@ if(isset($_GET['id'])) {
 		$_POST = array();
 
 	if(empty($_POST)) {
-		$listing = PL_Listing::read(array('id' => $_GET['id']));
+		$listing = PLX_Listings::read(array('id' => $_GET['id']));
 		$_POST = $listing;
 	}
 }

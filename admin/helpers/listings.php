@@ -43,7 +43,7 @@ class PL_Listing_Admin_Helper {
 		$args['limit'] = $_POST['iDisplayLength'];
 		$args['offset'] = $_POST['iDisplayStart'];		
 
-		$api_response = PL_Listing::get($args);
+		$api_response = PLX_Search::listings($args);
 
 		$listings = array();
 		foreach ($api_response['listings'] as $key => $listing) {
@@ -116,7 +116,7 @@ class PL_Listing_Admin_Helper {
 
 	public static function add_listing() {
 		self::prepare_post_array();
-		$api_response = PL_Listing::create($_POST);
+		$api_response = PLX_Listings::create($_POST);
 
 		if(isset($api_response['id']))
 			PL_Option_Helper::set_demo_data_flag(false);
@@ -132,7 +132,7 @@ class PL_Listing_Admin_Helper {
 
 	public static function update_listing() {
 		self::prepare_post_array();
-		return PL_Listing::update($_POST);
+		return PLX_Listings::update($_POST);
 	}
 
 	public static function update_listing_ajax() {
@@ -142,7 +142,7 @@ class PL_Listing_Admin_Helper {
 	}
 
 	public static function delete_listing_ajax() {
-		$api_response = PL_Listing::delete($_POST);
+		$api_response = PLX_Listings::delete($_POST);
 
 		if(empty($api_response))
 			echo json_encode(array('response' => true, 'message' => 'Listing successfully deleted. This page will reload momentarily.'));
@@ -186,7 +186,7 @@ class PL_Listing_Admin_Helper {
 					$image['size'] = implode($image['size']);
 
 				if (in_array($image['type'], array('image/jpeg','image/jpg','image/png','image/gif')))
-					$api_response = PL_Listing::temp_image($_POST, $image['name'], $image['type'], $image['tmp_name']);
+					$api_response = PLX_Listings::image($_POST, $image['name'], $image['type'], $image['tmp_name']);
 				else
 					$api_response['message'] = "Unsupported file type - the image file must be a jpeg, jpg, png or gif file.".$image['type'];
 
