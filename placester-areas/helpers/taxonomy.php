@@ -82,7 +82,7 @@ class PL_Taxonomy_Helper {
 				}
 				$slug = strtolower($wp_query->query_vars[$tax]);
 				// check if this is an mls neighborhood
-				$response = PL_Listing::locations();
+				$response = PLX_Search::locations();
 				if (!empty($response[$loc])) {
 					$key = array_search($slug, array_map('sanitize_title_with_dashes', $response[$loc]));
 					if ($key !== false) {
