@@ -23,5 +23,5 @@ function placester_add_maps_if_no_blueprint () {
 }
 
 
-PL_Admin_Page::register_script('google-maps', 'http://maps.googleapis.com/maps/api/js');
+PL_Admin_Page::register_script('google-maps', PL_Option_Helper::get_google_maps_js_url());
 PL_Admin_Page::register_script('text-overlay', PL_MAPS_JS_URL . 'text-overlay.js', array('google-maps'));

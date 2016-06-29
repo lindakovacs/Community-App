@@ -7,7 +7,7 @@ class PLS_Map_Lifestyle_Polygon extends PLS_Map {
 		self::make_markers($listings, $marker_args, $map_args);
 		extract($map_args, EXTR_SKIP);
 		
-     	wp_enqueue_script('google-maps', 'http://maps.googleapis.com/maps/api/js');
+     	wp_enqueue_script('google-maps', PL_Option_Helper::get_google_maps_js_url());
 		wp_register_script('text-overlay', PLACESTER_PLUGIN_URL . 'placester-maps/js/text-overlay.js' );
 		wp_enqueue_script('text-overlay');
 

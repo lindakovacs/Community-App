@@ -21,7 +21,7 @@ class PLS_Widget_Office extends WP_Widget {
 	public function widget( $args, $instance ) {
 		extract($args);
 
-		wp_enqueue_script('google-maps', 'http://maps.googleapis.com/maps/api/js');
+		wp_enqueue_script('google-maps', PL_Option_Helper::get_google_maps_js_url());
 		$agent = PL_User::whoami();
 
 		// Widget output ?>
@@ -38,9 +38,6 @@ class PLS_Widget_Office extends WP_Widget {
 			<h3><?php echo $title; ?></h3>
 
 			<section id="map-widget">
-
-        <!--script src="http://maps.googleapis.com/maps/api/js" type="text/javascript"></script-->
-
 				<script type="text/javascript">
 					jQuery(document).ready(function () {
 

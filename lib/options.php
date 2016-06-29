@@ -28,8 +28,10 @@ class PL_Options {
 	}
 }
 
+
 // This global wrapper eventually needs to be removed -- need time to alter its consumers...
 function placester_get_api_key() { return PL_Option_Helper::api_key(); }
+
 
 class PL_Option_Helper {
 
@@ -77,11 +79,11 @@ class PL_Option_Helper {
 	public static function set_google_places_key ($new_places_key) {
 		if (self::get_google_places_key() == $new_places_key) {
 			$result = false;
-			$message = "You're already using that Google Places API Key";
+			$message = "You're already using that Google API Key";
 		}
 		else {
 			$result = PL_Options::set('placester_places_api_key', $new_places_key);
-			$message = ($result ? "You've successfully updated your Google Places API Key" : "There was an error -- please try again");
+			$message = ($result ? "You've successfully updated your Google API Key" : "There was an error -- please try again");
 		}
 
 		return array('result' => $result, 'message' => $message);
@@ -90,6 +92,16 @@ class PL_Option_Helper {
 	public static function get_google_places_key () {
 		$places_api_key = PL_Options::get('placester_places_api_key', '');
 		return $places_api_key;
+	}
+
+	public static function get_google_maps_js_url($qstring = null) {
+		$url = 'http://maps.googleapis.com/maps/api/js';
+		if($api_key = PL_Option_Helper::get_google_places_key())
+			$url .= '?key=' . $api_key . ($qstring ? '&' . $qstring : '');
+		else if($qstring)
+			$url .= '?' . $qstring;
+
+		return $url;
 	}
 
 	public static function set_polygons ($add = false, $remove_id = false) {
@@ -171,71 +183,8 @@ class PL_Option_Helper {
 		}
 
 		$geo_default = array('lat' => 42.3596681, 'lng' => -71.0599325);
-		$geo_error = array('lat' => 42.3596680, 'lng' => -71.0599326);
-
-		$response = PL_Helper_User::whoami();
-		if ($response) {
-
-			// user info
-			if (isset($response['user']) && isset($response['user']['location'])) {
-				$loc = $response['user']['location'];
-				$lat = $loc['latitude'];
-				$lng = $loc['longitude'];
-				if ($lat && $lng) {
-					return array('lat' => $lat, 'lng' => $lng);
-				}
-
-				if($loc['locality'] && $loc['region']) {
-					$address = $loc['address'] . " " . $loc['locality'] . ", " . $loc['region'];
-
-					if (!($geo = self::geocode_address($address))) {
-						$geo = $geo_default;
-					}
-				}
-			}
-
-			// company info
-			if (!isset($geo) && isset($response['location'])) {
-				$loc = $response['location'];
-				$lat = $loc['latitude'];
-				$lng = $loc['longitude'];
-				if ($lat && $lng) {
-					return array('lat' => $lat, 'lng' => $lng);
-				}
-
-				if($loc['locality'] && $loc['region']) {
-					$address = $loc['address'] . " " . $loc['locality'] . ", " . $loc['region'];
-					if (!($geo = self::geocode_address($address))) {
-						$geo = $geo_default;
-					}
-				}
-			}
-		}
-
-		// only try to geocode once, whether successful or not
-		if(isset($geo)) {
-			self::set_default_location ($geo);
-			return $geo;
-		}
-
-		// default
+		self::set_default_location ($geo_default);
 		return $geo_default;
-	}
-
-	private static function geocode_address ($address) {
-		$url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($address);
-		$result = wp_remote_get($url);
-
-		if (is_array($result) && isset($result['body']) && $result['body']) {
-			$body = json_decode($result['body']);
-			if(isset($body->results) && isset($body->results[0]) && isset($body->results[0]->geometry)) {
-				return array(
-					'lat' => $body->results[0]->geometry->location->lat,
-					'lng' => $body->results[0]->geometry->location->lng);
-			}
-		}
-
-		return null;
 	}
 
 	public static function set_translations ($dictionary) {
