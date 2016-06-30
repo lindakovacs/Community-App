@@ -505,7 +505,6 @@ class PLS_Format
 			"belowgroundlsqf" => "Below Ground Sqft",
 			"insulation" => "Insulation",
 			"approx_head_cost" => "Approximate Head Cost",
-			"approx_lot_sqft" => "4791",
 			"cooling" => "Cooling",
 			"basement" => "Basement",
 			"basemnt" => "Basement",
