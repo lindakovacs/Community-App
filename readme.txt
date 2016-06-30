@@ -9,7 +9,7 @@ Easily create and manage real estate sites powered by WordPress.
 
 == Description ==
 
-From the creators of http://placester.com: Create your fully functional real estate website with a single plugin. Some of the features include: 
+From the creators of http://placester.com: Create your fully functional real estate website with a single plugin. Some of the features include:
 
 * RETS integrations available, continuously updated with your MLS.
 * Create / edit / update / search listings.
@@ -140,6 +140,8 @@ In general - real-time. But if you use 3rd party property management services, t
 
 = 1.4.3 =
 * Added Google API Key to requests for Maps js
+* Added a map to the Add/Edit Property page
+* Added the ability to order images on private listings
 
 = 1.4.2 =
 * Additional caching improvements and configurability
