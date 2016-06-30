@@ -138,15 +138,15 @@ class PL_Form {
 					</select>
 				</section>
 			<?php	
-		} 
+		}
 		elseif ($type == 'text' || $type == 'int') {
 			?>
-				<section id="<?php echo $section_prefix . $id ?>" class="pls_search_form <?php echo $css ?>">
-					<label for="<?php echo $id ?>" class="<?php echo $type ?>"><?php echo $text ?><?php if (!empty($description)) : ?><span class="description"><?php echo htmlentities($description);?></span><?php endif;?></label>	
-					<input id="<?php echo $id ?>" class="form_item_<?php echo $type ?>" type="text" name="<?php echo $name ?>" value="<?php echo htmlentities($value) ?>" data-attr_type="<?php echo $type ?>" />
-				</section>
+			<section id="<?php echo $section_prefix . $id ?>" class="pls_search_form <?php echo $css ?>">
+				<label for="<?php echo $id ?>" class="<?php echo $type ?>"><?php echo $text ?><?php if (!empty($description)) : ?><span class="description"><?php echo htmlentities($description);?></span><?php endif;?></label>
+				<input id="<?php echo $id ?>" class="form_item_<?php echo $type ?>" type="text" name="<?php echo $name ?>" value="<?php echo htmlentities($value) ?>" data-attr_type="<?php echo $type ?>" />
+			</section>
 			<?php
-		} 
+		}
 		elseif ($type == 'date') {
 			?>
 				<section id="<?php echo $section_prefix . $id ?>" class="pls_search_form <?php echo $css ?>">
@@ -154,7 +154,7 @@ class PL_Form {
 					<input id="<?php echo $id ?>_picker" class="form_item_date" type="text" name="<?php echo $name ?>" <?php echo !empty($value) ? 'value="'.$value.'"' : ''; ?> />
 				</section>
 			<?php
-		} 
+		}
 		elseif ($type == 'image') {
 			?>
 				<section id="<?php echo $section_prefix . $id ?>" class="pls_search_form <?php echo $css ?>">

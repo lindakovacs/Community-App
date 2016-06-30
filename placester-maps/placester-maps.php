@@ -21,3 +21,7 @@ function placester_add_maps_if_no_blueprint () {
 		include_once('lib/office-widget.php');
 	}
 }
+
+
+PL_Admin_Page::register_script('google-maps', PL_Option_Helper::get_google_maps_js_url());
+PL_Admin_Page::register_script('text-overlay', PL_MAPS_JS_URL . 'text-overlay.js', array('google-maps'));

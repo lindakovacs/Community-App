@@ -6,7 +6,7 @@ class PLS_Map_Lifestyle extends PLS_Map {
 		$map_args = self::process_defaults($map_args);
 		self::make_markers($listings, $marker_args, $map_args);
 		extract($map_args, EXTR_SKIP);
-		wp_enqueue_script('google-maps', 'http://maps.googleapis.com/maps/api/js?libraries=places');
+		wp_enqueue_script('google-maps', PL_Option_Helper::get_google_maps_js_url('libraries=places'));
 		ob_start();
 		?>
 			<script type="text/javascript">				

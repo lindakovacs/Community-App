@@ -53,7 +53,7 @@ PL_Form::generate_form(PL_Config::PL_API_LISTINGS('get', 'args'), array('method'
         <th><span>Baths</span></th>
         <th><span>Price</span></th>
         <th><span>Sqft</span></th>
-        <th><span>Available</span></th>
+        <th><span>Status</span></th>
       </tr>
     </thead>
     <tbody></tbody>

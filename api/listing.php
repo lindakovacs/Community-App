@@ -730,17 +730,19 @@ if(!$PL_API_LISTINGS) {
 							'method' => 'supported_countries',
 							'default' => array('PL_Listing','convert_default_country')
 						)
-					)
+					),
+					'coords_latitude' => array('type' => 'hidden','group' => 'location', 'label' => 'Latitude'),
+					'coords_longitude' => array('type' => 'hidden','group' => 'location', 'label' => 'Longitude')
 				),
 				// // binds to keys / values of all attributes (cur + uncur)
 				'metadata' => array(
+					'status' => array('type' => 'text', 'group' => 'Basic Details', 'label' => 'Listing Status'),
 					//comm_rental
 					'prop_name' => array('type' => 'text','group' => 'basic details', 'label' => 'Property Name'),
 					'cons_stts' => array('type' => 'select','options' => array('exstng' => 'Existing', 'und_prop' => 'Under Construction / Proposed'), 'group' => 'basic details', 'label' => 'Construction Status'),
 					'bld_suit' => array('type' => 'checkbox','group' => 'basic details', 'label' => 'Built to Suit'),
 					'min_div' => array('type' => 'text','group' => 'building details', 'label' => 'Minimum Divisible'),
 					'max_cont' => array('type' => 'text','group' => 'building details', 'label' => 'Maximum Contiguous'),
-					'bld_sz' => array('type' => 'text','group' => 'building details', 'label' => 'Total Building Size'),
 					'bld_sz' => array('type' => 'text','group' => 'building details', 'label' => 'Total Building Size'),
 					//res_rental
 					'beds' => array('type' => 'text','group' => 'basic details', 'label' => 'Bedrooms'),
@@ -752,7 +754,7 @@ if(!$PL_API_LISTINGS) {
 					'desc' => array('type' => 'textarea', 'group' => 'description', 'label' => 'Description'),
 					//rentals
 					'lse_trms' => array('type' => 'select', 'options' => array('false' => 'Not Set', 'per_mnt' => 'Per Month','per_ngt' => 'Per Night', 'per_wk' => 'Per Week', 'per_yr' => 'Per Year'), 'group' => 'Transaction Details','label' => 'Lease Terms'),
-					'lse_type' => array('type' => 'select', 'options' => array('false' => 'Not Set', 'ind_grs' => 'Full Service','ind_grs' => 'Industrial Gross', 'mod_grs' => 'Modified Gross', 'mod_net' => 'Modified Net', 'na' => 'N/A', 'other' => 'Other' ), 'group' => 'Transaction Details','label' => 'Lease Type'),
+					'lse_type' => array('type' => 'select', 'options' => array('false' => 'Not Set', 'ind_grs' => 'Full Service', 'mod_grs' => 'Modified Gross', 'mod_net' => 'Modified Net', 'na' => 'N/A', 'other' => 'Other' ), 'group' => 'Transaction Details','label' => 'Lease Type'),
 					'sublse' => array('type' => 'checkbox', 'group' => 'Transaction Details','label' => 'Sublease'),
 					'rate_unit' => array('type' => 'select', 'options' => array('false' => 'Not Set', 'amt_mnt' => 'Amount/Month','amt_yr' => 'Amount/Year', 'sf_mnt' => 'Sqft/Month', 'sf_yr' => 'Sqft/Year'), 'group' => 'Transaction Details','label' => 'Rental Rate'),
 					//General
@@ -766,7 +768,7 @@ if(!$PL_API_LISTINGS) {
 					'floors' => array('type' => 'text', 'group' => 'basic Details', 'label' => 'Floors'),
 					'hoa_mand' => array('type' => 'checkbox', 'group' => 'financial details', 'label' => 'HOA Mandatory'),
 					'hoa_fee' => array('type' => 'text', 'group' => 'financial details', 'label' => 'HOA Fee'),
-					'lndr_own' => array('type' => 'select','options' => array('false' => 'Not Set','true' => 'Yes', 'false' => 'No', 'undis' => 'Undisclosed'), 'group' => 'financial details', 'label' => 'Floors'),
+					'lndr_own' => array('type' => 'select','options' => array('false' => 'Not Set','true' => 'Yes', 'undis' => 'Undisclosed'), 'group' => 'financial details', 'label' => 'Floors'),
 					'style' => array('type' => 'select','options' => array('false' => 'Not Set','bungal' => 'Bungalow', 'cape' => 'Cape Cod', 'colonial' => 'Colonial' ,'contemp' => 'Contemporary', 'cott' => 'Cottage', 'farmh' => 'Farmhouse','fnt_bk_splt' => 'Front to Back Split', 'gamb_dutc'=>'Gambrel/Dutch','garrison' => 'Garrison', 'greek_rev' => 'Greek Revival', 'loft_splt' => 'Lofted Split','mult_lvl' => 'Multi-level','rai_ranch' => 'Raised Ranch','ranch' => 'Ranch','saltb' => 'Saltbox', 'split_ent' => 'Split Entry', 'tudor' => 'Tudor', 'victor' => 'Victorian', 'antiq' => 'Antique'), 'group' => 'structure details', 'label' => 'Style'),
 					//Pet Details
 					'cats' => array('type' => 'checkbox', 'group' => 'Pets', 'label' => 'Cats'),

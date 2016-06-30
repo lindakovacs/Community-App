@@ -23,9 +23,6 @@ function placester_areas_defer($title) {
 }
 
 
-PL_Admin_Page::register_script('google-maps', 'http://maps.googleapis.com/maps/api/js');
-PL_Admin_Page::register_script('text-overlay', PL_AREAS_JS_URL . 'text-overlay.js', array('google-maps'));
-
 $pl_admin_page = new PL_Admin_Page('placester', 1100, 'placester_areas', 'Locations', 'Area Pages', PL_AREAS_DIR . 'admin/views/property-taxonomies.php');
 
 $pl_admin_page = new PL_Admin_Page('placester_areas', 1150, 'placester_polygons', 'Custom Areas', 'Custom Areas', PL_AREAS_DIR . 'admin/views/polygons.php');

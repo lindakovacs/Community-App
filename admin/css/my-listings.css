@@ -130,6 +130,10 @@
 .red {
     color: #BC0B0B;
 }
+.grey {
+    color: lightgrey;
+    cursor: default;
+}
 tr.odd, tr.even {
   height: 48px;
 }
