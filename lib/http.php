@@ -38,42 +38,37 @@ Class PL_HTTP extends WP_Http {
 
 		foreach ($request as $key => $value) {
 			/* Value is an array... */
-	        if (is_array($value)) {
-	        	/* Value-array has is empty... */
-	            if (empty($value) && $allow_empty_values) {
-	                $str .= self::add_amp($str) . urlencode($key) . '[]=';
-	            }
-	            
-	            /* Value-array HAS values... */
-	            foreach ($value as $k => $v) {
-	            	// Check if key is an int, set $k_show accordingly...
-	            	$k_show = ( is_int($k) ? '' : $k );
+			if (is_array($value)) {
+				/* Value-array has is empty... */
+				if (empty($value) && $allow_empty_values) {
+					$str .= self::add_amp($str) . urlencode($key) . '[]=';
+				}
 
-	            	/* $v is an array */
+				/* Value-array HAS values... */
+				foreach ($value as $k => $v) {
+					// Check if key is an int, set $k_show accordingly...
+					$k_show = ( is_int($k) ? '' : $k );
+
+					/* $v is an array */
 					if (is_array($v)) {
-						// Different logic for single & multi-value cases...
-						$multi = ( count($v) > 1 && count($v) != 0 );
-
 						foreach ($v as $i => $j) {
 							$i_show = ( is_int($i) ? '' : $i );
-							$dim2 = ( $multi || !empty($i_show) ? '[' . $i_show . ']' : '' );
-
-							$str .= self::add_amp($str) . urlencode($key) . '[' . $k_show . ']' . $dim2 . '=' . urlencode($j);
+							$str .= self::add_amp($str) . urlencode($key) . '[' . $k_show . ']' . '[' . $i_show . ']' . '=' . urlencode($j);
 						}
 					}
 					/* $v is NOT an array... */
 					else {
 						$str .= self::add_amp($str) . urlencode($key) . '[' . $k_show . ']=' . urlencode($v);
 					}
-	            }
-	        }
-	        /* Value is NOT an array... (i.e., is a scalar) */
-	        else {
-                $str .= self::add_amp($str) . urlencode($key) . '=' . urlencode($value);
-	        }
-	    }
+				}
+			}
+			/* Value is NOT an array... (i.e., is a scalar) */
+			else {
+				$str .= self::add_amp($str) . urlencode($key) . '=' . urlencode($value);
+			}
+		}
 
-	    return $str;
+		return $str;
 	}
 
 	/*
@@ -156,7 +151,7 @@ Class PL_HTTP extends WP_Http {
 	 * @return array
 	 */
 	public static function send_request_multipart ($url, $request, $file_name, $file_mime_type, $file_tmpname) {
-		
+
 		if (! function_exists( 'curl_init' ) || ! function_exists( 'curl_exec' ) ) {
 			return array('message' => "You cannot upload pictures because cURL is not installed on your server.\n\nPlease ask your hosting provider to install the PHP cURL module.");
 		}
@@ -171,7 +166,7 @@ Class PL_HTTP extends WP_Http {
 			return array('message' => "Unable to upload the file to $file_location.\n\nIs its parent directory writable by the server?");
 		}
 		$ssl_verify = apply_filters('https_ssl_verify', true);
-		
+
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_VERBOSE, 0);
@@ -181,7 +176,7 @@ Class PL_HTTP extends WP_Http {
 		curl_setopt($ch, CURLOPT_URL, $url );
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, ( $ssl_verify === true ) ? 2 : false );
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $ssl_verify );
-		
+
 		// Use a local cert to make sure we have a valid one when not on the hosted network...
 		if (!defined("HOSTED_PLUGIN_KEY")) {
 			curl_setopt($ch, CURLOPT_CAINFO, trailingslashit(PLACESTER_PLUGIN_DIR) . "cacert.pem");
@@ -199,7 +194,7 @@ Class PL_HTTP extends WP_Http {
 			// error_log(var_export(curl_error($ch), true));
 			return false;
 		}
-		
+
 		$o = json_decode($response, true);
 		return $o;
 	}
@@ -338,9 +333,9 @@ class WP_Http_PL_Curl {
 				curl_setopt( $handle, CURLOPT_POSTFIELDS, $r['body'] );
 				break;
 			case 'DELETE':
-	            curl_setopt( $handle, CURLOPT_CUSTOMREQUEST, "DELETE");
+				curl_setopt( $handle, CURLOPT_CUSTOMREQUEST, "DELETE");
 				curl_setopt( $handle, CURLOPT_POSTFIELDS, $r['body']);
-	            curl_setopt( $handle, CURLOPT_HEADER, 0);
+				curl_setopt( $handle, CURLOPT_HEADER, 0);
 				break;
 			default:
 				curl_setopt( $handle, CURLOPT_CUSTOMREQUEST, $r['method'] );

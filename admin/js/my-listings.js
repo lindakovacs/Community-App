@@ -124,7 +124,7 @@ jQuery(document).ready(function($) {
             2:{
                 text:"Permanently Delete",
                 click: function () {
-                    $.post(ajaxurl, {action: "delete_listing", id: $('span#delete_listing_address').attr('ref')}, function(data, textStatus, xhr) {
+                    $.post(ajaxurl, {action: "delete_listing", id: $('span#delete_listing_address').attr('data-ref')}, function(data, textStatus, xhr) {
                         console.log(data);
                         if (data) {
                             if (data.response) {
@@ -143,10 +143,10 @@ jQuery(document).ready(function($) {
     });
     $('#pls_delete_listing').live('click', function(event) {
         event.preventDefault();
-        var property_id = $(this).attr('ref');
+        var property_id = $(this).attr('data-ref');
         var address = $(this).parentsUntil('tr').children('.address').text();
         $('span#delete_listing_address').html(address);
-        $('span#delete_listing_address').attr('ref',property_id);
+        $('span#delete_listing_address').attr('data-ref', property_id);
         delete_listing_confirm.dialog("open");
 
     });

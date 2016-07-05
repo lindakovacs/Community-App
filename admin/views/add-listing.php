@@ -1,18 +1,58 @@
 <?php
-// fetch listing and store it in the $_POST global...
-	if (isset($_GET['id'])) {
+
+
+if(isset($_GET['id'])) {
+	if($_POST['action'] == 'update_listing' && isset($_POST['id']) && $_GET['id'] == $_POST['id']) {
+		$api_response = PL_Listing_Admin_Helper::update_listing();
+		if(is_array($api_response) && isset($api_response['id'])) {
+			$_POST = array(); // update listing successful, reread it from the server
+			$view_url = site_url('/property/' . $api_response['id']);
+			$edit_url = admin_url('admin.php?page=placester_property_edit&id=' . $api_response['id']);
+			$message = '<div id="message" class="updated below-h2"><p>
+				Listing successfully updated! You may
+					<a href="' . $view_url . '" class="button-secondary">View</a> or
+					<a href="' . $edit_url . '" class="button-secondary">Edit</a>
+				</p></div>';
+		}
+		else if(is_array($api_response) && isset($api_response['message']))
+			$message = $api_response['message'];
+		else
+			$message = 'Update failed';
+	}
+	else
+		$_POST = array();
+
+	if(empty($_POST)) {
 		$listings = PL_Listing::get(array('listing_ids' => array($_GET['id']), 'address_mode' => 'exact'));
 		$_POST = empty($listings['listings']) ? null : $listings['listings'][0];
 
-		// alter structure of $_POST to match listing edit/create structure
 		$curated_data = is_array($_POST['cur_data']) ? $_POST['cur_data'] : array();
 		$uncurated_data = is_array($_POST['uncur_data']) ? $_POST['uncur_data'] : array();
-		$_POST['metadata'] = array_merge($curated_data, $uncurated_data);
 
-		// no longer needed
+		$_POST['metadata'] = array_merge($curated_data, $uncurated_data);
 		unset($_POST['cur_data'], $_POST['uncur_data']);
 	}
+}
+
+else if(isset($_POST['action']) && $_POST['action'] == 'add_listing') {
+	$api_response = PL_Listing_Admin_Helper::add_listing();
+	if(is_array($api_response) && isset($api_response['id'])) {
+		$_POST = array(); // add listing successful, add another
+		$view_url = site_url('/property/' . $api_response['id']);
+		$edit_url = admin_url('admin.php?page=placester_property_edit&id=' . $api_response['id']);
+		$message = '<div id="message" class="created below-h2"><p>
+				Listing successfully created! You may
+					<a href="' . $view_url . '" class="button-secondary">View</a> or
+					<a href="' . $edit_url . '" class="button-secondary">Edit</a>
+				</p></div>';
+	}
+	else if(is_array($api_response) && isset($api_response['message']))
+		$message = $api_response['message'];
+	else
+		$message = 'Create failed';
+}
 ?>
+
 
 <?php if (isset($_GET['id'])): ?>
 	<div id="loading_overlay" style="display:none">Updating Listing...</div>
@@ -20,14 +60,18 @@
 	<div id="loading_overlay" style="display:none">Creating Listing...</div>
 <?php endif ?>
 
-<div id="manage_listing_message"></div>
-<form action="<?php echo admin_url('/admin-ajax.php')?>" method="<?php echo isset($_GET['id']) ? 'PUT' : 'POST' ?>" enctype="multipart/form-data" id="add_listing_form">
+<div id="manage_listing_message"><?php echo isset($message) ? $message : ''; ?></div>
+
+<form method="POST" enctype="multipart/form-data" id="add_listing_form">
 	<?php if (isset($_GET['id'])): ?>
-		<input type="hidden" name="id" value="<?php echo $_GET['id'] ?>">
+		<input id="hidden-form-action" type="hidden" name="action" value="update_listing">
+		<input id="hidden-property-id" type="hidden" name="id" value="<?php echo $_GET['id']; ?>">
+	<?php else: ?>
+		<input id="hidden-form-action" type="hidden" name="action" value="add_listing">
 	<?php endif ?>
 
 	<div id="poststuff" class="metabox-holder has-right-sidebar">
-		<div id="side-info-column" class="inner-sidebar"> <!-- Right Sidebar -->
+		<div id="side-info-column" class="inner-sidebar">
 			<div id="side-sortables" class="meta-box-sortables ui-sortable">
 
 				<?php include('partials/publish-box-sidebar.php'); ?>
@@ -40,24 +84,34 @@
 
 					<!-- Compound Type Select -->
 					<?php echo PL_Form::item('compound_type',
-						PL_Config::PL_API_LISTINGS('create', 'args', 'compound_type'),
-						'POST'
+						PL_Config::PL_API_LISTINGS('create', 'args', 'compound_type'), 'POST'
 					); ?>
 
 					<!-- Property Type Input -->
-					<?php echo PL_Form::generate_form(
-						PL_Config::bundler('PL_API_LISTINGS', array('create', 'args'), array('property_type')),
-						array('method' => 'POST', 'include_submit' => false, 'wrap_form' => false, 'echo_form' => false)
+					<?php echo PL_Form::item('property_type',
+						PL_Config::PL_API_LISTINGS('create', 'args', 'property_type'), 'POST'
+					); ?>
+
+					<!-- Listing Status Input -->
+					<?php echo PL_Form::item('status',
+						PL_Config::PL_API_LISTINGS('create', 'args', 'metadata', 'status'), 'POST', 'metadata'
 					); ?>
 
 				</div>
 				<div class="clear"></div>
 
 				<?php echo new PL_Admin_Box(null, 'Location', null,
-					PL_Form::generate_form(
-						PL_Config::bundler('PL_API_LISTINGS', array('create', 'args'), array('location')),
-						array('method' => 'POST', 'include_submit' => false, 'wrap_form' => false, 'echo_form' => false)
-					)
+					'<div class="location-entry">' .
+						PL_Form::generate_form(
+							PL_Config::bundler('PL_API_LISTINGS', array('create', 'args'), array('location')),
+							array('method' => 'POST', 'include_submit' => false, 'wrap_form' => false, 'echo_form' => false)
+						) .
+					'</div>' .
+					'<div class="location-map">' .
+						'<input id="location-coords-latitude" type="hidden" name="location[coords_latitude]" value="' . $_POST['location']['coords'][0] . '">' .
+						'<input id="location-coords-longitude" type="hidden" name="location[coords_longitude]" value="' . $_POST['location']['coords'][1] . '">' .
+						'<div id="location-map-canvas" style="height: 500px;"></div>' .
+					'</div>'
 				) ?>
 
 				<!-- Residential Sales -->

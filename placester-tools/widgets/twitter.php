@@ -89,31 +89,15 @@ class PLS_Widget_Twitter extends WP_Widget {
 
 // Widget output
 function get_twitter_feed($username, $count) {
-
-  $cache = new PLS_Cache('fb_feed');
-  if ($result = $cache->get($username)) {
-    return $result;
-  }
-  
-  if (empty($username)) {
-    return;
-  }
+  if (empty($username))
+    return "";
   
   $name_count = strlen($username);
   $twitter_feed = 'https://api.twitter.com/1/statuses/user_timeline.rss?screen_name=' . $username;
-  $feed = fetch_feed($twitter_feed);
+  $twitter_feed_html = "";
 
-  if (!is_wp_error( $feed ) ) { // Checks that the object is created correctly 
-  
-    if ($feed->get_items() != null) {
-      $items = $feed->get_items();
-    } else {
-      break;
-    }
-
-    $twitter_feed_html = "";
-
-    foreach ( $feed->get_items() as $key => $item ) {
+  if (!is_wp_error( $feed = fetch_feed($twitter_feed) ) ) { // Checks that the object is created correctly
+    if ($items = $feed->get_items()) foreach ( $items as $key => $item ) {
 
       // Get title value hash
       $full_title = $item->get_title();
@@ -151,7 +135,7 @@ function get_twitter_feed($username, $count) {
       if( $key >= ($count - 1) ) { break; }
 
     } //endforeach
-
-    return $twitter_feed_html;
   }
+
+  return $twitter_feed_html;
 }

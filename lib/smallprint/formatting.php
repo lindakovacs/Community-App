@@ -505,7 +505,6 @@ class PLS_Format
 			"belowgroundlsqf" => "Below Ground Sqft",
 			"insulation" => "Insulation",
 			"approx_head_cost" => "Approximate Head Cost",
-			"approx_lot_sqft" => "4791",
 			"cooling" => "Cooling",
 			"basement" => "Basement",
 			"basemnt" => "Basement",
@@ -780,23 +779,6 @@ class PLS_Format
 		} else {
 			return $content;
 		}
-	}
-
-	public static function get_lat_lng_of_address($address)
-	{
-		$url = 'http://maps.googleapis.com/maps/api/geocode/json?address=' . $address;
-		$url = str_replace(',', '', $url);
-		$url = str_replace(' ', '+', $url);
-		$result = wp_remote_get($url);
-
-		$body = json_decode($result['body']);
-		if (isset($body->results) && isset($body->results[0]) && isset($body->results[0]->geometry)) {
-			return array(
-				'lat' => $body->results[0]->geometry->location->lat,
-				'lng' => $body->results[0]->geometry->location->lng);
-		}
-
-		return null;
 	}
 
 //end of class
