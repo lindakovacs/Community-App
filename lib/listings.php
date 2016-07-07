@@ -45,13 +45,13 @@ class PL_Listing_Helper {
 		$args['address_mode'] = 'exact'; // this overrides the server-side account setting
 
 		// Call the API with the given args...
-		$args = self::map_listing_request($args);
+		$args = self::map_listings_request($args);
 		$listings = PLX_Search::listings($args);
+		$listings = self::map_listings_response($listings);
 
 		// Make sure it contains listings, then process accordingly...
 		if (!empty($listings['listings'])) {
 			foreach ($listings['listings'] as $key => $listing) {
-				$listing = self::map_listing_response($listing);
 
 				// if the user wants "block" addresses, remove the street number (trying to catch known variations)
 				if($address_mode == 'polygon') {
@@ -75,12 +75,151 @@ class PL_Listing_Helper {
 		return $listings;
 	}
 
-	protected static function map_listing_request($request) {
-		return $request;
+	// convert from blueprint format to internal format
+	protected static function map_listings_request($request) {
+		$mapped = array('address_mode' => 'exact');
+
+		foreach($request as $name => $value) {
+			if($name == 'listing_ids')
+				$mapped['id'] = $value;
+
+			else if($name == 'compound_type')
+				$mapped['listing_type'] = $value;
+			else if($name == 'zoning_types')
+				$mapped['zoning_type'] = $value;
+			else if($name == 'purchase_types')
+				$mapped['purchase_type'] = $value;
+
+			else if($name == 'property_type')
+				$mapped['metadata']['prop_type'] = $value;
+			else if($name == 'property_type_match')
+				$mapped['metadata']['prop_type_match'] = $value;
+
+			else if($name == 'metadata')
+				foreach($value as $meta_name => $meta_value) {
+					if($meta_name == 'prop_type')
+						$mapped['property_type'] = $meta_value;
+					else if($meta_name == 'prop_type_match')
+						$mapped['property_type_match'] = $meta_value;
+
+					else if($meta_name == 'status' || $meta_name == 'status_match')
+						$mapped['metadata'][$meta_name] = $meta_value;
+
+					else if($meta_name == 'lst_dte')
+						$mapped['list_date'] = $meta_value;
+					else if($meta_name == 'min_lst_dte')
+						$mapped['min_list_date'] = $meta_value;
+					else if($meta_name == 'max_lst_dte')
+						$mapped['max_list_date'] = $meta_value;
+
+					else if($meta_name == 'dom')
+						$mapped['days_on'] = $meta_value;
+					else if($meta_name == 'min_dom')
+						$mapped['min_days_on'] = $meta_value;
+					else if($meta_name == 'max_dom')
+						$mapped['max_days_on'] = $meta_value;
+					else
+						$mapped[$meta_name] = $meta_value;
+				}
+
+			else if($name == 'sort_by') {
+				if($value == 'compound_type')
+					$mapped['sort_by'] = 'listing_type';
+				else if($value == 'cur_data.prop_type')
+					$mapped['sort_by'] = 'property_type';
+				else if($value == 'cur_data.status')
+					$mapped['sort_by'] = 'status';
+				else if($value == 'cur_data.lst_dte')
+					$mapped['sort_by'] = 'list_date';
+				else if($value == 'cur_data.dom')
+					$mapped['sort_by'] = 'days_on';
+				else if($value == 'total_images')
+					$mapped['sort_by'] = 'images';
+
+				else
+					$mapped['sort_by'] = array_pop(explode('.', $value));
+			}
+
+			else if(in_array($name, array('location', 'box', 'rets'))) {
+				foreach($value as $group_name => $group_value) {
+					$mapped[$group_name] = $group_value;
+				}
+			}
+
+			else
+				$mapped[$name] = $value;
+		}
+
+		return $mapped;
+	}
+
+	// convert from intrnal format to blueprint format
+	protected static function map_listings_response($response) {
+		if($response['listings']) {
+			foreach($response['listings'] as $id => &$listing)
+				$listing = self::map_listing_response($listing);
+		}
+		else {
+			$response['total'] = $response['count'] = 0;
+			$response['listings'] = array();
+		}
+
+		return $response;
 	}
 
 	protected static function map_listing_response($response) {
-		return $response;
+		$mapped = array();
+
+		foreach($response as $name => $value) {
+			if($name == 'listing_type')
+				$mapped['compound_type'] = $value;
+			else if($name == 'zoning_type')
+				$mapped['zoning_types'] = (array) $value;
+			else if($name == 'purchase_type')
+				$mapped['purchase_types'] = (array) $value;
+
+			else if($name == 'property_type')
+				$mapped['cur_data']['prop_type'] = $mapped['property_type'] = $value;
+			else if($name == 'status')
+				$mapped['cur_data']['status'] = $value;
+			else if($name == 'list_date')
+				$mapped['cur_data']['lst_dte'] = $value;
+			else if($name == 'days_on')
+				$mapped['cur_data']['dom'] = $value;
+
+			else if($name == 'url')
+				$mapped['cur_data']['url'] = $value;
+
+			else if($name == 'latitude')
+				$mapped['location']['coords'][0] = $value;
+			else if($name == 'longitude')
+				$mapped['location']['coords'][1] = $value;
+
+			else if($name == 'images')
+				$mapped['images'] = $value;
+
+			else if($group = self::get_attribute_group($name))
+				$mapped[$group][$name] = $value;
+			else
+				$mapped[$name] = $value;
+		}
+
+		return $mapped;
+	}
+
+	public static function get_attribute_group($attribute) {
+		if($attribute = PLX_Attributes::get($attribute)) {
+			if($attribute['group'] == 'Provider')
+				return 'rets';
+			else if($attribute['group'] == 'Location')
+				return 'location';
+			else if($attribute['group'] != 'Listing')
+				return 'cur_data';
+			else
+				return null;
+		}
+
+		return 'uncur_data';
 	}
 
 	protected static function obscure_address($address) {
