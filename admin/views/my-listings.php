@@ -26,10 +26,6 @@
 </form>
 
 <?php
-// to set filtering values on any of the available listing attributes
-// PL_Form::generate_form(PL_Config::PL_API_LISTINGS('get', 'args'), array('method' => "POST", 'title' => true, 'include_submit' => false, 'id' => 'pls_admin_my_listings', 'textarea_as_text' => true));
-//
-//
 
 $attributes = PLX_Attributes::get_attributes();
 $parameters = PLX_Parameters::get_parameters();
