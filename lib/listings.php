@@ -80,7 +80,10 @@ class PL_Listing_Helper {
 		$mapped = array('_blueprint' => $request);
 
 		foreach($request as $name => $value) {
-			if($name == 'listing_ids')
+			if($value === '')
+				unset($mapped['_blueprint'][$name]);
+
+			else if($name == 'listing_ids')
 				$mapped['id'] = $value;
 
 			else if($name == 'compound_type')
@@ -97,7 +100,10 @@ class PL_Listing_Helper {
 
 			else if($name == 'metadata')
 				foreach($value as $meta_name => $meta_value) {
-					if($meta_name == 'prop_type')
+					if($meta_value === '')
+						unset($mapped['_blueprint'][$name][$meta_name]);
+
+					else if($meta_name == 'prop_type')
 						$mapped['property_type'] = $meta_value;
 					else if($meta_name == 'prop_type_match')
 						$mapped['property_type_match'] = $meta_value;
@@ -140,11 +146,14 @@ class PL_Listing_Helper {
 					$mapped['sort_by'] = array_pop(explode('.', $value));
 			}
 
-			else if(in_array($name, array('location', 'box', 'rets'))) {
+			else if(in_array($name, array('location', 'box', 'rets')))
 				foreach($value as $group_name => $group_value) {
-					$mapped[$group_name] = $group_value;
+					if($group_value === '')
+						unset($mapped['_blueprint'][$name][$group_name]);
+
+					else
+						$mapped[$group_name] = $group_value;
 				}
-			}
 
 			else
 				$mapped[$name] = $value;

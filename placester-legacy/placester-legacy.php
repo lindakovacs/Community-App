@@ -85,6 +85,8 @@ class PLX_Legacy_Interface extends PLX_Data_Interface {
 
 		$mapped = array('address_mode' => 'exact');
 		foreach($request as $name => $value) {
+			if($value === '') continue;
+
 			if($name == 'id')
 				$mapped['listing_ids'] = (array) $value;
 
