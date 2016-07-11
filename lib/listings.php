@@ -172,7 +172,7 @@ class PL_Listing_Helper {
 		if(isset($response['_legacy']))
 			return $response['_legacy'];
 
-		$mapped = array();
+		$mapped = array('location' => '', 'cur_data' => array(), 'uncur_data' => array());
 
 		foreach($response as $name => $value) {
 			if($name == 'listing_type')

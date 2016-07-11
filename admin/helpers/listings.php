@@ -52,7 +52,7 @@ class PL_Listing_Admin_Helper {
 
 			$address = $listing["address"] . ' ' . $listing["locality"] . ' ' . $listing["region"];
 
-			if(isset($listing['import_id']) || isset($listing['provider_id'])) { // imported MLS listing, cannot be edited
+			if((isset($listing['import_id']) && $listing['import_id']) || (isset($listing['provider_id']) && $listing['provider_id'])) { // imported MLS listing, cannot be edited
 				$view_url = PL_Pages::get_url($listing['id'], $listing);
 				$address_link = '<a class="address" href="' . $view_url . '">' . $address . '</a>';
 				$action_links = '<span class="grey">Edit</span>';

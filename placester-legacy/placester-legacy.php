@@ -57,6 +57,9 @@ class PLX_Legacy_Interface extends PLX_Data_Interface {
 		$mapped['list_date'] = $response['cur_data']['lst_dte'];
 		$mapped['days_on'] = $response['cur_data']['dom'];
 
+		$mapped['import_id'] = $response['import_id'];
+		$mapped['provider_id'] = $response['provider_id'];
+
 		$mapped['latitude'] = $response['location']['coords'][0];
 		$mapped['longitude'] = $response['location']['coords'][1];
 
