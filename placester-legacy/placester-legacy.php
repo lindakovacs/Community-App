@@ -43,7 +43,7 @@ class PLX_Legacy_Interface extends PLX_Data_Interface {
 	}
 
 	public static function map_listing_response($response) {
-		$mapped = array();
+		$mapped = array('_legacy' => $response);
 		$mapped['id'] = $response['id'];
 
 		$mapped['listing_type'] = $response['compound_type'];
@@ -77,8 +77,10 @@ class PLX_Legacy_Interface extends PLX_Data_Interface {
 	}
 
 	public static function map_search_request($request) {
-		$mapped = array('address_mode' => 'exact');
+		if(isset($request['_blueprint']))
+			return $request['_blueprint'];
 
+		$mapped = array('address_mode' => 'exact');
 		foreach($request as $name => $value) {
 			if($name == 'id')
 				$mapped['listing_ids'] = (array) $value;

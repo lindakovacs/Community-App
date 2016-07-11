@@ -113,7 +113,7 @@ class PLX_Local_Search extends PLX_Search {
 
 		$aggr_result = array();
 		foreach((array) $args['keys'] as $name)
-			if($attribute = PLX_Attributes::get($name) && $attribute['type'] = PLX_Attributes::TEXT_VALUE)
+			if(($attribute = PLX_Attributes::get($name)) && $attribute['type'] == PLX_Attributes::TEXT_VALUE)
 			{
 				$meta_key = 'plx.' . $name;
 				$aggr_clause = array('join' => " inner join $wpdb->postmeta as aggregate"

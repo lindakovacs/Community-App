@@ -77,7 +77,7 @@ class PL_Listing_Helper {
 
 	// convert from blueprint format to internal format
 	protected static function map_listings_request($request) {
-		$mapped = array('address_mode' => 'exact');
+		$mapped = array('_blueprint' => $request);
 
 		foreach($request as $name => $value) {
 			if($name == 'listing_ids')
@@ -168,6 +168,10 @@ class PL_Listing_Helper {
 	}
 
 	protected static function map_listing_response($response) {
+		// if we're using a legacy data source, we already have the blueprint-compatible structure
+		if(isset($response['_legacy']))
+			return $response['_legacy'];
+
 		$mapped = array();
 
 		foreach($response as $name => $value) {

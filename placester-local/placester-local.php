@@ -55,7 +55,7 @@ class PLX_Local_Interface extends PLX_Data_Interface {
 			case PLX_Attributes::NUMERIC:
 			case PLX_Attributes::CURRENCY:
 			case PLX_Attributes::COORDINATE:
-				return 'numeric';
+				return 'decimal';
 
 			case PLX_Attributes::DATE_TIME:
 

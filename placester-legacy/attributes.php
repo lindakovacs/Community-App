@@ -17,21 +17,25 @@ class PLX_Legacy_Attributes extends PLX_Placester_Attributes {
 			'aid' =>              array(   'name' => 'aid',              'type' => self::TEXT_ID,        'group' => 'Provider',               'display' => 'Agent ID'                    ),
 			'aname' =>            array(   'name' => 'aname',            'type' => self::SHORT_TEXT,     'group' => 'Provider',               'display' => 'Agent Name'                  ),
 			'aphone' =>           array(   'name' => 'aphone',           'type' => self::SHORT_TEXT,     'group' => 'Provider',               'display' => 'Agent Phone'                 ),
+			'aemail' =>           array(   'name' => 'aemail',           'type' => self::SHORT_TEXT,     'group' => 'Provider',               'display' => 'Agent EMail'                 ),
 			'alicense' =>         array(   'name' => 'alicense',         'type' => self::SHORT_TEXT,     'group' => 'Provider',               'display' => 'Agent License'               ),
 
 			'oid' =>              array(   'name' => 'oid',              'type' => self::TEXT_ID,        'group' => 'Provider',               'display' => 'Office ID'                   ),
 			'oname' =>            array(   'name' => 'oname',            'type' => self::SHORT_TEXT,     'group' => 'Provider',               'display' => 'Office Name'                 ),
 			'ophone' =>           array(   'name' => 'ophone',           'type' => self::SHORT_TEXT,     'group' => 'Provider',               'display' => 'Office Phone'                ),
+			'oemail' =>           array(   'name' => 'oemail',           'type' => self::SHORT_TEXT,     'group' => 'Provider',               'display' => 'Office EMail'                ),
 
 			// Co-attribution
 			'acoid' =>            array(   'name' => 'acoid',            'type' => self::TEXT_ID,        'group' => 'Provider',               'display' => 'Co-agent ID'                 ),
 			'aconame' =>          array(   'name' => 'aconame',          'type' => self::SHORT_TEXT,     'group' => 'Provider',               'display' => 'Co-agent Name'               ),
 			'acophone' =>         array(   'name' => 'acophone',         'type' => self::SHORT_TEXT,     'group' => 'Provider',               'display' => 'Co-agent Phone'              ),
+			'acoemail' =>         array(   'name' => 'acoemail',         'type' => self::SHORT_TEXT,     'group' => 'Provider',               'display' => 'Co-agent EMail'              ),
 			'acolicense' =>       array(   'name' => 'acolicense',       'type' => self::SHORT_TEXT,     'group' => 'Provider',               'display' => 'Co-agent License'            ),
 
 			'ocoid' =>            array(   'name' => 'ocoid',            'type' => self::TEXT_ID,        'group' => 'Provider',               'display' => 'Co-office ID'                ),
 			'oconame' =>          array(   'name' => 'oconame',          'type' => self::SHORT_TEXT,     'group' => 'Provider',               'display' => 'Co-office Name'              ),
 			'ocophone' =>         array(   'name' => 'ocophone',         'type' => self::SHORT_TEXT,     'group' => 'Provider',               'display' => 'Co-office Phone'             ),
+			'ocoemail' =>         array(   'name' => 'ocoemail',         'type' => self::SHORT_TEXT,     'group' => 'Provider',               'display' => 'Co-office EMail'             ),
 		));
 
 		$attributes['country']['fixed'] = true;
