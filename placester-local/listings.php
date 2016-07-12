@@ -219,14 +219,14 @@ class PLX_Local_Listings extends PLX_Listings {
 			}
 		}
 
-		$listing['images'] = $new_imgs;
-		if(count($listing['images']))
-			$new_meta['images'] = count($listing['images']);
+		$new_listing['images'] = $new_imgs;
+		if(count($new_listing['images']))
+			$new_meta['images'] = count($new_listing['images']);
 
 
 		$post = wp_update_post(array(
-			'ID' => $listing['id'],
-			'post_content' => serialize($listing)));
+			'ID' => $new_listing['id'],
+			'post_content' => serialize($new_listing)));
 
 		if($post) {
 			PLX_Local_Interface::store_post_fields($post, $new_meta, $old_meta);
