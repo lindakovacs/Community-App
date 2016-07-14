@@ -1,6 +1,9 @@
 <?php
 
 
+require_once('attributes.php');
+
+
 class PLX_Form {
 	const INPUT = 1;
 	const RADIO = 5;

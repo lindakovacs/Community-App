@@ -186,7 +186,7 @@ class PL_Listing_Admin_Helper {
 					$image['size'] = implode($image['size']);
 
 				if (in_array($image['type'], array('image/jpeg','image/jpg','image/png','image/gif')))
-					$api_response = PLX_Listings::image($_POST, $image['name'], $image['type'], $image['tmp_name']);
+					$api_response = PLX_Images::upload($_POST, $image['name'], $image['type'], $image['tmp_name']);
 				else
 					$api_response['message'] = "Unsupported file type - the image file must be a jpeg, jpg, png or gif file.".$image['type'];
 

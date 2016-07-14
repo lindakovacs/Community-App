@@ -1,7 +1,11 @@
 <?php
 
 
-require_once(PLACESTER_PLUGIN_DIR . 'placester-legacy/placester-legacy.php');
+require_once(PLACESTER_PLUGIN_DIR . 'libnew/placester-local.php');
+require_once(PLACESTER_PLUGIN_DIR . 'libnew/placester-legacy.php');
+
+PLX_Local_Interface::init();
+//PLX_Legacy_Interface::init();
 
 
 // v2/2.1 ruby core API
