@@ -35,7 +35,7 @@ jQuery(document).ready(function($) {
 
 	// Initialize the jQuery File Upload widget:
 	$('div.fileupload-buttonbar').fileupload({
-		formData: { action: 'add_temp_image' },
+		formData: { action: 'upload_image' },
 		sequentialUploads: true,
 		dataType: 'json',
 

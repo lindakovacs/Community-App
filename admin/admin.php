@@ -70,9 +70,8 @@ class PL_Admin_Page extends PL_Admin_Page_v1A {
 
 
 // shared resources
-PL_Admin_Page::register_style('placester-global', PL_ADMIN_CSS_URL . 'global.css', array('jquery-ui'));
 PL_Admin_Page::register_style('settings-all', PL_ADMIN_CSS_URL . 'settings.css');
-
+PL_Admin_Page::register_style('placester-global', PL_ADMIN_CSS_URL . 'global.css', array('jquery-ui'));
 PL_Admin_Page::register_script('placester-global', PL_ADMIN_JS_URL . 'global.js', array('jquery'));
 
 
@@ -89,27 +88,8 @@ $pl_admin_page = new PL_Admin_Page('placester', 200, 'placester_integration', 'I
 $pl_admin_page->require_script('integration', PL_ADMIN_JS_URL . 'integration.js');
 $pl_admin_page->require_style('integration', PL_ADMIN_CSS_URL . 'integration.css');
 
-require_once(PL_ADMIN_VIEWS_DIR . 'listings.php');
-//$pl_admin_page = new PL_Admin_Page('placester', 300, 'placester_properties', 'Listings', 'All Listings', PL_ADMIN_VIEWS_DIR . 'my-listings.php');
-//$pl_admin_page->require_script('my-listings', PL_ADMIN_JS_URL . 'my-listings.js', array('jquery-ui-dialog', 'jquery-ui-datepicker', 'jquery-datatables'));
-//$pl_admin_page->require_style('my-listings', PL_ADMIN_CSS_URL . 'my-listings.css', array('jquery-datatables'));
-
-$pl_admin_page = new PL_Admin_Page('placester_properties', 320, 'placester_property_add', 'Add Listing', 'Add Listing', PL_ADMIN_VIEWS_DIR . 'add-listing.php');
-$pl_admin_page->require_script('jquery-iframe-transport', PL_ADMIN_JS_URL . 'blueimp/js/jquery.iframe-transport.js', array('jquery'));
-$pl_admin_page->require_script('jquery-fileupload', PL_ADMIN_JS_URL . 'blueimp/js/jquery.fileupload.js', array('jquery-ui-widget', 'jquery-ui-sortable'));
-$pl_admin_page->require_script('add-listing', PL_ADMIN_JS_URL . 'add-listing.js', array('jquery-ui-datepicker', 'jquery-iframe-transport', 'jquery-fileupload'));
-$pl_admin_page->require_script('location-map', PL_ADMIN_JS_URL . 'location-map.js', array('add-listing', 'google-maps', 'text-overlay'));
-$pl_admin_page->require_style('add-listing', PL_ADMIN_CSS_URL . 'add-listing.css');
-
-$pl_admin_page = new PL_Admin_Page('placester_properties_x', 325, 'placester_property_edit', 'Edit Listing', 'Edit Listing', PL_ADMIN_VIEWS_DIR . 'add-listing.php');
-$pl_admin_page->require_script('jquery-iframe-transport', PL_ADMIN_JS_URL . 'blueimp/js/jquery.iframe-transport.js', array('jquery'));
-$pl_admin_page->require_script('jquery-fileupload', PL_ADMIN_JS_URL . 'blueimp/js/jquery.fileupload.js', array('jquery-ui-widget', 'jquery-ui-sortable'));
-$pl_admin_page->require_script('add-listing', PL_ADMIN_JS_URL . 'add-listing.js', array('jquery-ui-datepicker', 'jquery-iframe-transport', 'jquery-fileupload'));
-$pl_admin_page->require_script('location-map', PL_ADMIN_JS_URL . 'location-map.js', array('add-listing', 'google-maps', 'text-overlay'));
-$pl_admin_page->require_style('add-listing', PL_ADMIN_CSS_URL . 'add-listing.css');
-
-//$pl_admin_page = new PL_Admin_Page('placester', 9100, 'placester_support', 'Support', 'Support', PL_ADMIN_VIEWS_DIR . 'support.php');
-//$pl_admin_page->require_style('support', PL_ADMIN_CSS_URL . 'support.css');
+require_once('listings.php');
+require_once('listing.php');
 
 
 // miscellaneous touch-ups to standard admin pages

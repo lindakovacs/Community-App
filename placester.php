@@ -60,7 +60,6 @@ include_once('api/integration.php');
 // needed on the wp-admin side only (eventually)
 include_once('admin/admin.php');
 include_once('admin/helpers/users.php');
-include_once('admin/helpers/listings.php');
 include_once('admin/helpers/integrations.php');
 
 
