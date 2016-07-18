@@ -88,7 +88,7 @@ jQuery(document).ready(function($) {
             ],
             "aaSorting": [[0, "desc"]],
             "fnServerParams": function ( aoData ) {
-                aoData.push( { "name": "action", "value" : "datatable_ajax"} );
+                aoData.push( { "name": "action", "value" : "listings_table"} );
                 aoData.push( { "name": "sSearch", "value" : $('input#address_search').val() })
                 aoData = my_listings_search_params(aoData);
             }

@@ -89,9 +89,10 @@ $pl_admin_page = new PL_Admin_Page('placester', 200, 'placester_integration', 'I
 $pl_admin_page->require_script('integration', PL_ADMIN_JS_URL . 'integration.js');
 $pl_admin_page->require_style('integration', PL_ADMIN_CSS_URL . 'integration.css');
 
-$pl_admin_page = new PL_Admin_Page('placester', 300, 'placester_properties', 'Listings', 'All Listings', PL_ADMIN_VIEWS_DIR . 'my-listings.php');
-$pl_admin_page->require_script('my-listings', PL_ADMIN_JS_URL . 'my-listings.js', array('jquery-ui-dialog', 'jquery-ui-datepicker', 'jquery-datatables'));
-$pl_admin_page->require_style('my-listings', PL_ADMIN_CSS_URL . 'my-listings.css', array('jquery-datatables'));
+require_once(PL_ADMIN_VIEWS_DIR . 'listings.php');
+//$pl_admin_page = new PL_Admin_Page('placester', 300, 'placester_properties', 'Listings', 'All Listings', PL_ADMIN_VIEWS_DIR . 'my-listings.php');
+//$pl_admin_page->require_script('my-listings', PL_ADMIN_JS_URL . 'my-listings.js', array('jquery-ui-dialog', 'jquery-ui-datepicker', 'jquery-datatables'));
+//$pl_admin_page->require_style('my-listings', PL_ADMIN_CSS_URL . 'my-listings.css', array('jquery-datatables'));
 
 $pl_admin_page = new PL_Admin_Page('placester_properties', 320, 'placester_property_add', 'Add Listing', 'Add Listing', PL_ADMIN_VIEWS_DIR . 'add-listing.php');
 $pl_admin_page->require_script('jquery-iframe-transport', PL_ADMIN_JS_URL . 'blueimp/js/jquery.iframe-transport.js', array('jquery'));
