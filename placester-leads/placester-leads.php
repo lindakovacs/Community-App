@@ -24,19 +24,19 @@ include_once('helpers/lead-capture.php');
 
 $pl_admin_page = new PL_Admin_Page('placester', 1200, 'placester_leads', 'Leads', 'All Leads', PL_LEADS_DIR . 'admin/views/internal-crm.php');
 $pl_admin_page->require_script('placester-crm', PL_LEADS_JS_URL . 'crm.js', array('jquery-datatables'));
-$pl_admin_page->require_style('placester-crm', PL_LEADS_CSS_URL . 'crm.css', array('settings-all'));
+$pl_admin_page->require_style('placester-crm', PL_LEADS_CSS_URL . 'crm.css', array('placester-settings'));
 
 $pl_admin_page = new PL_Admin_Page('placester_leads', 1210, 'placester_emails', 'Email Notifications', 'Email Notifications', PL_LEADS_DIR . 'admin/views/lead-capture.php');
 $pl_admin_page->require_script('lead-capture', PL_LEADS_JS_URL . 'general.js', array('jquery-ui-core', 'jquery-ui-dialog'));
-$pl_admin_page->require_style('lead-capture', PL_LEADS_CSS_URL . 'general.css', array('settings-all'));
+$pl_admin_page->require_style('lead-capture', PL_LEADS_CSS_URL . 'general.css', array('placester-settings'));
 
 $pl_admin_page = new PL_Admin_Page('placester_leads', 1220, 'placester_crm', 'CRM Integration', 'CRM Integration', PL_LEADS_DIR . 'admin/views/external-crm.php');
 $pl_admin_page->require_script('placester-crm', PL_LEADS_JS_URL . 'crm.js', array('jquery-datatables'));
-$pl_admin_page->require_style('placester-crm', PL_LEADS_CSS_URL . 'crm.css', array('settings-all'));
+$pl_admin_page->require_style('placester-crm', PL_LEADS_CSS_URL . 'crm.css', array('placester-settings'));
 
 $pl_admin_page = new PL_Admin_Page('placester_leads', 1240, 'placester_client', 'Client Message', 'Client Message', PL_LEADS_DIR . 'admin/views/client.php');
 $pl_admin_page->require_script('placester-client', PL_LEADS_JS_URL . 'client.js');
-$pl_admin_page->require_style('placester-client', PL_LEADS_CSS_URL . 'client.css', array('settings-all'));
+$pl_admin_page->require_style('placester-client', PL_LEADS_CSS_URL . 'client.css', array('placester-settings'));
 
 
 add_action('wp_enqueue_scripts', 'placester_membership_enqueue');

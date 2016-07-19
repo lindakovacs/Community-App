@@ -29,4 +29,4 @@ $pl_admin_page = new PL_Admin_Page('placester_areas', 1150, 'placester_polygons'
 $pl_admin_page->require_script('colorpick', PL_AREAS_JS_URL . 'colorpicker/colorpicker.js');
 $pl_admin_page->require_style('colorpick', PL_AREAS_JS_URL . 'colorpicker/colorpicker.css');
 $pl_admin_page->require_script('polygons', PL_AREAS_JS_URL . 'polygon.js', array('jquery-datatables', 'google-maps', 'text-overlay', 'colorpick'));
-$pl_admin_page->require_style('polygons', PL_AREAS_CSS_URL . 'polygon.css', array('settings-all', 'colorpick'));
+$pl_admin_page->require_style('polygons', PL_AREAS_CSS_URL . 'polygon.css', array('placester-settings', 'colorpick'));

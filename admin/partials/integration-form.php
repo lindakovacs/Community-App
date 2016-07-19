@@ -1,7 +1,6 @@
 <?php 
-	$mls_list = PL_Integration_Helper::mls_list(); 
-	$whoami = PL_Helper_User::whoami();
-	// error_log(serialize($whoami));
+	$mls_list = PL_Integration::mls_list();
+	$whoami = PL_User::whoami();
 
 	$phone = !empty($whoami['phone']) ? $whoami['phone'] : (!empty($whoami['user']['phone']) ? $whoami['user']['phone'] : '');
 	$email = !empty($whoami['email']) ? $whoami['email'] : (!empty($whoami['user']['email']) ? $whoami['user']['email'] : '');

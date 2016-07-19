@@ -17,7 +17,7 @@ class PL_Compliance {
 			)
 		);
 
-		$whoami = PL_Helper_User::whoami();
+		$whoami = PL_User::whoami();
 		//if this account has multiple providers. Accounts with just one appear in "provider"
 		//if the requester passes in a provider_id, try to match it, else, do nothing.
 		if ( $whoami['providers'] && $provider_id && isset($whoami['providers'][$provider_id] ) )

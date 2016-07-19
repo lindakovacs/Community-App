@@ -77,6 +77,7 @@ class PL_Admin_Listings extends PL_Admin_Page {
 		<?php
 	}
 
+
 	public static function init() {
 		$pl_admin = new self();
 		add_action('wp_ajax_listings_table', array(__CLASS__, 'listings_table_ajax'));

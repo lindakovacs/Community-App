@@ -68,6 +68,14 @@ class PL_User {
 }
 
 
+// for blueprint compatibility
+class PL_Helper_User {
+	public static function whoami($args = array(), $custom_api_key = null) {
+		return PL_User::whoami($args, $custom_api_key);
+	}
+}
+
+
 // v2 ruby core API
 global $PL_API_SERVER;
 global $PL_API_USERS;

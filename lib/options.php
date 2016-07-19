@@ -56,7 +56,7 @@ class PL_Option_Helper {
 			$message = "You're already using that Placester API Key";
 		}
 		else {
-			$response = PL_Helper_User::whoami(array(), $new_api_key);
+			$response = PL_User::whoami(array(), $new_api_key);
 			if ($response && isset($response['user'])) {
 				$option_result = PL_Options::set('placester_api_key', $new_api_key);
 				if ($option_result) {
@@ -168,7 +168,7 @@ class PL_Option_Helper {
 
 	public static function get_default_country () {
 		$result = PL_Options::get('pls_default_country');
-		return $result;
+		return $result ?: 'US';
 	}
 
 	public static function set_default_location ($lat_lng) {

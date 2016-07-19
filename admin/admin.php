@@ -49,13 +49,6 @@ class PL_Admin_Page extends PL_Admin_Page_v1A {
 
 		// enqueue the page-specific scripts
 		parent::page_enqueue_scripts();
-
-		// special menu rendering for property edit page
-		if($this->page_name == 'placester_property_edit') {
-			$this->page_parent = 'placester_properties'; // make edit page visible in menu only when it is used
-			if($_REQUEST['id'])
-				$this->page_name .= '&id=' . $_REQUEST['id'];
-		}
 	}
 
 	public function page_print_scripts() {
@@ -70,24 +63,15 @@ class PL_Admin_Page extends PL_Admin_Page_v1A {
 
 
 // shared resources
-PL_Admin_Page::register_style('settings-all', PL_ADMIN_CSS_URL . 'settings.css');
+PL_Admin_Page::register_style('placester-settings', PL_ADMIN_CSS_URL . 'settings.css');
 PL_Admin_Page::register_style('placester-global', PL_ADMIN_CSS_URL . 'global.css', array('jquery-ui'));
 PL_Admin_Page::register_script('placester-global', PL_ADMIN_JS_URL . 'global.js', array('jquery'));
 
 
 // administration pages
-$pl_admin_page = new PL_Admin_Page('placester', 100, 'placester_settings', 'Settings', 'General', PL_ADMIN_VIEWS_DIR . 'general.php');
-$pl_admin_page->require_script('settings-general', PL_ADMIN_JS_URL . 'general.js', array('jquery-ui-core', 'jquery-ui-dialog'));
-$pl_admin_page->require_style('settings-general', PL_ADMIN_CSS_URL . 'general.css', array('settings-all'));
-
-$pl_admin_page = new PL_Admin_Page('placester_settings', 180, 'placester_international', 'International', 'International', PL_ADMIN_VIEWS_DIR . 'international.php');
-$pl_admin_page->require_script('international', PL_ADMIN_JS_URL . 'international.js');
-$pl_admin_page->require_style('settings-all');
-
-$pl_admin_page = new PL_Admin_Page('placester', 200, 'placester_integration', 'IDX/MLS', 'IDX/MLS', PL_ADMIN_VIEWS_DIR . 'integration.php');
-$pl_admin_page->require_script('integration', PL_ADMIN_JS_URL . 'integration.js');
-$pl_admin_page->require_style('integration', PL_ADMIN_CSS_URL . 'integration.css');
-
+require_once('general.php');
+require_once('international.php');
+require_once('integration.php');
 require_once('listings.php');
 require_once('listing.php');
 

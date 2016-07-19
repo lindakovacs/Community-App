@@ -83,7 +83,7 @@ class PL_Admin_Listing extends PL_Admin_Page {
 
 		// fill in default country for new listing
 		if(empty($_POST))
-			$_POST = array('country' => PL_Helper_User::get_default_country());
+			$_POST = array('country' => PL_Option_Helper::get_default_country());
 		?>
 
 		<div id="loading_overlay" style="display:none"><?php echo $overlay; ?></div>
@@ -245,9 +245,21 @@ class PL_Admin_Listing extends PL_Admin_Page {
 		<?php
 	}
 
+	public function page_enqueue_scripts() {
+		parent::page_enqueue_scripts();
+
+		// special menu rendering for property edit page
+		if($this->page_name == 'placester_property_edit') {
+			$this->page_parent = 'placester_properties'; // make edit page visible in menu only when it is used
+			if($_REQUEST['id'])
+				$this->page_name .= '&id=' . $_REQUEST['id'];
+		}
+	}
+
+
 	public static function init() {
 		$pl_admin_page = new self('placester_properties', 320, 'placester_property_add', 'Add Listing');
-		$pl_admin_page = new self('placester_properties_x', 325, 'placester_property_edit', 'Edit Listing');
+		$pl_admin_page = new self('placester_no_display', 325, 'placester_property_edit', 'Edit Listing');
 		add_action('wp_ajax_upload_image', array(__CLASS__, 'upload_image_ajax'));
 	}
 
