@@ -139,7 +139,7 @@ add_action('wp_head', 'placester_info_bar');
 add_action('admin_head', 'placester_info_bar');
 function placester_info_bar() {
 	if(PL_Option_Helper::get_demo_data_flag() && current_user_can('manage_options')) {
-		include(PLACESTER_PLUGIN_DIR . 'admin/views/partials/infobar.php');
+		include('admin/infobar.php');
 	}
 }
 

@@ -68,7 +68,7 @@ class PL_User {
 }
 
 
-// for blueprint compatibility
+// PL_COMPATIBILITY_MODE -- preserve the interface expected by blueprint
 class PL_Helper_User {
 	public static function whoami($args = array(), $custom_api_key = null) {
 		return PL_User::whoami($args, $custom_api_key);
