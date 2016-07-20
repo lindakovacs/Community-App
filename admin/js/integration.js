@@ -41,10 +41,10 @@ jQuery(document).ready(function($) {
 			errors.push('Please enter a valid phone number');
 		}
 
-		var broker_email = $('#broker_email');
-		if (broker_email.length != 0 && !validate_email_address(broker_email.val())) {
-			broker_email.addClass('invalid');
-			broker_email.closest('div .row').find('h3').first().addClass('invalid');
+		var feed_agent_email = $('#feed_agent_email');
+		if (feed_agent_email.length != 0 && !validate_email_address(feed_agent_email.val())) {
+			feed_agent_email.addClass('invalid');
+			feed_agent_email.closest('div .row').find('h3').first().addClass('invalid');
 			errors.push('Please enter a valid email address');
 		}
 
@@ -79,7 +79,7 @@ jQuery(document).ready(function($) {
 		$.post(ajaxurl, form_values, function(data, textStatus, xhr) {
 
 			if (data && data.result) {
-				$(form_message).html(data.message);
+				rets_form_message.html(data.message);
 				setTimeout(function () {
 					window.location.href = window.location.href;
 				}, 500);

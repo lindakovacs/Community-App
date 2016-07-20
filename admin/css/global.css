@@ -55,7 +55,9 @@ h3.hndle {
   font-size: 15px;
   font-family: Arial;
   font-weight: normal;
-  padding: 7px 10px; }
+  margin: 0;
+  padding: 8px 12px;
+}
 
 /* global modal styling */
 /* Cleaning up jqueryUI's styles */
