@@ -34,18 +34,25 @@ jQuery(document).ready(function($) {
 			errors.push('Please enter a valid agent id');
 		}
 
-		var phone = $('#phone');
-		if (phone.length != 0 && !validate_phone_number(phone.val())) {
-			phone.addClass('invalid');
-			phone.closest('div .row').find('h3').first().addClass('invalid');
-			errors.push('Please enter a valid phone number');
-		}
-
 		var feed_agent_email = $('#feed_agent_email');
 		if (feed_agent_email.length != 0 && !validate_email_address(feed_agent_email.val())) {
 			feed_agent_email.addClass('invalid');
 			feed_agent_email.closest('div .row').find('h3').first().addClass('invalid');
 			errors.push('Please enter a valid email address');
+		}
+
+		var broker_email = $('#broker_email');
+		if (broker_email.length != 0 && !validate_email_address(broker_email.val())) {
+			broker_email.addClass('invalid');
+			broker_email.closest('div .row').find('h3').first().addClass('invalid');
+			errors.push('Please enter a valid email address');
+		}
+
+		var phone = $('#phone');
+		if (phone.length != 0 && !validate_phone_number(phone.val())) {
+			phone.addClass('invalid');
+			phone.closest('div .row').find('h3').first().addClass('invalid');
+			errors.push('Please enter a valid phone number');
 		}
 
 		if (errors.length) {

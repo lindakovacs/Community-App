@@ -44,10 +44,33 @@ class PL_Admin_Integration extends PL_Admin_Page {
 			<p>Looking for multiple MLS integrations? Drop us a note at <a mailto="support@placester.com">support@placester.com</a> or give us a ring at (800) 728-8391 and we'll get you set up.</p>
 		<?php }
 
-		else if (!empty($integration_status['integration']['id'])) { ?>
+		else if (!empty($integration_status['integration']['id'])) {
+			switch($integration_status['integration']['status']) {
+				case 4:
+				case 'Approved - Awaiting Activation':
+					$status = ' was approved';
+					break;
+				case 1:
+				case 'Rejected':
+					$status = ' was rejected';
+					break;
+				case 3:
+				case 'Completed':
+					$status = ' was completed';
+					break;
+				case 'In Progress':
+					$status = ' is pending';
+					break;
+				default:
+					if(!is_numeric($integration_status['integration']['status']))
+						$status = ' has status: ' . $integration_status['integration']['status'];
+					else
+						$status = ' is pending';
+			}
+			?>
 
 			<div class="header-wrapper">
-				<h2>Your integration request <?php echo $integration_status['integration']['id'] ?> is pending</h2>
+				<h2>Your integration request <?php echo $integration_status['integration']['id'] . $status; ?></h2>
 			</div>
 			<p class="import-message">(Submitted <?php echo date_format(date_create($integration_status['integration']['created_at']), "jS F, Y g:i A.") ?>)</p>
 
@@ -85,7 +108,7 @@ class PL_Admin_Integration extends PL_Admin_Page {
 			<p>The Real Estate Website Builder plugin can pull listings from your local MLS using a widely supported format called RETS. Once activated, the plugin will automatically update your website with listings as they are added, edited, and removed.
 				Note that MLS integrations require a <a href="https://placester.com/subscription/">Premium Subscription</a> to Placester which is $45 per month.</p>
 
-			<?php if (PL_Option_Helper::api_key())
+			<?php if ($integration_status['whoami'])
 				$this->render_integration_form();
 		}
 	}
@@ -152,6 +175,16 @@ class PL_Admin_Integration extends PL_Admin_Page {
 					</div>
 					<div class="elements">
 						<input id="feed_agent_email" name="feed_agent_email" size="30" type="text" value="<?php echo $email ?>">
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="info">
+						<h3>Broker Email Address</h3>
+						<p>Broker approval is required by some MLS associations.</p>
+					</div>
+					<div class="elements">
+						<input id="broker_email" name="broker_email" size="30" type="text" value="<?php echo $email ?>">
 					</div>
 				</div>
 
