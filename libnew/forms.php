@@ -166,40 +166,29 @@ class PLX_Form {
 	}
 }
 
-class PLX_Attribute_Form extends PLX_Form {
+class PLX_Data_Form extends PLX_Form {
 	protected $form_data;
+
+	public function __construct($data = null) {
+		$this->set_form_data($data ?: $_POST);
+
+	}
 
 	public function set_form_data($data) {
 		$this->form_data = $data;
 	}
 
-	public function get_form_item($name, $display = null, $type = null, $options = null, $default = null) {
-		if(is_null($display) && $attribute = PLX_Attributes::get($name))
-			$display = $attribute['display'];
-
-		if(is_null($type) && (isset($attribute) || $attribute = PLX_Attributes::get($name)))
-			$type = $this->get_default_item_type($attribute);
-
-		if(is_null($options) && (isset($attribute) || $attribute = PLX_Attributes::get($name)))
-			$options = $this->get_default_item_options($attribute);
-
-		if(!isset($attribute)) $attribute = PLX_Attributes::get($name);
-		$value = $this->get_item_value($attribute, $default);
-
-		return parent::get_form_item($name, $display, $type, $options, $value);
+	public function get_form_item($name, $display, $type, $options, $default = null) {
+		return parent::get_form_item($name, $display, $type, $options, $this->get_item_value($name, $default));
 	}
 
-	protected function get_item_value($attribute, $default = null) {
-		if(!isset($this->form_data))
-			$this->form_data = &$_POST;
-
-		return isset($this->form_data[$attribute['name']]) ?
-			($this->form_data[$attribute['name']]) :
-			($this->form_data ? null : $default);
+	protected function get_item_value($name, $default = null) {
+		return isset($this->form_data[$name]) ? $this->form_data[$name] : ($this->form_data ? null : $default);
 	}
 
-	static protected function get_default_item_type($attribute) {
-		switch($attribute['type']) {
+	// for use by derived classes
+	static protected function get_item_type($data_type) {
+		switch($data_type) {
 			case PLX_Attributes::BOOLEAN:
 				return PLX_Form::CHECKBOX;
 
@@ -215,10 +204,7 @@ class PLX_Attribute_Form extends PLX_Form {
 				return PLX_Form::INPUT;
 
 			case PLX_Attributes::TEXT_VALUE:
-				if($attribute['fixed'])
-					return PLX_Form::SELECT;
-				else
-					return PLX_Form::INPUT;
+				return PLX_Form::SELECT;
 
 			case PLX_Attributes::SHORT_TEXT:
 				return PLX_Form::INPUT;
@@ -229,6 +215,26 @@ class PLX_Attribute_Form extends PLX_Form {
 
 		return null;
 	}
+}
+
+
+class PLX_Attribute_Form extends PLX_Data_Form {
+	public function get_form_item($name, $display = null, $type = null, $options = null, $default = null) {
+		$attribute = PLX_Attributes::get($name);
+
+		if(is_null($display))
+			$display = $attribute['display'];
+		if(is_null($type))
+			$type = $this->get_default_item_type($attribute);
+		if(is_null($options))
+			$options = $this->get_default_item_options($attribute);
+
+		return parent::get_form_item($name, $display, $type, $options, $default);
+	}
+
+	protected function get_default_item_type($attribute) {
+		return $this->get_item_type($attribute['type']);
+	}
 
 	protected function get_default_item_options($attribute) {
 		return PLX_Attributes::get_attribute_values($attribute['name']);
@@ -236,28 +242,28 @@ class PLX_Attribute_Form extends PLX_Form {
 }
 
 
-class PLX_Add_Listing_Form extends PLX_Attribute_Form {
-	public function get_form_attributes() {
-		$form_attributes = array('basic' => array(), 'extended' => array());
+class PLX_Parameter_Form extends PLX_Data_Form {
+	public function get_form_item($name, $display = null, $type = null, $options = null, $default = null) {
+		$parameter = PLX_Parameters::get($name);
 
-		foreach(PLX_Attributes::get_attribute_values('listing_type') as $type => $display) {
+		if(is_null($display))
+			$display = $parameter['display'];
+		if(is_null($type))
+			$type = $this->get_default_item_type($parameter);
+		if(is_null($options))
+			$options = $this->get_default_item_options($parameter);
 
-			foreach(PLX_Attributes::get_basic_attributes($type) as $group => $attributes) {
-				if($group == 'Listing' || $group == 'Location') {
-					if(!isset($form_attributes[$group]))
-						$form_attributes[$group] = $attributes;
-				} else {
-					$form_attributes['basic'][$type][$group] = $attributes;
-				}
-			}
+		return parent::get_form_item($name, $display, $type, $options, $default);
+	}
 
-			foreach(PLX_Attributes::get_extended_attributes($type) as $group => $attributes)
-				$form_attributes['extended'][$type][$group] = $attributes;
-		}
+	protected function get_default_item_type($parameter) {
+		return $this->get_item_type($parameter['type']);
+	}
 
-		return $form_attributes;
+	protected function get_default_item_options($parameter) {
+		return PLX_Attributes::get_attribute_values($parameter['attribute']);
 	}
 }
 
 
-class PLX_Search_Form extends PLX_Attribute_Form {}
+class PLX_Search_Form extends PLX_Parameter_Form {}

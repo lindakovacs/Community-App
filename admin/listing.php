@@ -1,6 +1,5 @@
 <?php
 
-
 require_once(PLACESTER_PLUGIN_DIR . 'libnew/forms.php');
 
 
@@ -105,55 +104,10 @@ class PL_Admin_Listing extends PL_Admin_Page {
 				</div>
 				<div id="post-body">
 					<div id="post-body-content">
-						<?php $form = new PLX_Add_Listing_Form(); $form_attributes = $form->get_form_attributes(); ?>
-						<div id="shared-Listing-attributes">
-							<?php foreach($form_attributes['Listing'] as $attribute)
-								echo $form->get_form_item($attribute['name']); ?>
-						</div>
-
-						<div id="shared-Location-attributes" class="postbox">
-							<h3 class="hndle"><span><?php echo PLX_Attributes::get_group_title('Location'); ?></span></h3>
-							<div class="inside">
-								<div id="location-entry">
-									<?php foreach($form_attributes['Location'] as $attribute)
-										if(!in_array($attribute['name'], array('latitude', 'longitude')))
-											echo $form->get_form_item($attribute['name']); ?>
-								</div>
-								<div id="location-map-canvas"></div>
-								<div id="location-coord-display">
-									<?php echo $form->get_form_item('latitude'); ?>
-									<?php echo $form->get_form_item('longitude'); ?>
-								</div>
-							</div>
-						</div>
-
-						<?php foreach($form_attributes['basic'] as $type => $groups) { ?>
-							<div id="<?php echo "basic-$type-attributes"; ?>" class="<?php echo "basic-attributes $type-attributes"; ?>" style="display: none;">
-								<?php foreach($groups as $group => $attributes) { ?>
-									<div id="<?php echo "basic-$type-$group-attributes"; ?>" class="postbox">
-										<h3 class="hndle"><span><?php echo PLX_Attributes::get_group_title($group, $type); ?></span></h3>
-										<div class="inside">
-											<?php foreach($attributes as $attribute)
-												echo $form->get_form_item($attribute['name']); ?>
-										</div>
-									</div>
-								<?php } ?>
-							</div>
-						<?php } ?>
-
-						<?php foreach($form_attributes['extended'] as $type => $groups) { ?>
-							<div id="<?php echo "extended-$type-attributes"; ?>" class="<?php echo "extended-attributes $type-attributes"; ?>" style="display: none;">
-								<?php foreach($groups as $group => $attributes) { ?>
-									<div id="<?php echo "extended-$type-$group-attributes"; ?>" class="postbox">
-										<h3 class="hndle"><span><?php echo PLX_Attributes::get_group_title($group, $type); ?></span></h3>
-										<div class="inside">
-											<?php foreach($attributes as $attribute)
-												echo $form->get_form_item($attribute['name']); ?>
-										</div>
-									</div>
-								<?php } ?>
-							</div>
-						<?php } ?>
+						<?php
+							$form = new PL_Admin_Listing_Form();
+							$form->render();
+						?>
 
 						<div id="listing-images" class="postbox">
 							<h3 class="hndle"><span>Images</span></h3>
@@ -350,5 +304,94 @@ class PL_Admin_Listing extends PL_Admin_Page {
 		header('Content-type: text/html');
 		echo json_encode($response);
 		die();
+	}
+}
+
+
+class PL_Admin_Listing_Form extends PLX_Attribute_Form {
+	public function render() {
+		$form_attributes = $this->get_form_attributes(); ?>
+
+		<div id="shared-Listing-attributes">
+			<?php foreach($form_attributes['Listing'] as $attribute)
+				echo $this->get_form_item($attribute['name']); ?>
+		</div>
+
+		<div id="shared-Location-attributes" class="postbox">
+			<h3 class="hndle"><span><?php echo PLX_Attributes::get_group_title('Location'); ?></span></h3>
+			<div class="inside">
+				<div id="location-entry">
+					<?php foreach($form_attributes['Location'] as $attribute)
+						if(!in_array($attribute['name'], array('latitude', 'longitude')))
+							echo $this->get_form_item($attribute['name']); ?>
+				</div>
+				<div id="location-map-canvas"></div>
+				<div id="location-coord-display">
+					<?php echo $this->get_form_item('latitude'); ?>
+					<?php echo $this->get_form_item('longitude'); ?>
+				</div>
+			</div>
+		</div>
+
+		<?php foreach($form_attributes['basic'] as $type => $groups) { ?>
+			<div id="<?php echo "basic-$type-attributes"; ?>" class="<?php echo "basic-attributes $type-attributes"; ?>" style="display: none;">
+				<?php foreach($groups as $group => $attributes) { ?>
+					<div id="<?php echo "basic-$type-$group-attributes"; ?>" class="postbox">
+						<h3 class="hndle"><span><?php echo PLX_Attributes::get_group_title($group, $type); ?></span></h3>
+						<div class="inside">
+							<?php foreach($attributes as $attribute)
+								echo $this->get_form_item($attribute['name']); ?>
+						</div>
+					</div>
+				<?php } ?>
+			</div>
+		<?php } ?>
+
+		<?php foreach($form_attributes['extended'] as $type => $groups) { ?>
+			<div id="<?php echo "extended-$type-attributes"; ?>" class="<?php echo "extended-attributes $type-attributes"; ?>" style="display: none;">
+				<?php foreach($groups as $group => $attributes) { ?>
+					<div id="<?php echo "extended-$type-$group-attributes"; ?>" class="postbox">
+						<h3 class="hndle"><span><?php echo PLX_Attributes::get_group_title($group, $type); ?></span></h3>
+						<div class="inside">
+							<?php foreach($attributes as $attribute)
+								echo $this->get_form_item($attribute['name']); ?>
+						</div>
+					</div>
+				<?php } ?>
+			</div>
+		<?php }
+	}
+
+	protected function get_form_attributes() {
+		$form_attributes = array('basic' => array(), 'extended' => array());
+
+		foreach(PLX_Attributes::get_attribute_values('listing_type') as $type => $display) {
+
+			foreach(PLX_Attributes::get_basic_attributes($type) as $group => $attributes) {
+				if($group == 'Listing' || $group == 'Location') {
+					if(!isset($form_attributes[$group]))
+						$form_attributes[$group] = $attributes;
+				} else {
+					$form_attributes['basic'][$type][$group] = $attributes;
+				}
+			}
+
+			foreach(PLX_Attributes::get_extended_attributes($type) as $group => $attributes)
+				$form_attributes['extended'][$type][$group] = $attributes;
+		}
+
+		return $form_attributes;
+	}
+
+	protected function get_default_item_type($attribute) {
+		switch($attribute['type']) {
+			case PLX_Attributes::TEXT_VALUE:
+				if($attribute['fixed'])
+					return PLX_Form::SELECT;
+				else
+					return PLX_Form::INPUT;
+		}
+
+		return parent::get_default_item_type($attribute);
 	}
 }

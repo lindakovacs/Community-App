@@ -36,20 +36,33 @@ form#pls_admin_my_listings_filters {
 }
 
 
-/* Form sections */
-form#pls_admin_my_listings {
-    text-align: left;
-    line-height: 36px;
+.pl-form-item {
+    display: inline-block;
+    width: 190px;
+    margin: 10px;
 }
-.form_group, .form-subgroup {
+.pl-form-item.pl-form-textarea-item {
+    min-width: 190px;
+    width: calc(100% - 20px);
+}
+
+.pl-form-value {
     display: block;
-    margin: 0;
+    width: 100%;
 }
-.pls_search_form {
+.pl-form-item-label {
+    display: block;
+    margin-left: 3px;
+}
+
+.pl-form-item-label.pl-form-radio-label, .pl-form-item-label.pl-form-checkbox-label {
     display: inline-block;
 }
-.pls_search_form:not(:first-of-type) {
-    margin-left: 30px;
+.pl-form-value.pl-form-radio, .pl-form-value.pl-form-checkbox {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin: 3px 1px;
 }
 
 
