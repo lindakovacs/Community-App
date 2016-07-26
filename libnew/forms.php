@@ -114,7 +114,7 @@ class PLX_Form {
 		?>
 			<div id="<?php echo "pl-form-item-$name"; ?>" class="pl-form-item pl-form-multiselect-item">
 				<label for="<?php echo "pl-form-$name"; ?>" class="pl-form-item-label pl-form-multiselect-label"><?php echo $display; ?></label>
-				<select id="<?php echo "pl-form-$name"; ?>" class="pl-form-value pl-form-multiselect" name="<?php echo $name; ?>" multiple="multiple">
+				<select id="<?php echo "pl-form-$name"; ?>" class="pl-form-value pl-form-multiselect" name="<?php echo $name; ?>[]" multiple="multiple">
 				<?php foreach($options as $option_name => $option_display) { ?>
 					<option class="pl-form-option" value="<?php echo $option_name; ?>"<?php if(in_array($option_name, $values)) echo ' selected="selected"'; ?>>
 						<?php echo self::esc($option_display); ?>
@@ -138,7 +138,7 @@ class PLX_Form {
 			<fieldset id="<?php echo "pl-form-item-$name"; ?>" class="pl-form-item pl-form-checkbox-group">
 				<legend class="pl-form-item-legend pl-form-checkbox-legend"><?php echo $display; ?></legend>
 				<?php foreach($options as $option_name => $option_display) {
-					echo self::get_form_item($name, $option_display, self::CHECKBOX, $option_name, in_array($option_name, $values) ? $option_name : null);
+					echo self::get_form_item($name . '[]', $option_display, self::CHECKBOX, $option_name, in_array($option_name, $values) ? $option_name : null);
 				} ?>
 			</fieldset>
 		<?php

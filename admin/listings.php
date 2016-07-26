@@ -14,9 +14,7 @@ class PL_Admin_Listings extends PL_Admin_Page {
 
 	public function render_admin_content() {
 		$search_form = new PL_Admin_Listings_Form();
-		$search_parameters = $search_form->get_form_parameters();
-
-		$filter_form = new PLX_Form();
+		$parameters = $search_form->get_form_parameters();
 		?>
 
 		<form name="input" method="POST" class="plx-search-form" id="pl-admin-listings-form">
@@ -24,25 +22,19 @@ class PL_Admin_Listings extends PL_Admin_Page {
 				<?php echo $search_form->get_form_item('mls_id', 'Search by MLS ID'); ?>
 				<?php echo $search_form->get_form_item('address', 'Search by Address'); ?>
 				<?php echo $search_form->get_form_item('agency_only', 'Agency Listings'); ?>
-				<?php echo $search_form->get_form_item('images', 'With Images'); ?>
+				<?php echo $search_form->get_form_item('images', 'Images'); ?>
 			</section>
 
 			<section class="form-group" id="search-filters">
-				<?php echo $filter_form->get_form_item('filters[]', 'Show Additional Filters', PLX_Form::CHECKBOX_GROUP, array(
-					'listing' => 'Listing Types', 'location' => 'Location', 'basic' => 'Basic Details', 'advanced' => 'Advanced')); ?>
-			</section>
-
-			<section class="form-group" id="advanced-filters" style="display: none;">
-				<?php echo $filter_form->get_form_item('advanced-filters[]', 'Show Advanced Filters', PLX_Form::CHECKBOX_GROUP,
-					array_keys($search_parameters['extended'])); ?>
+				<?php $search_form->render_filter_form($parameters); ?>
 			</section>
 
 			<section class="form-group" id="basic-search">
-				<?php $search_form->render_basic_form($search_parameters['basic']); ?>
+				<?php $search_form->render_basic_form($parameters['basic']); ?>
 			</section>
 
-			<section class="form-group" id="advanced-search">
-				<?php $search_form->render_advanced_form($search_parameters['extended']); ?>
+			<section class="form-group" id="advanced-search" style="display: none;">
+				<?php $search_form->render_advanced_form($parameters['extended']); ?>
 			</section>
 		</form>
 
@@ -207,6 +199,27 @@ class PL_Admin_Listings_Form extends PLX_Parameter_Form {
 		return $form_parameters;
 	}
 
+	public function render_filter_form($search_parameters) {
+		$filter_form = new PLX_Data_Form(array());
+		?>
+
+		<fieldset>
+			<legend>Show Additional Filters</legend>
+			<div id="basic-filters"><?php
+				echo $filter_form->get_form_item('filters[]', 'Listing Types', PLX_Form::CHECKBOX, 'listing');
+				echo $filter_form->get_form_item('filters[]', 'Location', PLX_Form::CHECKBOX, 'location');
+				echo $filter_form->get_form_item('filters[]', 'Basic Details', PLX_Form::CHECKBOX, 'basic');
+				echo $filter_form->get_form_item('filters[]', 'More...', PLX_Form::CHECKBOX, 'advanced'); ?>
+			</div>
+			<div id="advanced-filters" style="display: none;"><?php
+				foreach(array_keys($search_parameters['extended']) as $option)
+					echo $filter_form->get_form_item('filters[]', $option, PLX_Form::CHECKBOX, $option); ?>
+			</div>
+		</fieldset>
+
+		<?php
+	}
+
 	public function render_basic_form($basic_parameters) {
 		?>
 
@@ -246,7 +259,7 @@ class PL_Admin_Listings_Form extends PLX_Parameter_Form {
 	public function render_advanced_form($extended_parameters) {
 		?>
 
-		<div id="extended-parameters" style="display: none;">
+		<div id="extended-parameters">
 			<?php foreach($extended_parameters as $group => $parameters) { ?>
 				<div id="<?php echo "extended-$group-parameters"; ?>" class="postbox" style="display: none;">
 					<h3 class="hndle"><span><?php echo PLX_Parameters::get_group_title($group); ?></span></h3>

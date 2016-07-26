@@ -374,7 +374,7 @@ class PLX_Parameters extends PLX_Data_Internal {
 	}
 
 	protected function _get_group_title($group) {
-		return $group;
+		return PLX_Attributes::get_group_title($group);
 	}
 
 	protected function _get_group_parameters($groups, $flatten = false) {

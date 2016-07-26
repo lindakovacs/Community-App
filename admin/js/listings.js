@@ -3,20 +3,17 @@
 jQuery(document).ready(function($) {
     $('section#quick-search .pl-form-value').live('change', function (event) {
         event.preventDefault();
-        listings_datatable.fnDraw();
-    });
+        trigger_search();    });
 
     $('section#basic-search .pl-form-value').live('change', function (event) {
         event.preventDefault();
-        listings_datatable.fnDraw();
-    });
+        trigger_search();    });
 
     $('section#advanced-search .pl-form-value').live('change', function (event) {
         event.preventDefault();
-        listings_datatable.fnDraw();
-    });
+        trigger_search();    });
 
-    $('section#search-filters .pl-form-value:not([value="advanced"])').live('change', function (event) {
+    $('div#basic-filters .pl-form-value:not([value="advanced"])').live('change', function (event) {
         event.preventDefault();
         var before = listings_search_params([]);
 
@@ -28,22 +25,22 @@ jQuery(document).ready(function($) {
         possibly_trigger_search(before, 600);
     });
 
-    $('section#search-filters .pl-form-value[value="advanced"]').live('change', function (event) {
+    $('div#basic-filters .pl-form-value[value="advanced"]').live('change', function (event) {
         event.preventDefault();
         var before = listings_search_params([]);
 
         if ($(this).is(":checked")) {
-            $('section#advanced-filters').slideDown(500);
-            $('section#advanced-search div#extended-parameters').slideDown(500);
+            $('div#advanced-filters').slideDown(500);
+            $('section#advanced-search').slideDown(500);
         } else {
-            $('section#advanced-filters').slideUp(500);
-            $('section#advanced-search div#extended-parameters').slideUp(500);
+            $('div#advanced-filters').slideUp(500);
+            $('section#advanced-search').slideUp(500);
         }
 
         possibly_trigger_search(before, 600);
     });
 
-    $('section#advanced-filters .pl-form-value').live('change', function (event) {
+    $('div#advanced-filters .pl-form-value').live('change', function (event) {
         event.preventDefault();
         var before = listings_search_params([]);
 
@@ -57,7 +54,7 @@ jQuery(document).ready(function($) {
 
     // parses search form and adds parameters to aoData
     function listings_search_params (aoData) {
-        $.each($('form#pl-admin-listings-form .pl-form-value').filter(':visible').add('section#advanced-filters .pl-form-value').serializeArray(), function(i, field) {
+        $.each($('form#pl-admin-listings-form .pl-form-value').filter(':visible').add('section#search-filters .pl-form-value').serializeArray(), function(i, field) {
             if(field.value && field.value != 'false') {
                 if(field.value == 'true') field.value = 1;
                 aoData.push({"name" : field.name, "value" : field.value});
@@ -67,14 +64,20 @@ jQuery(document).ready(function($) {
         return aoData;
     }
 
+    function trigger_search() {
+        $('#placester_listings_list_processing').css('display', 'block'); // "Processing..." stays hidden on initial page load
+        listings_datatable.fnDraw();
+    }
+
     // redraw if parameters with values are shown or hidden
-    var slide_timer;
     function possibly_trigger_search (before, delay) {
-        clearTimeout(slide_timer);
-        slide_timer = setTimeout(function () {
+        if(arguments.callee.timer)
+            clearTimeout(arguments.callee.timer);
+
+        arguments.callee.timer = setTimeout(function () {
             var after = listings_search_params([]);
             if(before.length != after.length)
-                listings_datatable.fnDraw();
+                trigger_search();
         }, delay);
     }
 
@@ -84,12 +87,12 @@ jQuery(document).ready(function($) {
         "bServerSide": true,
         "sServerMethod": "POST",
         'sPaginationType': 'full_numbers',
-        'sDom': '<"dataTables_top"pi>lftpir',
+        'sDom': '<"dataTables_top"p>lftir',
         "sAjaxSource": ajaxurl, //wordpress url thing
         "aoColumns" : [
-            { sWidth: '100px' },    //images
+            { sWidth: '60px' },     //images
             { sWidth: '300px' },    //address
-            { sWidth: '70px' },     //zip
+            { sWidth: '60px' },     //zip
             { sWidth: '120px' },    //listing type
             { sWidth: '120px' },    //property type
             { sWidth: '80px' },     //status
@@ -100,11 +103,22 @@ jQuery(document).ready(function($) {
         ],
         "aaSorting": [[0, "desc"]],
         "fnServerParams": function ( aoData ) {
+            position_processing_message();
             aoData.push( { "name": "action", "value" : "listings_table"} );
             aoData = listings_search_params(aoData);
         }
     });
 
+    function position_processing_message() {
+        var tbody = $('#placester_listings_list').find('tbody');
+        var pos = tbody.position();
+        var size = tbody.css(['width', 'height']);
+
+        $('#placester_listings_list_processing').css({
+            'left': pos.left, 'top': pos.top,
+            'width': size.width, 'height': size.height
+        });
+    }
 
     //datepicker
     $("input#metadata-max_avail_on_picker, #metadata-min_avail_on_picker").datepicker({

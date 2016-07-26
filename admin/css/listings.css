@@ -1,52 +1,22 @@
 
-#placester_listings_list_processing {
-    text-indent: 20px;
-    color: #444;
-    visibility: visible;
-    position: absolute;
-    top: 45px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.8);
-    font-size: 30px;
-    padding: 50px 0 0 40%;
-    z-index: 1000;
-    font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",sans-serif;
-    font-weight: normal;
-    text-shadow: rgba(255, 255, 255, 1) 0 1px 0
-}
-
-
-div#pl-form-item-address {
-    width: 390px;
-}
-
 .plx-search-form section {
     margin-top: 10px;
     margin-bottom: 20px;
 }
 
-.plx-search-form section#advanced-filters {
-    padding-top: 10px;
+div#pl-form-item-address {
+    width: 390px;
 }
 
-fieldset.pl-form-item {
-    display: block;
-    margin-left: 0;
-    margin-right: 0;
-    width: auto;
-}
-
-fieldset.pl-form-item legend {
+section#search-filters > fieldset > legend {
     font-size: larger;
     font-weight: bolder;
     margin-left: 10px;
     margin-right: 10px;
 }
 
-fieldset.pl-form-item div.pl-form-item {
-    width: 140px;
+section#search-filters div.pl-form-item {
+    width: 150px;
 }
 
 
@@ -78,7 +48,6 @@ fieldset.pl-form-item div.pl-form-item {
     height: 16px;
     margin: 3px 1px;
 }
-
 
 
 .row_actions {
@@ -116,23 +85,47 @@ div#delete_response_message.green {
   font-weight: bold;
 }
 
+
 /**
  * Styles used by Datatables object in Admin interface
  */
+#placester_listings_list {
+    min-width: 1220px !important;
+    width: inherit !important;
+}
 
-.paging_full_numbers { 
-    margin-top: 12px; 
-    text-align: right;
+#placester_listings_list_wrapper {
+    position: relative;
+}
+
+#placester_listings_list_processing {
+    position: absolute;
+    display: none;
+    z-index: 1000;
+
+    background: rgba(207, 207, 207, 0.8);
+    min-width: 1218px !important;
+    width: calc(100% - 2px) !important;
+
+    font-size: 20px;
+    line-height: 48px;
+    text-align: center;
+}
+
+
+.paging_full_numbers {
     float: right;
-    padding-bottom: 10px;
+    margin-top: 12px;
+    text-align: right;
+    padding-bottom: 12px;
 }
 
 .dataTables_info {
+    text-align: center;
     padding-top: 12px;
-    float: right;
-    margin-right: 10px;
-    font-size: 12px;
+
     font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
+    font-size: 12px;
     font-style: italic;
 }
 
@@ -141,13 +134,14 @@ div#delete_response_message.green {
     display: none;
 }
 
+.paging_full_numbers a.paginate_button,
+.paging_full_numbers a.paginate_active {
+    padding: 3px 6px;
+}
+
 .paging_full_numbers span a.paginate_button,
 .paging_full_numbers span a.paginate_active {
     text-decoration: none;
-    padding: 3px 6px;
-    -moz-border-radius: 5px;
-    -khtml-border-radius: 5px;
-    -webkit-border-radius: 5px;
     border-radius: 5px;
     border: 1px solid;
     margin-right: 3px;
@@ -162,10 +156,10 @@ div#delete_response_message.green {
     cursor: pointer;
 }
 
-.paging_full_numbers span a.paginate_active { 
-    color: #555;
-    background: #DFDFDF;
+.paging_full_numbers span a.paginate_active {
     border-color: lightGrey;
+    background: #DFDFDF;
+    color: #555;
     cursor: auto;
 }
 
