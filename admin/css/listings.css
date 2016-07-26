@@ -18,21 +18,35 @@
 }
 
 
-/* Top section -- filter the filters */
-form#pls_admin_my_listings_filters {
-    text-align: center;
-    line-height: 36px;
+div#pl-form-item-address {
+    width: 390px;
 }
 
-/* Or search by address */
-.pls_search_form#address_search {
-    margin-left: 150px;
-    text-align: right;
-
-    font-size: 18px;
+.plx-search-form section {
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
-.pls_search_form#address_search input {
-    width: 300px;
+
+.plx-search-form section#advanced-filters {
+    padding-top: 10px;
+}
+
+fieldset.pl-form-item {
+    display: block;
+    margin-left: 0;
+    margin-right: 0;
+    width: auto;
+}
+
+fieldset.pl-form-item legend {
+    font-size: larger;
+    font-weight: bolder;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+fieldset.pl-form-item div.pl-form-item {
+    width: 140px;
 }
 
 

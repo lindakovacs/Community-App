@@ -13,17 +13,38 @@ class PL_Admin_Listings extends PL_Admin_Page {
 	}
 
 	public function render_admin_content() {
-		$form = new PL_Admin_Listings_Form();
+		$search_form = new PL_Admin_Listings_Form();
+		$search_parameters = $search_form->get_form_parameters();
+
+		$filter_form = new PLX_Form();
 		?>
 
-		<form name="input" method="POST" class="complex-search" id="pls_admin_my_listings_filters">
-			<section class="form_group form_group_show_filters" id="show_filters">
-				<?php echo $form->get_form_item('address', 'Search by Address'); ?>
-				<?php echo $form->get_form_item('images', 'Has Images'); ?>
+		<form name="input" method="POST" class="plx-search-form" id="pl-admin-listings-form">
+			<section class="form-group" id="quick-search">
+				<?php echo $search_form->get_form_item('mls_id', 'Search by MLS ID'); ?>
+				<?php echo $search_form->get_form_item('address', 'Search by Address'); ?>
+				<?php echo $search_form->get_form_item('agency_only', 'Agency Listings'); ?>
+				<?php echo $search_form->get_form_item('images', 'With Images'); ?>
+			</section>
+
+			<section class="form-group" id="search-filters">
+				<?php echo $filter_form->get_form_item('filters[]', 'Show Additional Filters', PLX_Form::CHECKBOX_GROUP, array(
+					'listing' => 'Listing Types', 'location' => 'Location', 'basic' => 'Basic Details', 'advanced' => 'Advanced')); ?>
+			</section>
+
+			<section class="form-group" id="advanced-filters" style="display: none;">
+				<?php echo $filter_form->get_form_item('advanced-filters[]', 'Show Advanced Filters', PLX_Form::CHECKBOX_GROUP,
+					array_keys($search_parameters['extended'])); ?>
+			</section>
+
+			<section class="form-group" id="basic-search">
+				<?php $search_form->render_basic_form($search_parameters['basic']); ?>
+			</section>
+
+			<section class="form-group" id="advanced-search">
+				<?php $search_form->render_advanced_form($search_parameters['extended']); ?>
 			</section>
 		</form>
-
-		<?php $form->render(); ?>
 
 		<div id="container">
 			<table id="placester_listings_list" class="widefat post fixed placester_properties" cellspacing="0">
@@ -76,21 +97,24 @@ class PL_Admin_Listings extends PL_Admin_Page {
 	public static function listings_table_ajax() {
 		$columns = array('images', 'address', 'postal', 'listing_type', 'property_type', 'status', 'beds', 'baths', 'price', 'sqft');
 
-		$args = array('address_mode' => 'exact');
+		// pagination
+		$args['limit'] = $_POST['iDisplayLength'];
+		$args['offset'] = $_POST['iDisplayStart'];
 		$args['sort_by'] = $columns[$_POST['iSortCol_0']];
 		$args['sort_type'] = $_POST['sSortDir_0'];
 
+		// listing filters
+		foreach($_POST as $key => $value)
+			if(PLX_Parameters::get($key))
+				$args[$key] = $value;
+
 		// text searching on address
-		$args['address'] = @$_POST['sSearch'];
-		$args['address_match'] = 'like';
+		if(isset($args['address']))
+			$args['address_match'] = 'like';
 
-		// Pagination
-		$args['limit'] = $_POST['iDisplayLength'];
-		$args['offset'] = $_POST['iDisplayStart'];
-
-		$listings = array();
 		$api_response = PLX_Search::listings($args);
 
+		$listings = array();
 		foreach ($api_response['listings'] as $key => $listing) {
 			$images = $listing['images'];
 			$listings[$key][] = ((is_array($images) && isset($images[0])) ? '<img width=50 height=50 src="' . $images[0]['url'] . '" />' : '');
@@ -154,41 +178,59 @@ class PL_Admin_Listings extends PL_Admin_Page {
 
 
 class PL_Admin_Listings_Form extends PLX_Parameter_Form {
-	public function render() {
-		$form_parameters = $this->get_form_parameters(); ?>
+	public function get_form_parameters() {
+		$form_parameters = array('basic' => array(), 'extended' => array());
 
-		<div id="listing-parameters" class="postbox">
+		$form_parameters['basic']['Listing'] = array(
+			'listing_type' =>     PLX_Parameters::get('listing_type'),
+			'property_type' =>    PLX_Parameters::get('property_type'),
+			'zoning_type' =>      PLX_Parameters::get('zoning_type'),
+			'purchase_type' =>    PLX_Parameters::get('purchase_type'),
+			'status' =>           PLX_Parameters::get('status'));
+
+		$form_parameters['basic']['Location'] = array(
+			'locality' =>         PLX_Parameters::get('locality'),
+			'region' =>           PLX_Parameters::get('region'),
+			'postal' =>           PLX_Parameters::get('postal'),
+			'neighborhood' =>     PLX_Parameters::get('neighborhood'));
+
+		$form_parameters['basic']['Basic'] = array(
+			'min_price' =>        PLX_Parameters::get('min_price'),
+			'max_price' =>        PLX_Parameters::get('max_price'),
+			'min_sqft' =>         PLX_Parameters::get('min_sqft'),
+			'min_beds' =>         PLX_Parameters::get('min_beds'),
+			'min_baths' =>        PLX_Parameters::get('min_baths'),
+			'min_half_baths' =>   PLX_Parameters::get('min_half_baths'));
+
+		$form_parameters['extended'] = PLX_Parameters::get_extended_parameters();
+
+		return $form_parameters;
+	}
+
+	public function render_basic_form($basic_parameters) {
+		?>
+
+		<div id="listing-parameters" class="postbox" style="display: none;">
 			<h3 class="hndle"><span><?php echo PLX_Parameters::get_group_title('Listing'); ?></span></h3>
 			<div class="inside">
-				<?php foreach($form_parameters['Listing'] as $parameter)
+				<?php foreach($basic_parameters['Listing'] as $parameter)
 					echo $this->get_form_item($parameter['name']); ?>
 			</div>
 		</div>
+		<?php unset($basic_parameters['Listing']); ?>
 
-		<div id="location-parameters" class="postbox">
+		<div id="location-parameters" class="postbox" style="display: none;">
 			<h3 class="hndle"><span><?php echo PLX_Parameters::get_group_title('Location'); ?></span></h3>
 			<div class="inside">
-				<?php foreach($form_parameters['Location'] as $parameter)
+				<?php foreach($basic_parameters['Location'] as $parameter)
 					echo $this->get_form_item($parameter['name']); ?>
-				</div>
 			</div>
 		</div>
+		<?php unset($basic_parameters['Location']); ?>
 
-		<div id="basic-parameters">
-			<?php foreach($form_parameters['basic'] as $group => $parameters) { ?>
+		<div id="basic-parameters" style="display: none;">
+			<?php foreach($basic_parameters as $group => $parameters) { ?>
 				<div id="<?php echo "basic-$group-parameters"; ?>" class="postbox">
-					<h3 class="hndle"><span><?php echo PLX_Parameters::get_group_title($group); ?></span></h3>
-					<div class="inside">
-						<?php foreach($parameters as $parameter)
-							echo $this->get_form_item($parameter['name']); ?>
-					</div>
-				</div>
-			<?php } ?>
-		</div>
-
-		<div id="extended-parameters">
-			<?php foreach($form_parameters['extended'] as $group => $parameters) { ?>
-				<div id="<?php echo "extended-$group-parameters"; ?>" class="postbox">
 					<h3 class="hndle"><span><?php echo PLX_Parameters::get_group_title($group); ?></span></h3>
 					<div class="inside">
 						<?php foreach($parameters as $parameter)
@@ -201,43 +243,21 @@ class PL_Admin_Listings_Form extends PLX_Parameter_Form {
 		<?php
 	}
 
-	protected function get_form_parameters() {
-		$form_parameters = array();
+	public function render_advanced_form($extended_parameters) {
+		?>
 
-		$form_parameters['Listing'] = array(
-			'listing_type' =>     PLX_Parameters::get('listing_type'),
-			'property_type' =>    PLX_Parameters::get('property_type'),
-			'zoning_type' =>      PLX_Parameters::get('zoning_type'),
-			'purchase_type' =>    PLX_Parameters::get('purchase_type'),
-			'status' =>           PLX_Parameters::get('status'));
+		<div id="extended-parameters" style="display: none;">
+			<?php foreach($extended_parameters as $group => $parameters) { ?>
+				<div id="<?php echo "extended-$group-parameters"; ?>" class="postbox" style="display: none;">
+					<h3 class="hndle"><span><?php echo PLX_Parameters::get_group_title($group); ?></span></h3>
+					<div class="inside">
+						<?php foreach($parameters as $parameter)
+							echo $this->get_form_item($parameter['name']); ?>
+					</div>
+				</div>
+			<?php } ?>
+		</div>
 
-		$form_parameters['Location'] = array(
-			'locality' =>         PLX_Parameters::get('locality'),
-			'region' =>           PLX_Parameters::get('region'),
-			'postal' =>           PLX_Parameters::get('postal'),
-			'neighborhood' =>     PLX_Parameters::get('neighborhood'));
-
-		$form_parameters['basic'] = array();
-		$form_parameters['basic']['Basic'] = array(
-			'min_price' =>        PLX_Parameters::get('min_price'),
-			'max_price' =>        PLX_Parameters::get('max_price'),
-			'min_sqft' =>         PLX_Parameters::get('min_sqft'),
-			'min_beds' =>         PLX_Parameters::get('min_beds'),
-			'min_baths' =>        PLX_Parameters::get('min_baths'),
-			'min_half_baths' =>   PLX_Parameters::get('min_half_baths'));
-
-		$form_parameters['extended'] = array();
-		$form_parameters['extended'] = PLX_Parameters::get_extended_parameters();
-
-		return $form_parameters;
-	}
-
-	protected function get_default_item_type($parameter) {
-		switch($parameter['type']) {
-			case PLX_Attributes::LONG_TEXT:
-				return PLX_Form::INPUT;
-		}
-
-		return parent::get_default_item_type($parameter);
+		<?php
 	}
 }

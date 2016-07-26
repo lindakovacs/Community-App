@@ -27,7 +27,7 @@ class PLX_Form {
 				$options = array_combine($options, $options);
 		}
 		else {
-			$option = 'true';
+			$option = $name;
 			$options = array();
 		}
 
@@ -220,7 +220,8 @@ class PLX_Data_Form extends PLX_Form {
 
 class PLX_Attribute_Form extends PLX_Data_Form {
 	public function get_form_item($name, $display = null, $type = null, $options = null, $default = null) {
-		$attribute = PLX_Attributes::get($name);
+		if(!($attribute = PLX_Attributes::get($name)))
+			return null;
 
 		if(is_null($display))
 			$display = $attribute['display'];
@@ -244,7 +245,8 @@ class PLX_Attribute_Form extends PLX_Data_Form {
 
 class PLX_Parameter_Form extends PLX_Data_Form {
 	public function get_form_item($name, $display = null, $type = null, $options = null, $default = null) {
-		$parameter = PLX_Parameters::get($name);
+		if(!($parameter = PLX_Parameters::get($name)))
+			return null;
 
 		if(is_null($display))
 			$display = $parameter['display'];
@@ -266,4 +268,13 @@ class PLX_Parameter_Form extends PLX_Data_Form {
 }
 
 
-class PLX_Search_Form extends PLX_Parameter_Form {}
+class PLX_Search_Form extends PLX_Parameter_Form {
+	protected function get_default_item_type($parameter) {
+		switch($parameter['type']) {
+			case PLX_Attributes::LONG_TEXT:
+				return PLX_Form::INPUT;
+		}
+
+		return parent::get_default_item_type($parameter);
+	}
+}

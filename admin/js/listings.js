@@ -1,105 +1,118 @@
-/**
- *  Applies Chosen to forms.
- */
-// $( document ).ready( function() {
-//     $("select").chosen({allow_single_deselect: true});
-// });
-
 
 // For datatable
 jQuery(document).ready(function($) {
-
-    // Filter Filters
-    get_custom_filter_choices();
-
-    $('#pls_admin_my_listings_filters input').live('change', function (event) {
+    $('section#quick-search .pl-form-value').live('change', function (event) {
         event.preventDefault();
+        listings_datatable.fnDraw();
+    });
+
+    $('section#basic-search .pl-form-value').live('change', function (event) {
+        event.preventDefault();
+        listings_datatable.fnDraw();
+    });
+
+    $('section#advanced-search .pl-form-value').live('change', function (event) {
+        event.preventDefault();
+        listings_datatable.fnDraw();
+    });
+
+    $('section#search-filters .pl-form-value:not([value="advanced"])').live('change', function (event) {
+        event.preventDefault();
+        var before = listings_search_params([]);
+
+        if ($(this).is(":checked"))
+            $('section#basic-search div#' + $(this).attr('value') + '-parameters').slideDown(500);
+        else
+            $('section#basic-search > div#' + $(this).attr('value') + '-parameters').slideUp(500);
+
+        possibly_trigger_search(before, 600);
+    });
+
+    $('section#search-filters .pl-form-value[value="advanced"]').live('change', function (event) {
+        event.preventDefault();
+        var before = listings_search_params([]);
+
         if ($(this).is(":checked")) {
-            if ($(this).attr('name') == 'custom')
-                $('#pls_admin_my_listings > section').not('#listing_types, #location, #basic, #advanced').slideDown();
-            else
-                $('#pls_admin_my_listings > section#' + $(this).attr('name')).slideDown();
+            $('section#advanced-filters').slideDown(500);
+            $('section#advanced-search div#extended-parameters').slideDown(500);
         } else {
-            if ($(this).attr('name') == 'custom')
-                $('#pls_admin_my_listings > section').not('#listing_types, #location, #basic, #advanced').hide();
-            else
-                $('#pls_admin_my_listings > section#' + $(this).attr('name')).hide();
+            $('section#advanced-filters').slideUp(500);
+            $('section#advanced-search div#extended-parameters').slideUp(500);
         }
-        var params = {action : 'filter_options'};
-        params['filter'] = $(this).attr('id');
-        params['value'] = $(this).is(":checked");
-        setTimeout(function() {set_custom_filter_choices(params);}, 100);
-    });
-    
-    function get_custom_filter_choices(params) {
-        var params = {action : 'filter_options', get : true};
-        $.post(ajaxurl, params, function(data) {
-            if (data) {
-                $.each(data, function (index, value) {
-                    $('input#' + index).prop("checked", value === 'true');
-                    if (value === 'true') {
-                        if (index == 'custom')
-                            $('#pls_admin_my_listings > section').not('#listing_types, #location, #basic, #advanced').slideDown();
-                        else
-                            $('#pls_admin_my_listings > section#' + index).slideDown();
-                    } else {
-                        if (index == 'custom')
-                            $('#pls_admin_my_listings > section').not('#listing_types, #location, #basic, #advanced').hide();
-                        else
-                            $('#pls_admin_my_listings > section#' + index).hide();
-                    }
-                });
-            } else {
-                $('#pls_admin_my_listings .form_group').hide();
-            };
-        }, "json");
-    }
 
-    function set_custom_filter_choices(params) {
-        $.post(ajaxurl, params, function(data) {}, "json");
-    }
-
-    //datepicker
-    $("input#metadata-max_avail_on_picker, #metadata-min_avail_on_picker").datepicker({
-            showOtherMonths: true,
-            numberOfMonths: 2,
-            selectOtherMonths: true
+        possibly_trigger_search(before, 600);
     });
 
-    var my_listings_datatable = $('#placester_listings_list').dataTable( {
-            "bFilter": false,
-            "bProcessing": true,
-            "bServerSide": true,
-            "sServerMethod": "POST",
-            'sPaginationType': 'full_numbers',
-            'sDom': '<"dataTables_top"pi>lftpir',
-            "sAjaxSource": ajaxurl, //wordpress url thing
-            "aoColumns" : [
-                { sWidth: '100px' },    //images
-                { sWidth: '300px' },    //address
-                { sWidth: '70px' },     //zip
-                { sWidth: '100px' },     //type
-                { sWidth: '100px' },     //property
-                { sWidth: '60px' },     //beds
-                { sWidth: '60px' },     //baths
-                { sWidth: '70px' },     //price
-                { sWidth: '100px' },    //sqft
-                { sWidth: '100px' }     //available
-            ],
-            "aaSorting": [[0, "desc"]],
-            "fnServerParams": function ( aoData ) {
-                aoData.push( { "name": "action", "value" : "listings_table"} );
-                aoData.push( { "name": "sSearch", "value" : $('input#address_search').val() })
-                aoData = my_listings_search_params(aoData);
+    $('section#advanced-filters .pl-form-value').live('change', function (event) {
+        event.preventDefault();
+        var before = listings_search_params([]);
+
+        if ($(this).is(":checked"))
+            $('section#advanced-search div#extended-' + $(this).attr('value') + '-parameters').slideDown(500);
+        else
+            $('section#advanced-search div#extended-' + $(this).attr('value') + '-parameters').slideUp(500);
+
+        possibly_trigger_search(before, 600);
+    });
+
+    // parses search form and adds parameters to aoData
+    function listings_search_params (aoData) {
+        $.each($('form#pl-admin-listings-form .pl-form-value').filter(':visible').add('section#advanced-filters .pl-form-value').serializeArray(), function(i, field) {
+            if(field.value && field.value != 'false') {
+                if(field.value == 'true') field.value = 1;
+                aoData.push({"name" : field.name, "value" : field.value});
             }
         });
 
-    var address_timer;
-    $('input#address_search').live('keyup', function () {
-        clearTimeout(address_timer);
-        address_timer = setTimeout(function () {my_listings_datatable.fnDraw();}, 700);
+        return aoData;
+    }
 
+    // redraw if parameters with values are shown or hidden
+    var slide_timer;
+    function possibly_trigger_search (before, delay) {
+        clearTimeout(slide_timer);
+        slide_timer = setTimeout(function () {
+            var after = listings_search_params([]);
+            if(before.length != after.length)
+                listings_datatable.fnDraw();
+        }, delay);
+    }
+
+    var listings_datatable = $('#placester_listings_list').dataTable({
+        "bFilter": false,
+        "bProcessing": true,
+        "bServerSide": true,
+        "sServerMethod": "POST",
+        'sPaginationType': 'full_numbers',
+        'sDom': '<"dataTables_top"pi>lftpir',
+        "sAjaxSource": ajaxurl, //wordpress url thing
+        "aoColumns" : [
+            { sWidth: '100px' },    //images
+            { sWidth: '300px' },    //address
+            { sWidth: '70px' },     //zip
+            { sWidth: '120px' },    //listing type
+            { sWidth: '120px' },    //property type
+            { sWidth: '80px' },     //status
+            { sWidth: '60px' },     //beds
+            { sWidth: '60px' },     //beds
+            { sWidth: '60px' },     //price
+            { sWidth: '60px' }      //sqft
+        ],
+        "aaSorting": [[0, "desc"]],
+        "fnServerParams": function ( aoData ) {
+            aoData.push( { "name": "action", "value" : "listings_table"} );
+            aoData = listings_search_params(aoData);
+        }
     });
+
+
+    //datepicker
+    $("input#metadata-max_avail_on_picker, #metadata-min_avail_on_picker").datepicker({
+        showOtherMonths: true,
+        numberOfMonths: 2,
+        selectOtherMonths: true
+    });
+
 
     // hide/show action links in rows
     $('tr.odd, tr.even').live('mouseover', function(event) {
@@ -134,13 +147,14 @@ jQuery(document).ready(function($) {
                                 }, 750);
                             } else {
                                 $('#delete_response_message').html(data.message).removeClass('green').addClass('red');
-                            };
-                        };
+                            }
+                        }
                     }, 'json');
                 }
             }
         }
     });
+
     $('#pls_delete_listing').live('click', function(event) {
         event.preventDefault();
         var property_id = $(this).attr('data-ref');
@@ -148,44 +162,7 @@ jQuery(document).ready(function($) {
         $('span#delete_listing_address').html(address);
         $('span#delete_listing_address').attr('data-ref', property_id);
         delete_listing_confirm.dialog("open");
-
     });
-
-    // prevents default on search button
-    $('#pls_admin_my_listings').live('change', function(event) {
-        event.preventDefault();
-        my_listings_datatable.fnDraw();
-    });
-	// parses search form and adds parameters to aoData
-	function my_listings_search_params (aoData) {
-		var formAdditions = new Array();
-		$.each($('#pls_admin_my_listings:visible').serializeArray(), function(i, field) {
-
-			// only push the criteria we need for the call
-			if(field.value && field.value != 'false') {
-				if(field.value == 'true') field.value = 1;
-
-				if( field.name == 'zoning_types' || field.name == 'listing_types' || field.name == 'purchase_types' ) {
-					// API expects these to be arrays
-					aoData.push({"name" : field.name + "[]", "value" : field.value});
-				} else {
-					aoData.push({"name" : field.name, "value" : field.value});
-				}
-
-				// if this is an array then tell the api to look for multiple values
-				if( field.name.slice(-2) == '[]' ) {
-					if ( $.inArray(field.name, formAdditions) == -1) {
-						formAdditions.push(field.name);
-						var matchname = field.name.slice(0, -2);
-						matchname = matchname.slice(-1) == ']' ? matchname.slice(0,-1)+'_match]' : matchname+'_match';
-						aoData.push({name: matchname, value: 'in'});
-					}
-				}
-			}
-		});
-
-		return aoData;
-	}
 });
 
 
