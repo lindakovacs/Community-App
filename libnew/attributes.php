@@ -54,16 +54,16 @@ class PLX_Attributes extends PLX_Data_Internal {
 		return self::this()->_get_group_attributes($groups, $flatten);
 	}
 
-	public static function get_attribute_values($name, $static = true, $dynamic = true, $none = null) {
-		return self::this()->_get_attribute_values($name, $static, $dynamic, $none);
+	public static function get_attribute_values($name, $static = true, $dynamic = true) {
+		return self::this()->_get_attribute_values($name, $static, $dynamic);
 	}
 
-	public static function get_static_values($name, $none = null) {
-		return self::this()->_get_static_values($name, $none);
+	public static function get_static_values($name) {
+		return self::this()->_get_static_values($name);
 	}
 
-	public static function get_dynamic_values($name, $none = null) {
-		return self::this()->_get_dynamic_values($name, $none);
+	public static function get_dynamic_values($name) {
+		return self::this()->_get_dynamic_values($name);
 	}
 
 
@@ -156,24 +156,25 @@ class PLX_Attributes extends PLX_Data_Internal {
 		return $results;
 	}
 
-	protected function _get_attribute_values($name, $static = true, $dynamic = true, $none = null) {
-		if($static) $static = $this->_get_static_values($name, $none);
+	protected function _get_attribute_values($name, $static = true, $dynamic = true) {
+		if($static) $static = $this->_get_static_values($name);
 		else $static = null;
 
-		if($dynamic) $dynamic = $this->_get_dynamic_values($name, $none);
+		if($dynamic) $dynamic = $this->_get_dynamic_values($name);
 		else $dynamic = null;
 
 		if($static === null && $dynamic === null)
 			return null;
 
-		return array_merge((array) $static, (array) $dynamic);
+		// looks redundant, but this gives the ordering we want
+		return array_merge((array) $static, (array) $dynamic, (array) $static);
 	}
 
-	protected function _get_static_values($name, $none = null) {
+	protected function _get_static_values($name) {
 		if(!isset($this->attributes))
 			$this->attributes = $this->_define_attributes();
 
-		if(!isset($this->attributes[$name]) || $this->attributes[$name]['type'] != self::TEXT_VALUE)
+		if(!isset($this->attributes[$name]))
 			return null;
 
 		if(isset($this->attributes[$name]['values']))
@@ -182,8 +183,21 @@ class PLX_Attributes extends PLX_Data_Internal {
 		return array();
 	}
 
-	protected function _get_dynamic_values($name, $none = null) {
-		return null;
+	protected function _get_dynamic_values($name) {
+		if(!isset($this->attributes))
+			$this->attributes = $this->_define_attributes();
+
+		if(!isset($this->attributes[$name]) || $this->attributes[$name]['type'] != self::TEXT_VALUE)
+			return null;
+
+		$values = (array) PLX_Search::aggregates(array('keys' => array($name)));
+		$values = (array) $values[$name];
+
+		if($values) $values = array_combine($values, $values);
+		$values = array_merge($values, $blatz = array_intersect_key(PLX_Attributes::get_static_values($name), $values));
+
+		ksort($values, SORT_NATURAL + SORT_FLAG_CASE);
+		return $values;
 	}
 
 
@@ -315,16 +329,8 @@ class PLX_Parameters extends PLX_Data_Internal {
 		return self::this()->_get_group_parameters($groups, $flatten);
 	}
 
-	public static function get_parameter_values($name, $static = true, $dynamic = true, $none = null) {
-		return self::this()->_get_parameter_values($name, $static, $dynamic, $none);
-	}
-
-	public static function get_static_values($name, $none = null) {
-		return self::this()->_get_static_values($name, $none);
-	}
-
-	public static function get_dynamic_values($name, $none = null) {
-		return self::this()->_get_dynamic_values($name, $none);
+	public static function get_parameter_values($name, $none = null) {
+		return self::this()->_get_parameter_values($name, $none);
 	}
 
 	protected $parameters;
@@ -394,34 +400,29 @@ class PLX_Parameters extends PLX_Data_Internal {
 		return $results;
 	}
 
-	protected function _get_parameter_values($name, $static = true, $dynamic = true, $none = null) {
-		if($static) $static = $this->_get_static_values($name, $none);
-			else $static = null;
-
-		if($dynamic) $dynamic = $this->_get_dynamic_values($name, $none);
-			else $dynamic = null;
-
-		if($static === null && $dynamic === null)
-			return null;
-
-		return array_merge((array) $static, (array) $dynamic);
-	}
-
-	protected function _get_static_values($name, $none = null) {
+	protected function _get_parameter_values($name, $none = null) {
 		if(!isset($this->parameters))
 			$this->parameters = $this->_define_parameters();
 
-		if(!isset($this->parameters[$name]) || $this->parameters[$name]['type'] != PLX_Attributes::TEXT_VALUE)
-			return null;
+		if(isset($this->parameters[$name]['attribute'])) {
+			if($this->parameters[$name]['type'] == PLX_Attributes::TEXT_VALUE)
+				$values = PLX_Attributes::get_dynamic_values($this->parameters[$name]['attribute']);
 
-		if(isset($this->parameters[$name]['values']))
-			return $this->parameters[$name]['values'];
+			else
+				$values = PLX_Attributes::get_static_values($this->parameters[$name]['attribute']);
+		}
 
-		return array();
-	}
+		else if(isset($this->parameters[$name]['values']))
+			$values = $this->parameters[$name]['values'];
 
-	protected function _get_dynamic_values($name, $none = null) {
-		return null;
+		else
+			$values = null;
+
+		if($none !== null) { // looks redundant, but insures correct ordering and display value when empty string in the data
+			$values = array_merge(array('' => $none), (array) $values, array('' => $none));
+		}
+
+		return $values;
 	}
 
 	protected function _define_parameters() {

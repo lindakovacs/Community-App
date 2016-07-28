@@ -629,7 +629,7 @@ class PLX_Legacy_Search extends PLX_Search {
 	}
 
 	protected function _aggregates ($args = array()) {
-		$request = PLX_Legacy_Interface::map_search_request($args);
+		$request = PLX_Legacy_Interface::map_aggregate_request($args);
 		$request = array_merge(array("api_key" => self::api_key()), $request);
 
 		global $PL_API_SERVER;

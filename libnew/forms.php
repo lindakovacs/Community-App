@@ -16,7 +16,7 @@ class PLX_Form {
 	const HIDDEN = 31;
 	const READONLY = 35;
 
-	public function get_form_item($name, $display, $type, $options, $value = null) {
+	public function get_form_item($name, $display, $type, $options = null, $value = null) {
 		if(is_scalar($options)) { // $options is required to be scalar for a radio or checkbox -- it is used as the HTML "value" attribute
 			$option = $options;
 			$options = array($option => $option);
@@ -171,14 +171,13 @@ class PLX_Data_Form extends PLX_Form {
 
 	public function __construct($data = null) {
 		$this->set_form_data($data ?: $_POST);
-
 	}
 
 	public function set_form_data($data) {
 		$this->form_data = $data;
 	}
 
-	public function get_form_item($name, $display, $type, $options, $default = null) {
+	public function get_form_item($name, $display, $type, $options = null, $default = null) {
 		return parent::get_form_item($name, $display, $type, $options, $this->get_item_value($name, $default));
 	}
 
@@ -187,7 +186,7 @@ class PLX_Data_Form extends PLX_Form {
 	}
 
 	// for use by derived classes
-	static protected function get_item_type($data_type) {
+	protected function get_item_type($data_type) {
 		switch($data_type) {
 			case PLX_Attributes::BOOLEAN:
 				return PLX_Form::CHECKBOX;
@@ -215,6 +214,31 @@ class PLX_Data_Form extends PLX_Form {
 
 		return null;
 	}
+
+	// for use by derived classes -- should we generate default options?
+	protected function get_item_options($item_type, &$options) {
+		switch($item_type) {
+			case self::INPUT:
+				if($options === false)
+					$options = null;
+				break;
+
+			case self::SELECT:
+			case self::MULTISELECT:
+			case self::RADIO_GROUP:
+			case self::CHECKBOX_GROUP:
+				if($options === null)
+					$options = true;
+				else if($options === false)
+					$options = null;
+				break;
+
+			default:
+				return false;
+		}
+
+		return $options === true;
+	}
 }
 
 
@@ -227,7 +251,7 @@ class PLX_Attribute_Form extends PLX_Data_Form {
 			$display = $attribute['display'];
 		if(is_null($type))
 			$type = $this->get_default_item_type($attribute);
-		if(is_null($options))
+		if($this->get_item_options($type, $options))
 			$options = $this->get_default_item_options($attribute);
 
 		return parent::get_form_item($name, $display, $type, $options, $default);
@@ -252,7 +276,7 @@ class PLX_Parameter_Form extends PLX_Data_Form {
 			$display = $parameter['display'];
 		if(is_null($type))
 			$type = $this->get_default_item_type($parameter);
-		if(is_null($options))
+		if($this->get_item_options($type, $options))
 			$options = $this->get_default_item_options($parameter);
 
 		return parent::get_form_item($name, $display, $type, $options, $default);
@@ -263,7 +287,7 @@ class PLX_Parameter_Form extends PLX_Data_Form {
 	}
 
 	protected function get_default_item_options($parameter) {
-		return PLX_Attributes::get_attribute_values($parameter['attribute']);
+		return PLX_Parameters::get_parameter_values($parameter['name'], isset($parameter['attribute']) ? 'Any' : null);
 	}
 }
 
