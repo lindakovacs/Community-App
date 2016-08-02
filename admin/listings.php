@@ -107,6 +107,8 @@ class PL_Admin_Listings extends PL_Admin_Page {
 		$api_response = PLX_Search::listings($args);
 
 		$listings = array();
+		$listing_types = PLX_Attributes::get_attribute_values('listing_type', true, false);
+
 		foreach ($api_response['listings'] as $key => $listing) {
 			$images = $listing['images'];
 			$listings[$key][] = ((is_array($images) && isset($images[0])) ? '<img width=50 height=50 src="' . $images[0]['url'] . '" />' : '');
@@ -131,7 +133,7 @@ class PL_Admin_Listings extends PL_Admin_Page {
 			$listings[$key][] = $address_link . '<div class="row_actions">' . $action_links . '</div>';
 			$listings[$key][] = $listing["postal"];
 
-			$listings[$key][] = $listing["listing_type"];
+			$listings[$key][] = $listing_types[$listing["listing_type"]];
 
 			$listings[$key][] = $listing["property_type"];
 			$listings[$key][] = $listing["status"] ? $listing["status"] : '';
