@@ -111,7 +111,7 @@ function placester_register_library_scripts()
 	wp_register_style('jquery-ui', PLACESTER_PLUGIN_URL . 'lib/jquery-ui/css/smoothness/jquery-ui-1.8.17.custom.css');
 
 	wp_register_script('jquery-datatables', PLACESTER_PLUGIN_URL . 'lib/datatables/jquery.dataTables.js', array('jquery'), NULL, true);
-	wp_register_style('jquery-datatables', PLACESTER_PLUGIN_URL . 'lib/datatables/jquery.dataTables.js', array('jquery-ui'), NULL, true);
+	wp_register_style('jquery-datatables', PLACESTER_PLUGIN_URL . 'lib/datatables/jquery.dataTables.css', array('jquery-ui'), NULL, true);
 
 	// stupid hack for tampa and other old themes, remove after new version comes out
 	if (class_exists('Placester_Blueprint')) {
@@ -133,7 +133,7 @@ function placester_register_admin_scripts()
 	wp_register_style('jquery-ui', PLACESTER_PLUGIN_URL . 'lib/jquery-ui/css/smoothness/jquery-ui-1.8.17.custom.css');
 
 	wp_register_script('jquery-datatables', PLACESTER_PLUGIN_URL . 'lib/datatables/jquery.dataTables.js', array('jquery'), NULL, true);
-	wp_register_style('jquery-datatables', PLACESTER_PLUGIN_URL . 'lib/datatables/jquery.dataTables.js', array('jquery-ui'), NULL, true);
+	wp_register_style('jquery-datatables', PLACESTER_PLUGIN_URL . 'lib/datatables/jquery.dataTables.css', array('jquery-ui'), NULL, true);
 }
 
 
