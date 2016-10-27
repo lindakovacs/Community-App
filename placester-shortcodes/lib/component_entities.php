@@ -642,7 +642,7 @@ To add some text to your listings:<br />
 				$val = ob_get_clean();
 				break;
 			case 'favorite_link_toggle':
-				$val = PL_Favorite_Listings::placester_favorite_link_toggle(array_merge($atts, array('property_id' => $listing_list['id'])));
+				$val = PL_Favorite_Listings::placester_favorite_link_toggle(array_merge((array) $atts, array('property_id' => $listing_list['id'])));
 				break;
 			case 'custom':
 				// TODO: format based on data type
